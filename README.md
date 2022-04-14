@@ -9,6 +9,7 @@
 + Thai Hoang Tam (17387)
 + Dinh Minh Hoang (17124)
 + Huynh Cam Tu (16610)
++ Truong Quang Huy (18602)
 
 ## Project:
 Proposed!
