@@ -1,4 +1,4 @@
-package com.example.etoet
+package com.deltadeer.etoet
 
 import io.flutter.embedding.android.FlutterActivity
 
