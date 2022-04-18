@@ -12,7 +12,7 @@
 + Truong Quang Huy (18602)
 
 ## Project:
-Proposed!
+[Project description](Project_Proposal.pdf)
 
 
 ## Getting started
