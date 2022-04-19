@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "344264346912",
+    "project_id": "etoet-pe2022",
+    "storage_bucket": "etoet-pe2022.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:344264346912:android:04211c74b10c46618f9b45",
+        "android_client_info": {
+          "package_name": "com.deltadeer.etoet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "344264346912-1qh85k7a5tpslbfk37p0ojs3hfik6t10.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC38jxvHWLKSPWP6iXKtmjLcrnHuWqjvmA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "344264346912-1qh85k7a5tpslbfk37p0ojs3hfik6t10.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
