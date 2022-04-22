@@ -1,15 +1,31 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class VerifiedEmailView extends StatefulWidget {
-  const VerifiedEmailView({Key? key}) : super(key: key);
+class VerifyEmailView extends StatefulWidget {
+  const VerifyEmailView({Key? key}) : super(key: key);
 
   @override
-  _VerifiedEmailViewState createState() => _VerifiedEmailViewState();
+  _VerifyEmailViewState createState() => _VerifyEmailViewState();
 }
 
-class _VerifiedEmailViewState extends State<VerifiedEmailView> {
+class _VerifyEmailViewState extends State<VerifyEmailView> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold();
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Verifiy Email'),
+      ),
+      body: Column(
+        children: [
+          const Text('Please verify your email address: '),
+          TextButton(
+              onPressed: () async {
+                final user = FirebaseAuth.instance.currentUser;
+                await user?.sendEmailVerification();
+              },
+              child: const Text('Send email verification')),
+        ],
+      ),
+    );
   }
 }
