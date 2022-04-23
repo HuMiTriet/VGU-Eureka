@@ -1,6 +1,6 @@
 import 'package:etoet/views/auth/login_view.dart';
 import 'package:etoet/views/auth/register_view.dart';
-import 'package:etoet/views/home_page_view.dart';
+import 'package:etoet/views/sign_post.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -11,7 +11,7 @@ void main() {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const HomePageView(),
+      home: const SignPost(),
 
       //define the routes so that the app can navigate to the different views.
       routes: {
