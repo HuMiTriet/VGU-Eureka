@@ -1,5 +1,6 @@
 import 'package:etoet/views/auth/login_view.dart';
 import 'package:etoet/views/auth/register_view.dart';
+import 'package:etoet/views/main_view.dart';
 import 'package:etoet/views/sign_post.dart';
 import 'package:flutter/material.dart';
 
@@ -17,6 +18,7 @@ void main() {
       routes: {
         '/login/': (context) => const LoginView(),
         '/register/': (context) => const RegisterView(),
+        '/main/': (context) => const MainView(),
       },
     ),
   );
