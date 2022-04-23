@@ -1,3 +1,4 @@
+import 'dart:developer' as devtools show log;
 import 'package:etoet/firebase_options.dart';
 import 'package:etoet/views/auth/login_view.dart';
 import 'package:etoet/views/auth/verified_email_view.dart';
@@ -21,6 +22,8 @@ class SignPost extends StatelessWidget {
         switch (snapshot.connectionState) {
           case ConnectionState.done:
             final user = FirebaseAuth.instance.currentUser;
+
+            devtools.log(user.toString());
 
             if (user != null) {
               if (user.emailVerified) {
