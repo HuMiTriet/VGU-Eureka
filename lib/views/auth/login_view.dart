@@ -1,4 +1,7 @@
-import 'package:etoet/firebase_options.dart';
+import 'dart:developer' as devtools show log;
+
+import 'package:etoet/constants/routes.dart';
+import 'package:etoet/views/auth/error_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -47,12 +50,49 @@ class _LoginViewState extends State<LoginView> {
               final email = _email.text;
               final password = _password.text;
               try {
-                final userCredential = await FirebaseAuth.instance
-                    .signInWithEmailAndPassword(
-                        email: email, password: password);
-                print(userCredential);
+                await FirebaseAuth.instance.signInWithEmailAndPassword(
+                  email: email,
+                  password: password,
+                );
+
+                final user = FirebaseAuth.instance.currentUser;
+                if (user?.emailVerified ?? false) {
+                  // user is verified
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    mainRoute,
+                    (route) => false,
+                  );
+                } else {
+                  // user is NOT verified
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    verifyEmailRoute,
+                    (route) => false,
+                  );
+                }
               } on FirebaseAuthException catch (e) {
-                print(e);
+                devtools.log(e.toString());
+                switch (e.code) {
+                  case 'wrong-password':
+                    await showErrorDialog(context, 'Incorrect password');
+                    break;
+                  case 'user-not-found':
+                    await showErrorDialog(context, 'User not found');
+                    break;
+                  case 'user-disabled':
+                    await showErrorDialog(
+                        context, 'This user account has been suspended');
+                    break;
+                  case 'too-many-requests':
+                    await showErrorDialog(context, 'Too many requests');
+                    break;
+
+                  default:
+                    await showErrorDialog(context, 'Error: ${e.code}');
+                    break;
+                }
+              } catch (e) {
+                devtools.log(e.toString());
+                await showErrorDialog(context, 'Error: ${e.toString()}');
               }
             },
             child: const Text('Login'),
@@ -61,7 +101,7 @@ class _LoginViewState extends State<LoginView> {
           TextButton(
               onPressed: () {
                 Navigator.of(context).pushNamedAndRemoveUntil(
-                  '/register/',
+                  registerRoute,
                   (route) => false,
                 );
               },
