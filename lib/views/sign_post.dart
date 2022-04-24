@@ -1,4 +1,5 @@
 import 'dart:developer' as devtools show log;
+
 import 'package:etoet/firebase_options.dart';
 import 'package:etoet/views/auth/login_view.dart';
 import 'package:etoet/views/auth/verified_email_view.dart';
@@ -27,11 +28,14 @@ class SignPost extends StatelessWidget {
 
             if (user != null) {
               if (user.emailVerified) {
+                /// user is logged in and email is verified
                 return const MainView();
               } else {
+                /// user is logged in but email is not verified
                 return const VerifyEmailView();
               }
             } else {
+              /// user is not logged in
               return const LoginView();
             }
 
