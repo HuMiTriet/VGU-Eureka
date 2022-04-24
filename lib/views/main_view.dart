@@ -1,7 +1,8 @@
+import 'package:etoet/constants/routes.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-enum MenuAction { logout }
+enum MenuAction { signOut }
 
 class MainView extends StatefulWidget {
   @override
@@ -21,12 +22,14 @@ class _MainViewState extends State<MainView> {
           PopupMenuButton<MenuAction>(
             onSelected: (value) async {
               switch (value) {
-                case MenuAction.logout:
+                case MenuAction.signOut:
                   final shouldLogout = await showLogOutDialog(context);
                   if (shouldLogout) {
                     await FirebaseAuth.instance.signOut();
-                    Navigator.of(context)
-                        .pushNamedAndRemoveUntil('/login/', (_) => false);
+                    Navigator.of(context).pushNamedAndRemoveUntil(
+                      loginRoute,
+                      (_) => false,
+                    );
                   }
                   break;
               }
@@ -34,8 +37,8 @@ class _MainViewState extends State<MainView> {
             itemBuilder: (context) {
               return const [
                 PopupMenuItem<MenuAction>(
-                  value: MenuAction.logout,
-                  child: Text('Log out'),
+                  value: MenuAction.signOut,
+                  child: Text('Sign out'),
                 )
               ];
             },
@@ -52,14 +55,15 @@ Future<bool> showLogOutDialog(BuildContext context) {
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: const Text('Logout'),
-        content: const Text('Are you sure you want to log out ?'),
+        title: const Text('Sign out'),
+        content: const Text('Are you sure you want to sign out ?'),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(context).pop(true);
+              FirebaseAuth.instance.signOut();
             },
-            child: const Text('Log out'),
+            child: const Text('Sign out'),
           ),
           TextButton(
             onPressed: () {
