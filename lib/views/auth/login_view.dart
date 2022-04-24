@@ -3,7 +3,6 @@ import 'dart:developer' as devtools show log;
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/views/auth/error_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 class LoginView extends StatefulWidget {
@@ -23,7 +22,7 @@ class _LoginViewState extends State<LoginView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login'),
+        title: const Text('Login'),
       ),
       body: Column(
         children: [

@@ -14,7 +14,7 @@ void main() {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const HomePageView(),
+      home: const SignPost(),
 
       //define the routes so that the app can navigate to the different views.
       routes: {
