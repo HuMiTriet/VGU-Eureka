@@ -1,6 +1,7 @@
 import 'package:etoet/constants/routes.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 enum MenuAction { signOut }
 
@@ -45,7 +46,56 @@ class _MainViewState extends State<MainView> {
           )
         ],
       ),
-      body: const Text('Send SOS signal'),
+      body: GoogleMap(
+        initialCameraPosition: const CameraPosition(
+          target: LatLng(11.0551, 106.6657),
+          zoom: 15,
+        ),
+        mapType: MapType.normal,
+        onMapCreated: (GoogleMapController controller) {},
+        markers: <Marker>{
+          const Marker(
+            markerId: MarkerId('myMarker'),
+            position: LatLng(11.0551, 106.6657),
+            infoWindow: InfoWindow(
+              title: 'Vietnamese German University',
+              snippet: 'My Location',
+            ),
+            visible: true,
+            icon: BitmapDescriptor.defaultMarker,
+          ),
+          const Marker(
+            markerId: MarkerId('myMarker2'),
+            position: LatLng(10.07, 106.01),
+            infoWindow: InfoWindow(
+              title: 'My Location',
+              snippet: 'My Location',
+            ),
+            visible: true,
+            icon: BitmapDescriptor.defaultMarker,
+          ),
+        },
+        // polylines:
+      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     getRoad().then((road) {
+      //       print(road.polylineEncoded);
+      //       String encoded = road.polylineEncoded!;
+      //       // decodeEncodedPolyline(encoded).forEach((latLng) {
+      //       //   print(latLng);
+      //       // });
+      //       print(road.distance);
+      //       print(road.duration);
+      //       print(road.details);
+      //       print(road.canDrawRoad);
+      //       // road.polyline?.forEach((polyline) {
+      //       //   print(polyline);
+      //       // });
+      //     });
+      //   },
+      //   child: Icon(Icons.directions),
+      // ),
     );
   }
 }
