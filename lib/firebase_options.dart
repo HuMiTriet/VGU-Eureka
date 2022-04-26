@@ -25,10 +25,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       default:
         throw UnsupportedError(
           'DefaultFirebaseOptions are not supported for this platform.',
@@ -43,6 +40,7 @@ class DefaultFirebaseOptions {
     projectId: 'etoet-pe2022',
     authDomain: 'etoet-pe2022.firebaseapp.com',
     storageBucket: 'etoet-pe2022.appspot.com',
+    measurementId: 'G-7CGSRBRTVB',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
@@ -54,6 +52,16 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyBzm0LqFvcDLqsUTa1YOZwM2BkotoOO1kQ',
+    appId: '1:344264346912:ios:12583481ea92e4508f9b45',
+    messagingSenderId: '344264346912',
+    projectId: 'etoet-pe2022',
+    storageBucket: 'etoet-pe2022.appspot.com',
+    iosClientId: '344264346912-6sfjhcgr9842sd14a8ov1nu8rs88f4li.apps.googleusercontent.com',
+    iosBundleId: 'com.deltadeer.etoet',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyBzm0LqFvcDLqsUTa1YOZwM2BkotoOO1kQ',
     appId: '1:344264346912:ios:12583481ea92e4508f9b45',
     messagingSenderId: '344264346912',
