@@ -47,65 +47,72 @@ class _MainViewState extends State<MainView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Main UI here'),
-        actions: [
-          PopupMenuButton<MenuAction>(
-            onSelected: (value) async {
-              switch (value) {
-                case MenuAction.signOut:
-                  final shouldLogout = await showLogOutDialog(context);
-                  if (shouldLogout) {
-                    await FirebaseAuth.instance.signOut();
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      loginRoute,
-                      (_) => false,
-                    );
-                  }
-                  break;
-              }
-            },
-            itemBuilder: (context) {
-              return const [
-                PopupMenuItem<MenuAction>(
-                  value: MenuAction.signOut,
-                  child: Text('Sign out'),
-                )
-              ];
-            },
-          )
-        ],
-      ),
+      // appBar: AppBar(
+      //   title: const Text('Main UI here'),
+      //   actions: [
+      //     PopupMenuButton<MenuAction>(
+      //       onSelected: (value) async {
+      //         switch (value) {
+      //           case MenuAction.signOut:
+      //             final shouldLogout = await showLogOutDialog(context);
+      //             if (shouldLogout) {
+      //               await FirebaseAuth.instance.signOut();
+      //               Navigator.of(context).pushNamedAndRemoveUntil(
+      //                 loginRoute,
+      //                 (_) => false,
+      //               );
+      //             }
+      //             break;
+      //         }
+      //       },
+      //       itemBuilder: (context) {
+      //         return const [
+      //           PopupMenuItem<MenuAction>(
+      //             value: MenuAction.signOut,
+      //             child: Text('Sign out'),
+      //           )
+      //         ];
+      //       },
+      //     )
+      //   ],
+      // ),
       body: Stack(
         children: <Widget>[
           map,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: <Widget>[
-              ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.orange,
-                    shape: const CircleBorder(),
-                    fixedSize: const Size(40, 40),
-                  ),
-                  child: Icon(
-                    Icons.account_box_rounded,
-                    size: 24.0,
-                  )),
-              ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.orange,
-                    shape: const CircleBorder(),
-                    fixedSize: const Size(40, 40),
-                  ),
-                  child: Icon(
-                    Icons.settings,
-                    size: 24.0,
-                  )),
-            ],
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0.0, 30.0, 10.0, 0.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.orange,
+                      shape: const CircleBorder(),
+                      fixedSize: const Size(50, 50),
+                    ),
+                    child: Icon(
+                      Icons.account_box_rounded,
+                      size: 24.0,
+                    )),
+                ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(
+                        settingsRoute,
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.orange,
+                      shape: const CircleBorder(),
+                      fixedSize: const Size(50, 50),
+                    ),
+                    child: Icon(
+                      Icons.settings,
+                      size: 24.0,
+                    )),
+              ],
+            ),
           ),
         ],
       ),
@@ -114,10 +121,13 @@ class _MainViewState extends State<MainView> {
         alignment: WrapAlignment.center,
         children: <Widget>[
           FloatingActionButton(
+              heroTag: 'goToFriendsFromMain',
               onPressed: () {}, child: const Icon(Icons.group)),
           FloatingActionButton(
+              heroTag: 'goToSOSFromMain',
               onPressed: () {}, child: const Icon(Icons.add_alert)),
           FloatingActionButton(
+              heroTag: 'getCurrentLocationFromMain',
             onPressed: () async {
               map.updateCurrentLocation();
               map.updateMap(await map.getCurrentLocation());
