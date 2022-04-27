@@ -46,36 +46,63 @@ class _MainViewState extends State<MainView> {
           )
         ],
       ),
-      body: GoogleMap(
-        initialCameraPosition: const CameraPosition(
-          target: LatLng(11.0551, 106.6657),
-          zoom: 15,
-        ),
-        mapType: MapType.normal,
-        onMapCreated: (GoogleMapController controller) {},
-        markers: <Marker>{
-          const Marker(
-            markerId: MarkerId('myMarker'),
-            position: LatLng(11.0551, 106.6657),
-            infoWindow: InfoWindow(
-              title: 'Vietnamese German University',
-              snippet: 'My Location',
+      body: Stack(
+
+        children: <Widget> [
+          GoogleMap(
+            initialCameraPosition: const CameraPosition(
+              target: LatLng(11.0551, 106.6657),
+              zoom: 15,
             ),
-            visible: true,
-            icon: BitmapDescriptor.defaultMarker,
+            mapType: MapType.normal,
+            onMapCreated: (GoogleMapController controller) {},
+            markers: <Marker>{
+              const Marker(
+                markerId: MarkerId('myMarker'),
+                position: LatLng(11.0551, 106.6657),
+                infoWindow: InfoWindow(
+                  title: 'Vietnamese German University',
+                  snippet: 'My Location',
+                ),
+                visible: true,
+                icon: BitmapDescriptor.defaultMarker,
+              ),
+              const Marker(
+                markerId: MarkerId('myMarker2'),
+                position: LatLng(10.07, 106.01),
+                infoWindow: InfoWindow(
+                  title: 'My Location',
+                  snippet: 'My Location',
+                ),
+                visible: true,
+                icon: BitmapDescriptor.defaultMarker,
+              ),
+            },
+            // polylines:
           ),
-          const Marker(
-            markerId: MarkerId('myMarker2'),
-            position: LatLng(10.07, 106.01),
-            infoWindow: InfoWindow(
-              title: 'My Location',
-              snippet: 'My Location',
-            ),
-            visible: true,
-            icon: BitmapDescriptor.defaultMarker,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: <Widget> [
+              ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(primary: Colors.orange, shape: const CircleBorder(), fixedSize: const Size(40, 40),),
+                  child: Icon(
+                    Icons.account_box_rounded,
+                    size: 24.0,
+                  )
+              ),
+              ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(primary: Colors.orange, shape: const CircleBorder(), fixedSize: const Size(40, 40),),
+                  child: Icon(
+                    Icons.settings,
+                    size: 24.0,
+                  )
+              ),
+            ],
           ),
-        },
-        // polylines:
+        ],
       ),
       // floatingActionButton: FloatingActionButton(
       //   onPressed: () {
