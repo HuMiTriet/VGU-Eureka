@@ -1,7 +1,8 @@
 import 'package:etoet/constants/routes.dart';
+import 'package:etoet/views/map_body.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
 
 enum MenuAction { signOut }
 
@@ -14,6 +15,35 @@ class MainView extends StatefulWidget {
 }
 
 class _MainViewState extends State<MainView> {
+  GoogleMapImpl map = GoogleMapImpl();
+  Future<bool> hasLocationPermission() async {
+    return await Location().requestPermission().then((granted) {
+      if (granted == PermissionStatus.granted) {
+        return true;
+      } else if (granted == PermissionStatus.deniedForever) {
+        return false;
+      } else {
+        Location().requestPermission().then((granted) {
+          if (granted == PermissionStatus.granted) {
+            return true;
+          } else if (granted == PermissionStatus.deniedForever) {
+            return false;
+          } else {
+            return false;
+          }
+        });
+      }
+      return false;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    hasLocationPermission();
+    map = GoogleMapImpl();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,82 +77,56 @@ class _MainViewState extends State<MainView> {
         ],
       ),
       body: Stack(
-
-        children: <Widget> [
-          GoogleMap(
-            initialCameraPosition: const CameraPosition(
-              target: LatLng(11.0551, 106.6657),
-              zoom: 15,
-            ),
-            mapType: MapType.normal,
-            onMapCreated: (GoogleMapController controller) {},
-            markers: <Marker>{
-              const Marker(
-                markerId: MarkerId('myMarker'),
-                position: LatLng(11.0551, 106.6657),
-                infoWindow: InfoWindow(
-                  title: 'Vietnamese German University',
-                  snippet: 'My Location',
-                ),
-                visible: true,
-                icon: BitmapDescriptor.defaultMarker,
-              ),
-              const Marker(
-                markerId: MarkerId('myMarker2'),
-                position: LatLng(10.07, 106.01),
-                infoWindow: InfoWindow(
-                  title: 'My Location',
-                  snippet: 'My Location',
-                ),
-                visible: true,
-                icon: BitmapDescriptor.defaultMarker,
-              ),
-            },
-            // polylines:
-          ),
+        children: <Widget>[
+          map,
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.end,
-            children: <Widget> [
+            children: <Widget>[
               ElevatedButton(
                   onPressed: () {},
-                  style: ElevatedButton.styleFrom(primary: Colors.orange, shape: const CircleBorder(), fixedSize: const Size(40, 40),),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.orange,
+                    shape: const CircleBorder(),
+                    fixedSize: const Size(40, 40),
+                  ),
                   child: Icon(
                     Icons.account_box_rounded,
                     size: 24.0,
-                  )
-              ),
+                  )),
               ElevatedButton(
                   onPressed: () {},
-                  style: ElevatedButton.styleFrom(primary: Colors.orange, shape: const CircleBorder(), fixedSize: const Size(40, 40),),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.orange,
+                    shape: const CircleBorder(),
+                    fixedSize: const Size(40, 40),
+                  ),
                   child: Icon(
                     Icons.settings,
                     size: 24.0,
-                  )
-              ),
+                  )),
             ],
           ),
         ],
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {
-      //     getRoad().then((road) {
-      //       print(road.polylineEncoded);
-      //       String encoded = road.polylineEncoded!;
-      //       // decodeEncodedPolyline(encoded).forEach((latLng) {
-      //       //   print(latLng);
-      //       // });
-      //       print(road.distance);
-      //       print(road.duration);
-      //       print(road.details);
-      //       print(road.canDrawRoad);
-      //       // road.polyline?.forEach((polyline) {
-      //       //   print(polyline);
-      //       // });
-      //     });
-      //   },
-      //   child: Icon(Icons.directions),
-      // ),
+      floatingActionButton: Wrap(
+        spacing: 105,
+        alignment: WrapAlignment.center,
+        children: <Widget>[
+          FloatingActionButton(
+              onPressed: () {}, child: const Icon(Icons.group)),
+          FloatingActionButton(
+              onPressed: () {}, child: const Icon(Icons.add_alert)),
+          FloatingActionButton(
+            onPressed: () async {
+              map.updateCurrentLocation();
+              map.updateMap(await map.getCurrentLocation());
+              map.updateLiveLocation();
+            },
+            child: const Icon(Icons.location_on),
+          ),
+        ],
+      ),
     );
   }
 }
