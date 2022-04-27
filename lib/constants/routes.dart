@@ -5,3 +5,4 @@ const registerRoute = '/register/';
 const mainRoute = '/main/';
 const verifyEmailRoute = '/verify-email/';
 const recoverAccountRoute = '/recover-account/';
+const settingsRoute = '/settings/';
