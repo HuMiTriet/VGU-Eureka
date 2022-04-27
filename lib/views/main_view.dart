@@ -46,7 +46,10 @@ class _MainViewState extends State<MainView> {
           )
         ],
       ),
-      body: GoogleMap(
+      body: Stack(
+
+        children: <Widget> [
+          GoogleMap(
             initialCameraPosition: const CameraPosition(
               target: LatLng(11.0551, 106.6657),
               zoom: 15,
@@ -77,9 +80,9 @@ class _MainViewState extends State<MainView> {
             },
             // polylines:
           ),
-          floatingActionButton: Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: <Widget> [
               ElevatedButton(
                   onPressed: () {},
@@ -99,7 +102,8 @@ class _MainViewState extends State<MainView> {
               ),
             ],
           ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
+        ],
+      ),
       // floatingActionButton: FloatingActionButton(
       //   onPressed: () {
       //     getRoad().then((road) {
