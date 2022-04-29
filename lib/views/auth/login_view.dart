@@ -105,6 +105,13 @@ class _LoginViewState extends State<LoginView> {
                 );
               },
               child: const Text('Not registered yet ? Sign Up')),
+          TextButton(
+              onPressed: () {
+                Navigator.of(context).pushNamed(
+                  recoverAccountRoute,
+                );
+              },
+              child: const Text('Forgot your Password?')),
         ],
       ),
     );
