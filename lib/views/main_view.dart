@@ -1,5 +1,7 @@
+import 'dart:async';
+
 import 'package:etoet/constants/routes.dart';
-import 'package:etoet/views/map_body.dart';
+import 'package:etoet/services/map/map_factory.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
@@ -15,7 +17,8 @@ class MainView extends StatefulWidget {
 }
 
 class _MainViewState extends State<MainView> {
-  GoogleMapImpl map = GoogleMapImpl();
+  late Map map;
+  Timer? timer;
   Future<bool> hasLocationPermission() async {
     return await Location().requestPermission().then((granted) {
       if (granted == PermissionStatus.granted) {
@@ -39,43 +42,36 @@ class _MainViewState extends State<MainView> {
 
   @override
   void initState() {
+    map = MapFactory().getMap('GoogleMap');
     super.initState();
     hasLocationPermission();
-    map = GoogleMapImpl();
+    WidgetsBinding.instance?.addPostFrameCallback((_) async {
+      setState(() {
+        map.initializeMap();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    var screenWidth = MediaQuery.of(context).size.width *
+        MediaQuery.of(context).devicePixelRatio;
+    var screenHeight = MediaQuery.of(context).size.height *
+        MediaQuery.of(context).devicePixelRatio;
+    map.updateScreenSize(screenWidth, screenHeight);
+    timer = Timer.periodic(const Duration(seconds: 1), (t) {
+      setState(() {
+        map.updateCurrentMapAddress();
+      });
+      timer?.cancel();
+    });
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text('Main UI here'),
-      //   actions: [
-      //     PopupMenuButton<MenuAction>(
-      //       onSelected: (value) async {
-      //         switch (value) {
-      //           case MenuAction.signOut:
-      //             final shouldLogout = await showLogOutDialog(context);
-      //             if (shouldLogout) {
-      //               await FirebaseAuth.instance.signOut();
-      //               Navigator.of(context).pushNamedAndRemoveUntil(
-      //                 loginRoute,
-      //                 (_) => false,
-      //               );
-      //             }
-      //             break;
-      //         }
-      //       },
-      //       itemBuilder: (context) {
-      //         return const [
-      //           PopupMenuItem<MenuAction>(
-      //             value: MenuAction.signOut,
-      //             child: Text('Sign out'),
-      //           )
-      //         ];
-      //       },
-      //     )
-      //   ],
-      // ),
       body: Stack(
         children: <Widget>[
           map,
@@ -114,6 +110,14 @@ class _MainViewState extends State<MainView> {
               ],
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10.0, 40.0, 10.0, 0.0),
+            child: Text(map.address,
+                style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    backgroundColor: Color.fromARGB(104, 220, 155, 69))),
+          ),
         ],
       ),
       floatingActionButton: Wrap(
@@ -122,16 +126,16 @@ class _MainViewState extends State<MainView> {
         children: <Widget>[
           FloatingActionButton(
               heroTag: 'goToFriendsFromMain',
-              onPressed: () {}, child: const Icon(Icons.group)),
+              onPressed: () {},
+              child: const Icon(Icons.group)),
           FloatingActionButton(
               heroTag: 'goToSOSFromMain',
-              onPressed: () {}, child: const Icon(Icons.add_alert)),
+              onPressed: () {},
+              child: const Icon(Icons.add_alert)),
           FloatingActionButton(
-              heroTag: 'getCurrentLocationFromMain',
-            onPressed: () async {
-              map.updateCurrentLocation();
-              map.updateMap(await map.getCurrentLocation());
-              map.updateLiveLocation();
+            heroTag: 'getCurrentLocationFromMain',
+            onPressed: () {
+              map.moveToCurrentLocation();
             },
             child: const Icon(Icons.location_on),
           ),
