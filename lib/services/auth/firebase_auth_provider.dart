@@ -36,7 +36,7 @@ class FirebaseAuthProvider implements AuthProvider {
         default:
           throw GenericAuthException();
       }
-    } catch (e) {
+    } catch (_) {
       throw GenericAuthException();
     }
   }
@@ -78,7 +78,6 @@ class FirebaseAuthProvider implements AuthProvider {
         throw UserNotLoggedInAuthException();
       }
     } on FirebaseAuthException catch (e) {
-      devtools.log(e.toString());
       switch (e.code) {
         case 'wrong-password':
           throw WrongPasswordAuthException();
@@ -88,7 +87,7 @@ class FirebaseAuthProvider implements AuthProvider {
         default:
           throw GenericAuthException();
       }
-    } catch (e) {
+    } catch (_) {
       throw GenericAuthException();
     }
   }
