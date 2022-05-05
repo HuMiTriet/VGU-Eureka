@@ -6,7 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 
-enum MenuAction { signOut }
+/* enum MenuAction { signOut } */
 
 class MainView extends StatefulWidget {
   @override
