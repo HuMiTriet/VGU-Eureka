@@ -1,11 +1,11 @@
 import 'package:etoet/services/auth/auth_provider.dart';
 import 'package:etoet/services/auth/auth_user.dart';
 
-import 'firebase_auth_provider.dart';
+import 'concrete_providers/firebase_auth_provider.dart';
 
 /// Further abstract the backend from the UI layer.
 ///
-/// FirebaseAuthProvider - AuthService - AuthProvider - UI
+/// FirebaseAuthProvider - AuthProvider - AuthService- UI
 ///
 /// This class for now does not do anything for now but it is used for ease of
 /// database expansion in the future. You can use the AuthProvider class directly

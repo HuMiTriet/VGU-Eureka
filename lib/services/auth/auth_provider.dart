@@ -1,5 +1,6 @@
 import 'package:etoet/services/auth/auth_user.dart';
 
+/// FirebaseAuthProvider - AuthProvider - AuthService- UI
 abstract class AuthProvider {
   Future<void> initialize();
 
