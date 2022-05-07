@@ -5,9 +5,11 @@ import 'firebase_auth_provider.dart';
 
 /// Further abstract the backend from the UI layer.
 ///
-/// Main task of the [AuthProvider] is the intreface that the UI layer use to
-/// talk to the backend. This further level of abstraction is done so that the
-// UI layer is decoupled from the backend..
+/// FirebaseAuthProvider - AuthService - AuthProvider - UI
+///
+/// This class for now does not do anything for now but it is used for ease of
+/// database expansion in the future. You can use the AuthProvider class directly
+// but this is not advised.
 class AuthService implements AuthProvider {
   final AuthProvider provider;
 
