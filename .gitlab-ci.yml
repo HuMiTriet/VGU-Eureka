@@ -11,7 +11,7 @@ before_script:
   - cd ..
   - cd ..
   - cd ..
-  - cd /builds/teresuki/my_app_repo
+  - cd /builds/galvdat/vgu_tinyprojects/pe2022/pe2022_team-7/
 
 flutter_analyze:
   stage: pre-build
