@@ -18,7 +18,9 @@ class MainView extends StatefulWidget {
 
 class _MainViewState extends State<MainView> {
   late Map map;
+
   Timer? timer;
+
   Future<bool> hasLocationPermission() async {
     return await Location().requestPermission().then((granted) {
       if (granted == PermissionStatus.granted) {
@@ -74,6 +76,7 @@ class _MainViewState extends State<MainView> {
       });
       timer?.cancel();
     });
+
     return Scaffold(
       body: Stack(
         children: <Widget>[

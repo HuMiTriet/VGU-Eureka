@@ -21,6 +21,7 @@ class GoogleMapImpl extends StatefulWidget implements Map {
   late BuildContext context;
   late LatLng _location = const LatLng(11.0551, 106.6657);
   late GoogleMapController? _mapController;
+
   late StreamSubscription _locationSubscription;
   final loc.Location _locationTracker = loc.Location();
   Set<Marker> _markersList = {};
