@@ -1,9 +1,30 @@
 import 'package:firebase_auth/firebase_auth.dart' show User;
 import 'package:flutter/foundation.dart';
 
+// This annotation immutable tells the compiler that the content of this class
+// and its subclasses will not change.
 @immutable
 class AuthUser {
+  final String uid;
   final bool isEmailVerified;
 
-  const AuthUser(this.isEmailVerified);
+  final String? phoneNumber;
+  final String? email;
+  final String? displayName;
+
+  const AuthUser({
+    required this.isEmailVerified,
+    required this.phoneNumber,
+    required this.uid,
+    this.email,
+    this.displayName,
+  });
+
+  factory AuthUser.fromFirebase(User user) => AuthUser(
+        uid: user.uid,
+        isEmailVerified: user.emailVerified,
+        phoneNumber: user.phoneNumber,
+        email: user.email,
+        displayName: user.displayName,
+      );
 }

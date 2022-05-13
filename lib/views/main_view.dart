@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:etoet/constants/routes.dart';
+import 'package:etoet/services/map/map_factory.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
 
-enum MenuAction { signOut }
+/* enum MenuAction { signOut } */
 
 class MainView extends StatefulWidget {
   @override
@@ -14,88 +17,130 @@ class MainView extends StatefulWidget {
 }
 
 class _MainViewState extends State<MainView> {
+  late Map map;
+  Timer? timer;
+  Future<bool> hasLocationPermission() async {
+    return await Location().requestPermission().then((granted) {
+      if (granted == PermissionStatus.granted) {
+        return true;
+      } else if (granted == PermissionStatus.deniedForever) {
+        return false;
+      } else {
+        Location().requestPermission().then((granted) {
+          if (granted == PermissionStatus.granted) {
+            return true;
+          } else if (granted == PermissionStatus.deniedForever) {
+            return false;
+          } else {
+            return false;
+          }
+        });
+      }
+      return false;
+    });
+  }
+
+  @override
+  void initState() {
+    map = MapFactory().getMap('GoogleMap');
+    super.initState();
+    hasLocationPermission();
+    WidgetsBinding.instance?.addPostFrameCallback((_) async {
+      setState(() {
+        map.initializeMap();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    var screenWidth = MediaQuery.of(context).size.width *
+        MediaQuery.of(context).devicePixelRatio;
+    var screenHeight = MediaQuery.of(context).size.height *
+        MediaQuery.of(context).devicePixelRatio;
+    map.updateScreenSize(screenWidth, screenHeight);
+    timer = Timer.periodic(const Duration(seconds: 1), (t) {
+      setState(() {
+        map.updateCurrentMapAddress();
+      });
+      timer?.cancel();
+    });
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Main UI here'),
-        actions: [
-          PopupMenuButton<MenuAction>(
-            onSelected: (value) async {
-              switch (value) {
-                case MenuAction.signOut:
-                  final shouldLogout = await showLogOutDialog(context);
-                  if (shouldLogout) {
-                    await FirebaseAuth.instance.signOut();
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      loginRoute,
-                      (_) => false,
-                    );
-                  }
-                  break;
-              }
-            },
-            itemBuilder: (context) {
-              return const [
-                PopupMenuItem<MenuAction>(
-                  value: MenuAction.signOut,
-                  child: Text('Sign out'),
-                )
-              ];
-            },
-          )
+      body: Stack(
+        children: <Widget>[
+          map,
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0.0, 30.0, 10.0, 0.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.orange,
+                      shape: const CircleBorder(),
+                      fixedSize: const Size(50, 50),
+                    ),
+                    child: const Icon(
+                      Icons.account_box_rounded,
+                      size: 24.0,
+                    )),
+                ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(
+                        settingsRoute,
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.orange,
+                      shape: const CircleBorder(),
+                      fixedSize: const Size(50, 50),
+                    ),
+                    child: const Icon(
+                      Icons.settings,
+                      size: 24.0,
+                    )),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10.0, 40.0, 10.0, 0.0),
+            child: Text(map.address,
+                style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    backgroundColor: Color.fromARGB(104, 220, 155, 69))),
+          ),
         ],
       ),
-      body: GoogleMap(
-        initialCameraPosition: const CameraPosition(
-          target: LatLng(11.0551, 106.6657),
-          zoom: 15,
-        ),
-        mapType: MapType.normal,
-        onMapCreated: (GoogleMapController controller) {},
-        markers: <Marker>{
-          const Marker(
-            markerId: MarkerId('myMarker'),
-            position: LatLng(11.0551, 106.6657),
-            infoWindow: InfoWindow(
-              title: 'Vietnamese German University',
-              snippet: 'My Location',
-            ),
-            visible: true,
-            icon: BitmapDescriptor.defaultMarker,
+      floatingActionButton: Wrap(
+        spacing: 105,
+        alignment: WrapAlignment.center,
+        children: <Widget>[
+          FloatingActionButton(
+              heroTag: 'goToFriendsFromMain',
+              onPressed: () {},
+              child: const Icon(Icons.group)),
+          FloatingActionButton(
+              heroTag: 'goToSOSFromMain',
+              onPressed: () {},
+              child: const Icon(Icons.add_alert)),
+          FloatingActionButton(
+            heroTag: 'getCurrentLocationFromMain',
+            onPressed: () {
+              map.moveToCurrentLocation();
+            },
+            child: const Icon(Icons.location_on),
           ),
-          const Marker(
-            markerId: MarkerId('myMarker2'),
-            position: LatLng(10.07, 106.01),
-            infoWindow: InfoWindow(
-              title: 'My Location',
-              snippet: 'My Location',
-            ),
-            visible: true,
-            icon: BitmapDescriptor.defaultMarker,
-          ),
-        },
-        // polylines:
+        ],
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () {
-      //     getRoad().then((road) {
-      //       print(road.polylineEncoded);
-      //       String encoded = road.polylineEncoded!;
-      //       // decodeEncodedPolyline(encoded).forEach((latLng) {
-      //       //   print(latLng);
-      //       // });
-      //       print(road.distance);
-      //       print(road.duration);
-      //       print(road.details);
-      //       print(road.canDrawRoad);
-      //       // road.polyline?.forEach((polyline) {
-      //       //   print(polyline);
-      //       // });
-      //     });
-      //   },
-      //   child: Icon(Icons.directions),
-      // ),
     );
   }
 }
