@@ -17,3 +17,5 @@
 [Database ER diagram](./documentation/Database ER.png)
 
 [Use case description](./documentation/usecase_diagram.png)
+
+[Authentication](./documentation/Authentication_architecture.md)
