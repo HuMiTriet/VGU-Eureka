@@ -42,12 +42,20 @@ class _MainViewState extends State<MainView> {
 
   @override
   void initState() {
-    map = MapFactory().getMap('GoogleMap');
+    map = Map('GoogleMap');
+    map.setContext(context);
     super.initState();
     hasLocationPermission();
+
+    // run after build
     WidgetsBinding.instance?.addPostFrameCallback((_) async {
       setState(() {
         map.initializeMap();
+        var screenWidth = MediaQuery.of(context).size.width *
+            MediaQuery.of(context).devicePixelRatio;
+        var screenHeight = MediaQuery.of(context).size.height *
+            MediaQuery.of(context).devicePixelRatio;
+        map.updateScreenSize(screenWidth, screenHeight);
       });
     });
   }
@@ -60,11 +68,6 @@ class _MainViewState extends State<MainView> {
 
   @override
   Widget build(BuildContext context) {
-    var screenWidth = MediaQuery.of(context).size.width *
-        MediaQuery.of(context).devicePixelRatio;
-    var screenHeight = MediaQuery.of(context).size.height *
-        MediaQuery.of(context).devicePixelRatio;
-    map.updateScreenSize(screenWidth, screenHeight);
     timer = Timer.periodic(const Duration(seconds: 1), (t) {
       setState(() {
         map.updateCurrentMapAddress();
