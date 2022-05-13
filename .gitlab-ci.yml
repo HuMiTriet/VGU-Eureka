@@ -20,12 +20,17 @@ flutter_analyze:
     - flutter analyze
   rules:
     - allow_failure: true
+    - if: $CI_PIPELINE_SOURCE == "push"
+
 
 flutter_build_android: 
   stage: build
   script:
     - flutter clean
     - flutter build apk
+  rules:
+    - allow_failure: true
+    - if: $CI_PIPELINE_SOURCE == "push"
   artifacts:
     paths:
       - build/app/outputs/apk/release/app-release.apk
@@ -34,3 +39,5 @@ flutter_test:
   stage: test
   script:
     - flutter test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
