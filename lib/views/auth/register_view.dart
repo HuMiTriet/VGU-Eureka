@@ -82,7 +82,6 @@ class _RegisterViewState extends State<RegisterView> {
           ),
           TextButton(
               onPressed: () async {
-                await AuthService.firebase().logOut();
                 Navigator.of(context).pushNamedAndRemoveUntil(
                   loginRoute,
                   (route) => false,
