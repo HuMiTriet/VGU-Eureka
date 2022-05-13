@@ -132,28 +132,7 @@ class MapScreenState extends State<ProfilePage>
                         ProfileField(controller: emailController),
                         ProfileFieldLabel(label: 'Mobile'),
                         ProfileField(controller: mobileController),
-                        Padding(
-                            padding: const EdgeInsets.only(
-                                left: 25.0, right: 25.0, top: 14.0),
-                            child: TextButton(
-                                style: TextButton.styleFrom(
-                                  padding: const EdgeInsets.all(0.0),
-                                ),
-                                child: const Text(
-                                  'Change Password',
-                                  style: TextStyle(
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black),
-                                ),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            Change_Pass_Page()),
-                                  );
-                                })),
+                        EditProfile(value: 'Change Password'),
                       ],
                     ),
                   ),
@@ -164,6 +143,34 @@ class MapScreenState extends State<ProfilePage>
         ),
       )),
     );
+  }
+}
+
+class EditProfile extends StatelessWidget {
+  const EditProfile({Key? key, required this.value}) : super(key: key);
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+        padding: const EdgeInsets.only(left: 25.0, right: 25.0, top: 14.0),
+        child: TextButton(
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.all(0.0),
+            ),
+            child: Text(
+              value,
+              style: TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black),
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Change_Pass_Page()),
+              );
+            }));
   }
 }
 
