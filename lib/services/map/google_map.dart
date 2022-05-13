@@ -1,22 +1,25 @@
 import 'dart:async';
 import 'dart:developer' as devtools show log;
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:etoet/services/map/map_factory.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart' as loc;
 
 /// This is the implementation of the [Map] interface using [GoogleMap].
 ///
-/// It is used by the [MainView] widget.
-/// ## Functions:
+/// # Functions:
 /// - moveToCurrentLocation() - moves the map to the current location
 /// - updateCurrentMapAddress() - shows the current addressList that the map shows
 /// - updateScreenSize() - updates the screen size of the device
 /// - initializeMap() - initializes the map(move the map to current location, update addressList)
 class GoogleMapImpl extends StatefulWidget implements Map {
-  late LatLng _initialLocation = const LatLng(11.0551, 106.6657);
+  late BuildContext context;
+  late LatLng _location = const LatLng(11.0551, 106.6657);
   late GoogleMapController? _mapController;
   late StreamSubscription _locationSubscription;
   final loc.Location _locationTracker = loc.Location();
@@ -36,8 +39,12 @@ class GoogleMapImpl extends StatefulWidget implements Map {
   Set<Marker> get markersList => _markersList;
   Set<Polyline> get polylinesList => _polylinesList;
   late List<String> addressList = ['', '', '', '', '', '', '', ''];
-
+  late GoogleMap googleMap;
   GoogleMapImpl({Key? key}) : super(key: key);
+  @override
+  void setContext(BuildContext context) {
+    this.context = context;
+  }
 
   @override
   String address = 'Unknown';
@@ -45,8 +52,10 @@ class GoogleMapImpl extends StatefulWidget implements Map {
   @override
   void initializeMap() async {
     devtools.log('initialize map', name: 'initializeMap');
-    _moveMap(await _getCurrentLocation());
-    _updateCurrentAddress(await _getCurrentLocation());
+    var currentLocation = await _getCurrentLocation();
+    _moveMap(currentLocation);
+    _updateCurrentAddress(currentLocation);
+    updateCurrentMapAddress();
     _updateLiveLocation();
   }
 
@@ -63,9 +72,174 @@ class GoogleMapImpl extends StatefulWidget implements Map {
   }
 
   @override
-  void moveToCurrentLocation() async {
-    _updateCurrentLocation();
-    _moveMap(await _getCurrentLocation());
+  void moveToCurrentLocation() {
+    _moveMap(_location);
+  }
+
+  Future<Uint8List> getBytesFromAsset(String path, int width) async {
+    ByteData data = await rootBundle.load(path);
+    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
+        targetWidth: width);
+    ui.FrameInfo fi = await codec.getNextFrame();
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
+        .buffer
+        .asUint8List();
+  }
+
+  Future<Uint8List> getBytesFromCanvas(String text) async {
+    final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
+    final Canvas canvas = Canvas(pictureRecorder);
+    final Paint paint = Paint()..color = Colors.blue;
+    final Radius radius = Radius.circular(20.0);
+    final int width = 100;
+    final int height = 100;
+    canvas.drawRRect(
+        RRect.fromRectAndCorners(
+          Rect.fromLTWH(0.0, 0.0, width.toDouble(), height.toDouble()),
+          topLeft: radius,
+          topRight: radius,
+          bottomLeft: radius,
+          bottomRight: radius,
+        ),
+        paint);
+    TextPainter painter = TextPainter(textDirection: TextDirection.ltr);
+    painter.text = TextSpan(
+      text: text,
+      style: TextStyle(fontSize: 25.0, color: Colors.white),
+    );
+    painter.layout();
+    painter.paint(
+        canvas,
+        Offset((width * 0.5) - painter.width * 0.5,
+            (height * 0.5) - painter.height * 0.5));
+    final img = await pictureRecorder.endRecording().toImage(width, height);
+    final data = await img.toByteData(format: ui.ImageByteFormat.png);
+    return data!.buffer.asUint8List();
+  }
+
+  @override
+  void updateFriendsLocation() async {
+    final markerIcon = await getBytesFromCanvas('FRIEND');
+    final anya = await getBytesFromAsset('assets/images/Anya.png', 100);
+    final loid = await getBytesFromAsset('assets/images/Loid.png', 100);
+    final yor = await getBytesFromAsset('assets/images/Yor.png', 100);
+    markersList = {
+      Marker(
+        markerId: const MarkerId('friend'),
+        position: const LatLng(
+          10.7878,
+          106.7051,
+        ),
+        // icon: BitmapDescriptor,
+        icon: BitmapDescriptor.fromBytes(loid),
+        onTap: () {
+          print('Loid');
+          showDialog(
+              context: context,
+              builder: (_) => AlertDialog(
+                    title: Text('Loid is here'),
+                    content: Text('Need to help with something'),
+                    actions: [
+                      TextButton(
+                        child: Text('Cancel'),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      TextButton(
+                        child: Text('OK'),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  ));
+        },
+      ),
+      Marker(
+        markerId: const MarkerId('friend1'),
+        position: const LatLng(
+          10.7288,
+          106.7188,
+        ),
+        icon: BitmapDescriptor.fromBytes(yor),
+        onTap: () {
+          print('Yor');
+          showDialog(
+              context: context,
+              builder: (_) => AlertDialog(
+                    title: Text('Yor is here'),
+                    content: Text('Need to help with something'),
+                    actions: [
+                      TextButton(
+                        child: Text('Cancel'),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      TextButton(
+                        child: Text('OK'),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  ));
+        },
+      ),
+      Marker(
+        markerId: MarkerId('friend3'),
+        position: LatLng(
+          11.0551,
+          106.6657,
+        ),
+        icon: BitmapDescriptor.fromBytes(anya),
+        onTap: () {
+          print('Anya');
+          showDialog(
+              context: context,
+              builder: (_) => AlertDialog(
+                    title: Text('Anya'),
+                    content: Text('Need to help with something'),
+                    actions: [
+                      TextButton(
+                        child: Text('Cancel'),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      TextButton(
+                        child: Text('OK'),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  ));
+        },
+      ),
+      Marker(
+          markerId: const MarkerId('friend4'),
+          icon: BitmapDescriptor.fromBytes(markerIcon),
+          position: const LatLng(11.0566, 106.6687),
+          onTap: () {
+            showDialog(
+                context: context,
+                builder: (_) => AlertDialog(
+                      title: Text('Anya'),
+                      content: Text('Anya is here'),
+                      actions: [
+                        TextButton(
+                          child: Text('OK'),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ));
+          }),
+    };
+    devtools.log('update markers of friends', name: 'updateFriendsLocation');
   }
 
   void _updateCurrentAddress(LatLng location) {
@@ -118,20 +292,16 @@ class GoogleMapImpl extends StatefulWidget implements Map {
 
   Future<LatLng> _getCurrentLocation() async {
     var locationData = await loc.Location().getLocation();
+    _location = LatLng(locationData.latitude!, locationData.longitude!);
     devtools.log('locationData: $locationData', name: '_getCurrentLocation');
     return LatLng(locationData.latitude!, locationData.longitude!);
-  }
-
-  void _updateCurrentLocation() async {
-    _initialLocation = await _getCurrentLocation();
-    devtools.log('_initialLocation');
   }
 
   void _updateLiveLocation() {
     _locationSubscription =
         _locationTracker.onLocationChanged.listen((locationData) {
-      _initialLocation =
-          LatLng(locationData.latitude!, locationData.longitude!);
+      // devtools.log('locationData: $locationData', name: '_updateLiveLocation');
+      _location = LatLng(locationData.latitude!, locationData.longitude!);
     });
   }
 
@@ -150,9 +320,13 @@ class GoogleMapImpl extends StatefulWidget implements Map {
 }
 
 class _GoogleMapImplState extends State<GoogleMapImpl> {
+  Timer? timer;
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance?.addPostFrameCallback((_) async {
+      setState(() {});
+    });
   }
 
   @override
@@ -168,25 +342,45 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
 
   @override
   Widget build(BuildContext context) {
-    return GoogleMap(
-      initialCameraPosition: CameraPosition(
-        target: widget._initialLocation,
-        zoom: 15,
-      ),
-      onMapCreated: (controler) {
-        widget._mapController = controler;
-        devtools.log('Google map state build _map: ${widget._mapController}',
-            name: 'GoogleMapImplState');
-        _updateMap();
+    timer = Timer.periodic(const Duration(seconds: 1), (t) {
+      setState(() {
+        widget.updateFriendsLocation();
+      });
+      timer?.cancel();
+    });
+    return FutureBuilder(
+      future: widget._getCurrentLocation(),
+      builder: (context, AsyncSnapshot<LatLng> snapshot) {
+        if (snapshot.hasData) {
+          var location = snapshot.data;
+          return GoogleMap(
+            initialCameraPosition: CameraPosition(
+              target: location!,
+              zoom: 15,
+            ),
+            onMapCreated: (controler) {
+              widget._mapController = controler;
+              devtools.log(
+                  'Google map state build _map: ${widget._mapController}',
+                  name: 'GoogleMapImplState');
+              _updateMap();
+            },
+            markers: widget.markersList,
+            polylines: widget.polylinesList,
+            myLocationEnabled: true,
+            zoomControlsEnabled: false,
+            myLocationButtonEnabled: false,
+            mapToolbarEnabled: false,
+            // onCameraMove: (value) {
+            //   widget._updateCurrentAddress(value.target);
+            // },
+          );
+        } else {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
       },
-      markers: widget.markersList,
-      polylines: widget.polylinesList,
-      myLocationEnabled: true,
-      zoomControlsEnabled: false,
-      myLocationButtonEnabled: false,
-      // onCameraMove: (value) {
-      //   widget._updateCurrentAddress(value.target);
-      // },
     );
   }
 }
