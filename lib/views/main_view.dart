@@ -6,7 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 
-enum MenuAction { signOut }
+/* enum MenuAction { signOut } */
 
 class MainView extends StatefulWidget {
   @override
@@ -91,7 +91,7 @@ class _MainViewState extends State<MainView> {
                       shape: const CircleBorder(),
                       fixedSize: const Size(50, 50),
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.account_box_rounded,
                       size: 24.0,
                     )),
@@ -106,7 +106,7 @@ class _MainViewState extends State<MainView> {
                       shape: const CircleBorder(),
                       fixedSize: const Size(50, 50),
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.settings,
                       size: 24.0,
                     )),

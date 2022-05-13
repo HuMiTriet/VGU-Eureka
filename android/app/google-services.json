@@ -29,6 +29,13 @@
             {
               "client_id": "344264346912-1qh85k7a5tpslbfk37p0ojs3hfik6t10.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "344264346912-6sfjhcgr9842sd14a8ov1nu8rs88f4li.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.deltadeer.etoet"
+              }
             }
           ]
         }

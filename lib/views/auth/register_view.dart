@@ -1,8 +1,7 @@
-import 'dart:developer' as devtools show log;
-
 import 'package:etoet/constants/routes.dart';
+import 'package:etoet/services/auth/auth_exceptions.dart';
+import 'package:etoet/services/auth/auth_service.dart';
 import 'package:etoet/views/auth/error_dialog.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class RegisterView extends StatefulWidget {
@@ -13,13 +12,18 @@ class RegisterView extends StatefulWidget {
 }
 
 class _RegisterViewState extends State<RegisterView> {
+  /// Group of controllers that handle each of the text field
+  late final TextEditingController _username;
   late final TextEditingController _email;
   late final TextEditingController _password;
+  late final TextEditingController _phoneNumber;
 
   @override
   void dispose() {
     _email.dispose();
     _password.dispose();
+    _username.dispose();
+    _phoneNumber.dispose();
     super.dispose();
   }
 
@@ -27,6 +31,8 @@ class _RegisterViewState extends State<RegisterView> {
   void initState() {
     _email = TextEditingController();
     _password = TextEditingController();
+    _username = TextEditingController();
+    _phoneNumber = TextEditingController();
     super.initState();
   }
 
@@ -38,6 +44,26 @@ class _RegisterViewState extends State<RegisterView> {
       ),
       body: Column(
         children: [
+          /// user name
+          TextField(
+            controller: _username,
+            enableSuggestions: false,
+            decoration: const InputDecoration(
+              labelText: 'Username',
+            ),
+          ),
+
+          /// Phone number
+          TextField(
+            controller: _phoneNumber,
+            enableSuggestions: false,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              labelText: 'Phone Number',
+            ),
+          ),
+
+          /// email
           TextField(
             controller: _email,
             enableSuggestions: false,
@@ -47,6 +73,7 @@ class _RegisterViewState extends State<RegisterView> {
               hintText: 'Email',
             ),
           ),
+
           TextField(
             controller: _password,
             obscureText: true,
@@ -56,48 +83,34 @@ class _RegisterViewState extends State<RegisterView> {
               hintText: 'Password',
             ),
           ),
+
           TextButton(
             onPressed: () async {
               final email = _email.text;
               final password = _password.text;
               try {
-                await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                await AuthService.firebase().createUser(
                   email: email,
                   password: password,
                 );
 
-                final user = FirebaseAuth.instance.currentUser;
-                await user?.sendEmailVerification();
+                AuthService.firebase().sendEmailVerification();
 
                 Navigator.of(context).pushNamed(verifyEmailRoute);
-              } on FirebaseAuthException catch (e) {
-                devtools.log('$e', name: 'RegisterView');
-                switch (e.code) {
-                  case 'weak-password':
-                    await showErrorDialog(context, 'Weak password');
-                    break;
-
-                  case 'email-already-in-use':
-                    await showErrorDialog(context, 'Email already in use');
-                    break;
-
-                  case 'invalid-email':
-                    await showErrorDialog(context, 'Invalid email');
-                    break;
-
-                  default:
-                    await showErrorDialog(context, 'Error: ${e.code}');
-                    break;
-                }
-              } catch (e) {
-                await showErrorDialog(context, 'Error: ${e.toString()}');
+              } on WeakPassowrdAuthException {
+                await showErrorDialog(context, 'Weak password');
+              } on EmailAlreadyInUsedAuthException {
+                await showErrorDialog(context, 'Email already in use');
+              } on InvalidEmailAuthException {
+                await showErrorDialog(context, 'Invalid email');
+              } on GenericAuthException {
+                await showErrorDialog(context, 'Unknown error');
               }
             },
             child: const Text('Register'),
           ),
           TextButton(
               onPressed: () async {
-                await FirebaseAuth.instance.signOut();
                 Navigator.of(context).pushNamedAndRemoveUntil(
                   loginRoute,
                   (route) => false,

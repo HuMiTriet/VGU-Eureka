@@ -1,8 +1,7 @@
-import 'dart:developer' as devtools show log;
-
 import 'package:etoet/constants/routes.dart';
+import 'package:etoet/services/auth/auth_exceptions.dart';
+import 'package:etoet/services/auth/auth_service.dart';
 import 'package:etoet/views/auth/error_dialog.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class LoginView extends StatefulWidget {
@@ -49,13 +48,13 @@ class _LoginViewState extends State<LoginView> {
               final email = _email.text;
               final password = _password.text;
               try {
-                await FirebaseAuth.instance.signInWithEmailAndPassword(
+                await AuthService.firebase().login(
                   email: email,
                   password: password,
                 );
 
-                final user = FirebaseAuth.instance.currentUser;
-                if (user?.emailVerified ?? false) {
+                final user = AuthService.firebase().currentUser;
+                if (user?.isEmailVerified ?? false) {
                   // user is verified
                   Navigator.of(context).pushNamedAndRemoveUntil(
                     mainRoute,
@@ -68,30 +67,12 @@ class _LoginViewState extends State<LoginView> {
                     (route) => false,
                   );
                 }
-              } on FirebaseAuthException catch (e) {
-                devtools.log(e.toString());
-                switch (e.code) {
-                  case 'wrong-password':
-                    await showErrorDialog(context, 'Incorrect password');
-                    break;
-                  case 'user-not-found':
-                    await showErrorDialog(context, 'User not found');
-                    break;
-                  case 'user-disabled':
-                    await showErrorDialog(
-                        context, 'This user account has been suspended');
-                    break;
-                  case 'too-many-requests':
-                    await showErrorDialog(context, 'Too many requests');
-                    break;
-
-                  default:
-                    await showErrorDialog(context, 'Error: ${e.code}');
-                    break;
-                }
-              } catch (e) {
-                devtools.log(e.toString());
-                await showErrorDialog(context, 'Error: ${e.toString()}');
+              } on UserNotFoundAuthException {
+                await showErrorDialog(context, 'User not found');
+              } on WrongPasswordAuthException {
+                await showErrorDialog(context, 'Incorrect password');
+              } on GenericAuthException {
+                await showErrorDialog(context, 'Error');
               }
             },
             child: const Text('Login'),
