@@ -18,7 +18,9 @@ class MainView extends StatefulWidget {
 
 class _MainViewState extends State<MainView> {
   late Map map;
+
   Timer? timer;
+
   Future<bool> hasLocationPermission() async {
     return await Location().requestPermission().then((granted) {
       if (granted == PermissionStatus.granted) {
@@ -62,15 +64,19 @@ class _MainViewState extends State<MainView> {
   Widget build(BuildContext context) {
     var screenWidth = MediaQuery.of(context).size.width *
         MediaQuery.of(context).devicePixelRatio;
+
     var screenHeight = MediaQuery.of(context).size.height *
         MediaQuery.of(context).devicePixelRatio;
+
     map.updateScreenSize(screenWidth, screenHeight);
+
     timer = Timer.periodic(const Duration(seconds: 1), (t) {
       setState(() {
         map.updateCurrentMapAddress();
       });
       timer?.cancel();
     });
+
     return Scaffold(
       body: Stack(
         children: <Widget>[

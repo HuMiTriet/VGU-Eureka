@@ -22,12 +22,12 @@ class _SettingsViewState extends State<SettingsView> {
       body: ListView(
         children: [
           ListTile(
-            leading: Icon(Icons.logout),
-            title: Text(
+            leading: const Icon(Icons.logout),
+            title: const Text(
               'Log Out',
               style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500),
             ),
-            subtitle: Text(
+            subtitle: const Text(
               'Log out of the account',
               style: TextStyle(color: Colors.red, fontWeight: FontWeight.w500),
             ),
@@ -44,4 +44,3 @@ class _SettingsViewState extends State<SettingsView> {
     );
   }
 }
-

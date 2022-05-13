@@ -16,8 +16,10 @@ import 'package:location/location.dart' as loc;
 /// - updateScreenSize() - updates the screen size of the device
 /// - initializeMap() - initializes the map(move the map to current location, update addressList)
 class GoogleMapImpl extends StatefulWidget implements Map {
-  late LatLng _initialLocation = const LatLng(11.0551, 106.6657);
+  late LatLng initialLocation = const LatLng(11.0551, 106.6657);
+
   late GoogleMapController? _mapController;
+
   late StreamSubscription _locationSubscription;
   final loc.Location _locationTracker = loc.Location();
   Set<Marker> _markersList = {};
@@ -123,15 +125,14 @@ class GoogleMapImpl extends StatefulWidget implements Map {
   }
 
   void _updateCurrentLocation() async {
-    _initialLocation = await _getCurrentLocation();
+    initialLocation = await _getCurrentLocation();
     devtools.log('_initialLocation');
   }
 
   void _updateLiveLocation() {
     _locationSubscription =
         _locationTracker.onLocationChanged.listen((locationData) {
-      _initialLocation =
-          LatLng(locationData.latitude!, locationData.longitude!);
+      initialLocation = LatLng(locationData.latitude!, locationData.longitude!);
     });
   }
 
@@ -170,7 +171,7 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
   Widget build(BuildContext context) {
     return GoogleMap(
       initialCameraPosition: CameraPosition(
-        target: widget._initialLocation,
+        target: widget.initialLocation,
         zoom: 15,
       ),
       onMapCreated: (controler) {

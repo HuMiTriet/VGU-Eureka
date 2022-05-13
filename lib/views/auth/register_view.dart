@@ -1,5 +1,3 @@
-import 'dart:developer' as devtools show log;
-
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/auth_exceptions.dart';
 import 'package:etoet/services/auth/auth_service.dart';
