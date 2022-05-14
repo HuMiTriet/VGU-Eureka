@@ -13,14 +13,14 @@ before_script:
   - cd ..
   - cd /builds/galvdat/vgu_tinyprojects/pe2022/pe2022_team-7/
 
-flutter_analyze:
-  stage: pre-build
-  script:
-    - flutter doctor
-    - flutter analyze
-  rules:
-    - allow_failure: true
-    - if: $CI_PIPELINE_SOURCE == "push"
+# flutter_analyze:
+#   stage: pre-build
+#   script:
+#     - flutter doctor
+#     - flutter analyze
+#   rules:
+#     - allow_failure: true
+#     - if: $CI_PIPELINE_SOURCE == "push"
 
 
 flutter_build_android: 
