@@ -7,7 +7,7 @@ final databaseReference = FirebaseDatabase.instance.ref();
 DatabaseReference updateUserLocation(AuthUser authUser) {
   var location =
       databaseReference.child('users').child(authUser.uid).child('location');
-  location.set({
+  location.push().set({
     'latitude': authUser.location.latitude,
     'longitude': authUser.location.longitude,
   });
