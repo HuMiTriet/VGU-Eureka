@@ -16,14 +16,12 @@ class Database {
     var location =
         databaseReference.child('users').child(authUser.uid).child('location');
 
-    devtools.log(
-        'update location to database: $databaseReference'
+    location.set(authUser.location.toJson()).then((value) => devtools.log(
+        'location updated to database: $databaseReference'
         '\n'
         'userId: ${authUser.uid}'
         '\n'
         'lat: ${authUser.location.latitude} lng: ${authUser.location.longitude}',
-        name: 'Database: updateUserLocation');
-
-    location.set(authUser.location.toJson());
+        name: 'Database: updateUserLocation'));
   }
 }

@@ -25,11 +25,7 @@ class SignPost extends StatelessWidget {
 
             if (user != null) {
               if (user.isEmailVerified) {
-                var mainView = MainView();
-                mainView.authUser = user;
-
-                /// user is logged in and email is verified
-                return mainView;
+                return MainView(user: user);
               } else {
                 /// user is logged in but email is not verified
                 return const VerifyEmailView();

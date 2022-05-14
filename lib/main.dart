@@ -8,6 +8,8 @@ import 'package:etoet/views/settings_view.dart';
 import 'package:etoet/views/sign_post.dart';
 import 'package:flutter/material.dart';
 
+import 'services/auth/auth_user.dart';
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
@@ -22,10 +24,19 @@ void main() {
       routes: {
         loginRoute: (context) => const LoginView(),
         registerRoute: (context) => const RegisterView(),
-        mainRoute: (context) => MainView(),
+        /* mainRoute: (context) => MainView(), */
         verifyEmailRoute: (context) => const VerifyEmailView(),
         recoverAccountRoute: (context) => const RecoverAccountView(),
         settingsRoute: (context) => const SettingsView(),
+      },
+      onGenerateRoute: (settings) {
+        if (settings.name == mainRoute) {
+          final user = settings.arguments as AuthUser;
+          return MaterialPageRoute(
+            builder: (context) => MainView(user: user),
+          );
+        }
+        return null;
       },
     ),
   );

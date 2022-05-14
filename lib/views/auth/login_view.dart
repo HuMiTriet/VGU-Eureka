@@ -59,10 +59,12 @@ class _LoginViewState extends State<LoginView> {
                   Navigator.of(context).pushNamedAndRemoveUntil(
                     mainRoute,
                     (route) => false,
+                    arguments: user,
                   );
                 } else {
                   // user is NOT verified
-                  Navigator.of(context).pushNamedAndRemoveUntil(
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
                     verifyEmailRoute,
                     (route) => false,
                     arguments: user,
