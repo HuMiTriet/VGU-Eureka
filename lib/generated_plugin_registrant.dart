@@ -10,7 +10,7 @@ import 'package:firebase_analytics_web/firebase_analytics_web.dart';
 import 'package:firebase_auth_web/firebase_auth_web.dart';
 import 'package:firebase_core_web/firebase_core_web.dart';
 import 'package:firebase_database_web/firebase_database_web.dart';
-import 'package:location_web/location_web.dart';
+import 'package:geolocator_web/geolocator_web.dart';
 
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
@@ -21,6 +21,6 @@ void registerPlugins(Registrar registrar) {
   FirebaseAuthWeb.registerWith(registrar);
   FirebaseCoreWeb.registerWith(registrar);
   FirebaseDatabaseWeb.registerWith(registrar);
-  LocationWebPlugin.registerWith(registrar);
+  GeolocatorPlugin.registerWith(registrar);
   registrar.registerMessageHandler();
 }
