@@ -65,7 +65,7 @@ class _RecoverAccountViewState extends State<RecoverAccountView> {
       await showDialog(
         context: context,
         builder: (_) => CupertinoAlertDialog(
-          title: Text('Recovery Email Sent'),
+          title: const Text('Recovery Email Sent'),
           content: Text('Recovery Email Sent to ' + _email.text.trim()),
         ),
       );
