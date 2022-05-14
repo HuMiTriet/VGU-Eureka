@@ -3,6 +3,8 @@ import 'dart:developer' as devtools show log;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:etoet/services/auth/auth_user.dart';
+import 'package:etoet/services/database/database.dart';
 import 'package:etoet/services/map/map_factory.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -30,7 +32,12 @@ class GoogleMapImpl extends StatefulWidget implements Map {
   late num deviceHeight;
   List<String> addressList = ['', '', '', '', '', '', '', ''];
   late GoogleMap googleMap;
-  GoogleMapImpl({Key? key}) : super(key: key);
+
+  GoogleMapImpl({Key? key, required this.authUser}) : super(key: key);
+
+  @override
+  AuthUser authUser;
+
   @override
   void setContext(BuildContext context) {
     this.context = context;
@@ -43,6 +50,8 @@ class GoogleMapImpl extends StatefulWidget implements Map {
   void initializeMap() async {
     devtools.log('initialize map', name: 'initializeMap');
     var currentLocation = await _getCurrentLocation();
+    authUser.location.latitude = currentLocation.latitude;
+    authUser.location.longitude = currentLocation.longitude;
     _moveMap(currentLocation);
     _updateCurrentAddress(currentLocation);
     updateCurrentMapAddress();
@@ -306,6 +315,9 @@ class GoogleMapImpl extends StatefulWidget implements Map {
                 accuracy: LocationAccuracy.high, distanceFilter: 1))
         .listen((position) {
       _location = LatLng(position.latitude, position.longitude);
+      authUser.location.latitude = position.latitude;
+      authUser.location.longitude = position.longitude;
+      updateUserLocation(authUser);
       devtools.log('locationData: $position',
           name: 'GoogleMap: _updateLiveLocation');
     });
@@ -330,9 +342,7 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      setState(() {});
-    });
+    widget._updateLiveLocation();
   }
 
   @override
