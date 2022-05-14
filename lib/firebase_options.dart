@@ -39,6 +39,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '344264346912',
     projectId: 'etoet-pe2022',
     authDomain: 'etoet-pe2022.firebaseapp.com',
+    databaseURL: 'https://etoet-pe2022-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'etoet-pe2022.appspot.com',
     measurementId: 'G-7CGSRBRTVB',
   );
@@ -48,6 +49,7 @@ class DefaultFirebaseOptions {
     appId: '1:344264346912:android:04211c74b10c46618f9b45',
     messagingSenderId: '344264346912',
     projectId: 'etoet-pe2022',
+    databaseURL: 'https://etoet-pe2022-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'etoet-pe2022.appspot.com',
   );
 
@@ -56,7 +58,9 @@ class DefaultFirebaseOptions {
     appId: '1:344264346912:ios:12583481ea92e4508f9b45',
     messagingSenderId: '344264346912',
     projectId: 'etoet-pe2022',
+    databaseURL: 'https://etoet-pe2022-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'etoet-pe2022.appspot.com',
+    androidClientId: '344264346912-qbvbvkp2rlkvs4eq8hq8c8m3rhk3s2sm.apps.googleusercontent.com',
     iosClientId: '344264346912-6sfjhcgr9842sd14a8ov1nu8rs88f4li.apps.googleusercontent.com',
     iosBundleId: 'com.deltadeer.etoet',
   );
@@ -66,7 +70,9 @@ class DefaultFirebaseOptions {
     appId: '1:344264346912:ios:12583481ea92e4508f9b45',
     messagingSenderId: '344264346912',
     projectId: 'etoet-pe2022',
+    databaseURL: 'https://etoet-pe2022-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'etoet-pe2022.appspot.com',
+    androidClientId: '344264346912-qbvbvkp2rlkvs4eq8hq8c8m3rhk3s2sm.apps.googleusercontent.com',
     iosClientId: '344264346912-6sfjhcgr9842sd14a8ov1nu8rs88f4li.apps.googleusercontent.com',
     iosBundleId: 'com.deltadeer.etoet',
   );

@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "344264346912",
+    "firebase_url": "https://etoet-pe2022-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "etoet-pe2022",
     "storage_bucket": "etoet-pe2022.appspot.com"
   },
@@ -13,6 +14,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "344264346912-qbvbvkp2rlkvs4eq8hq8c8m3rhk3s2sm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.deltadeer.etoet",
+            "certificate_hash": "23a92cfaf4a958d3b265d0951b0331974b3208f5"
+          }
+        },
         {
           "client_id": "344264346912-1qh85k7a5tpslbfk37p0ojs3hfik6t10.apps.googleusercontent.com",
           "client_type": 3
