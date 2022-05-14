@@ -4,12 +4,12 @@ import 'package:firebase_database/firebase_database.dart';
 /// know which database to connect to
 final databaseReference = FirebaseDatabase.instance.ref();
 
-DatabaseReference updateUserLocation(AuthUser authUser) {
-  var location =
-      databaseReference.child('users').child(authUser.uid).child('location');
-  location.push().set({
-    'latitude': authUser.location.latitude,
-    'longitude': authUser.location.longitude,
-  });
-  return location;
+void updateUserLocation(AuthUser authUser) {
+  var location = databaseReference
+      .child('users/')
+      .child(authUser.uid)
+      .child('location')
+      .push();
+
+  location.set(authUser.location.toJson());
 }
