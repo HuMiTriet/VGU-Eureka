@@ -36,8 +36,9 @@ Future<bool> showLogOutDialog(BuildContext context) {
 }
 
 class MainView extends StatefulWidget {
+  late AuthUser authUser;
   @override
-  const MainView({Key? key}) : super(key: key);
+  MainView({Key? key}) : super(key: key);
 
   @override
   _MainViewState createState() => _MainViewState();
@@ -50,6 +51,7 @@ class _MainViewState extends State<MainView> {
 
   @override
   Widget build(BuildContext context) {
+    map.setAuthUser(widget.authUser);
     timer = Timer.periodic(const Duration(seconds: 1), (t) {
       setState(() {
         map.updateCurrentMapAddress();
@@ -173,9 +175,7 @@ class _MainViewState extends State<MainView> {
 
   @override
   void initState() {
-    final user = ModalRoute.of(context)!.settings.arguments as AuthUser;
-
-    map = Map('GoogleMap', user);
+    map = Map('GoogleMap');
     map.setContext(context);
     super.initState();
     hasLocationPermission();
