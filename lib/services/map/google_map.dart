@@ -7,8 +7,9 @@ import 'package:etoet/services/map/map_factory.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart' as loc;
+// import 'package:location/location.dart' as loc;
 
 /// This is the implementation of the [Map] interface using [GoogleMap].
 ///
@@ -21,25 +22,13 @@ class GoogleMapImpl extends StatefulWidget implements Map {
   late BuildContext context;
   late LatLng _location = const LatLng(11.0551, 106.6657);
   late GoogleMapController? _mapController;
-
   late StreamSubscription _locationSubscription;
-  final loc.Location _locationTracker = loc.Location();
+  // final loc.Location _locationTracker = loc.Location();
   Set<Marker> _markersList = {};
   Set<Polyline> _polylinesList = {};
   late num deviceWidth;
   late num deviceHeight;
-
-  set markersList(Set<Marker> markersList) {
-    _markersList = markersList;
-  }
-
-  set polylinesList(Set<Polyline> polylinesList) {
-    _polylinesList = polylinesList;
-  }
-
-  Set<Marker> get markersList => _markersList;
-  Set<Polyline> get polylinesList => _polylinesList;
-  late List<String> addressList = ['', '', '', '', '', '', '', ''];
+  List<String> addressList = ['', '', '', '', '', '', '', ''];
   late GoogleMap googleMap;
   GoogleMapImpl({Key? key}) : super(key: key);
   @override
@@ -118,13 +107,12 @@ class GoogleMapImpl extends StatefulWidget implements Map {
     return data!.buffer.asUint8List();
   }
 
-  @override
   void updateFriendsLocation() async {
     final markerIcon = await getBytesFromCanvas('FRIEND');
     final anya = await getBytesFromAsset('assets/images/Anya.png', 100);
     final loid = await getBytesFromAsset('assets/images/Loid.png', 100);
     final yor = await getBytesFromAsset('assets/images/Yor.png', 100);
-    markersList = {
+    _markersList = {
       Marker(
         markerId: const MarkerId('friend'),
         position: const LatLng(
@@ -227,9 +215,15 @@ class GoogleMapImpl extends StatefulWidget implements Map {
             showDialog(
                 context: context,
                 builder: (_) => AlertDialog(
-                      title: Text('Anya'),
-                      content: Text('Anya is here'),
+                      title: Text('Friend'),
+                      content: Text('My car has no gas. Please help me!'),
                       actions: [
+                        TextButton(
+                          child: Text('Cancel'),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
                         TextButton(
                           child: Text('OK'),
                           onPressed: () {
@@ -288,21 +282,32 @@ class GoogleMapImpl extends StatefulWidget implements Map {
       address = addressList[0];
     }
     devtools.log('update map Geocoding, set addressList: $address',
-        name: '_updateGeocoding');
+        name: 'GoogleMap: _updateGeocoding');
   }
 
   Future<LatLng> _getCurrentLocation() async {
-    var locationData = await loc.Location().getLocation();
-    _location = LatLng(locationData.latitude!, locationData.longitude!);
-    devtools.log('locationData: $locationData', name: '_getCurrentLocation');
-    return LatLng(locationData.latitude!, locationData.longitude!);
+    // var locationData = await loc.Location().getLocation();
+    var locationDataGeolocator = await Geolocator.getCurrentPosition();
+    _location = LatLng(
+        locationDataGeolocator.latitude, locationDataGeolocator.longitude);
+    devtools.log('locationData: $locationDataGeolocator',
+        name: 'GoogleMap: _getCurrentLocation');
+    return _location;
   }
 
   void _updateLiveLocation() {
-    _locationSubscription =
-        _locationTracker.onLocationChanged.listen((locationData) {
-      // devtools.log('locationData: $locationData', name: '_updateLiveLocation');
-      _location = LatLng(locationData.latitude!, locationData.longitude!);
+    // _locationSubscription =
+    //     _locationTracker.onLocationChanged.listen((locationData) {
+    //   // devtools.log('locationData: $locationData', name: '_updateLiveLocation');
+    //   _location = LatLng(locationData.latitude!, locationData.longitude!);
+    // });
+    _locationSubscription = Geolocator.getPositionStream(
+            locationSettings: const LocationSettings(
+                accuracy: LocationAccuracy.high, distanceFilter: 1))
+        .listen((position) {
+      _location = LatLng(position.latitude, position.longitude);
+      devtools.log('locationData: $position',
+          name: 'GoogleMap: _updateLiveLocation');
     });
   }
 
@@ -313,7 +318,7 @@ class GoogleMapImpl extends StatefulWidget implements Map {
         zoom: 15.0,
       ),
     ));
-    devtools.log('_moveMap to $location', name: '_moveMap');
+    devtools.log('_moveMap to $location', name: 'GoogleMap: _moveMap');
   }
 
   @override
@@ -325,7 +330,7 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       setState(() {});
     });
   }
@@ -336,9 +341,11 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
   }
 
   void _updateMap() async {
-    widget._moveMap(await widget._getCurrentLocation());
-    widget._updateCurrentAddress(await widget._getCurrentLocation());
+    var currentLocation = await widget._getCurrentLocation();
+    widget._moveMap(currentLocation);
+    widget._updateCurrentAddress(currentLocation);
     widget._updateLiveLocation();
+    devtools.log('_updateMap', name: 'GoogleMap: _updateMap');
   }
 
   @override
@@ -366,8 +373,8 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
                   name: 'GoogleMapImplState');
               _updateMap();
             },
-            markers: widget.markersList,
-            polylines: widget.polylinesList,
+            markers: widget._markersList,
+            polylines: widget._polylinesList,
             myLocationEnabled: true,
             zoomControlsEnabled: false,
             myLocationButtonEnabled: false,
