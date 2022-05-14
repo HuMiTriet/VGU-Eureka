@@ -1,0 +1,1 @@
+- Test for updating user's current location in realtime in database.
