@@ -8,8 +8,8 @@ DatabaseReference updateUserLocation(AuthUser authUser) {
   var location =
       databaseReference.child('users').child(authUser.uid).child('location');
   location.set({
-    /* 'latitude': authUser.latitude, */
-    /* 'longitude': authUser.longitude, */
+    'latitude': authUser.location.latitude,
+    'longitude': authUser.location.longitude,
   });
   return location;
 }
