@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:etoet/constants/routes.dart';
+import 'package:etoet/services/auth/auth_user.dart';
 import 'package:etoet/services/map/map_factory.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,11 @@ class MainView extends StatefulWidget {
 }
 
 class _MainViewState extends State<MainView> {
+  final AuthUser authUser = AuthUser(
+      uid: 'testUser123',
+      isEmailVerified: true,
+      phoneNumber: '+012345678',
+      email: 'test123@gmail.com');
   late Map map;
 
   Timer? timer;
@@ -80,7 +86,7 @@ class _MainViewState extends State<MainView> {
 
   @override
   void initState() {
-    map = Map('GoogleMap');
+    map = Map('GoogleMap', authUser);
     map.setContext(context);
     super.initState();
     hasLocationPermission();
@@ -88,6 +94,7 @@ class _MainViewState extends State<MainView> {
     // run after build
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       setState(() {
+        map.initializeMap();
         var screenWidth = MediaQuery.of(context).size.width *
             MediaQuery.of(context).devicePixelRatio;
         var screenHeight = MediaQuery.of(context).size.height *
