@@ -52,6 +52,7 @@ class GoogleMapImpl extends StatefulWidget implements Map {
     var currentLocation = await _getCurrentLocation();
     authUser.location.latitude = currentLocation.latitude;
     authUser.location.longitude = currentLocation.longitude;
+    Database.updateUserLocation(authUser);
     _moveMap(currentLocation);
     _updateCurrentAddress(currentLocation);
     updateCurrentMapAddress();
@@ -305,11 +306,6 @@ class GoogleMapImpl extends StatefulWidget implements Map {
   }
 
   void _updateLiveLocation() {
-    // _locationSubscription =
-    //     _locationTracker.onLocationChanged.listen((locationData) {
-    //   // devtools.log('locationData: $locationData', name: '_updateLiveLocation');
-    //   _location = LatLng(locationData.latitude!, locationData.longitude!);
-    // });
     _locationSubscription = Geolocator.getPositionStream(
             locationSettings: const LocationSettings(
                 accuracy: LocationAccuracy.high, distanceFilter: 1))
@@ -317,7 +313,7 @@ class GoogleMapImpl extends StatefulWidget implements Map {
       _location = LatLng(position.latitude, position.longitude);
       authUser.location.latitude = position.latitude;
       authUser.location.longitude = position.longitude;
-      updateUserLocation(authUser);
+      Database.updateUserLocation(authUser);
       devtools.log('locationData: $position',
           name: 'GoogleMap: _updateLiveLocation');
     });
