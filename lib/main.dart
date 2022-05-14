@@ -8,6 +8,8 @@ import 'package:etoet/views/settings_view.dart';
 import 'package:etoet/views/sign_post.dart';
 import 'package:flutter/material.dart';
 
+import 'services/auth/auth_user.dart';
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
