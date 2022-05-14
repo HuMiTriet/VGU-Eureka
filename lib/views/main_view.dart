@@ -6,9 +6,6 @@ import 'package:etoet/services/map/map_factory.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-// import 'package:location/location.dart';
-
-/* enum MenuAction { signOut } */
 
 class MainView extends StatefulWidget {
   @override
@@ -27,27 +24,6 @@ class _MainViewState extends State<MainView> {
   late Map map;
 
   Timer? timer;
-
-  // Future<bool> hasLocationPermission() async {
-  //   return await Location().requestPermission().then((granted) {
-  //     if (granted == PermissionStatus.granted) {
-  //       return true;
-  //     } else if (granted == PermissionStatus.deniedForever) {
-  //       return false;
-  //     } else {
-  //       Location().requestPermission().then((granted) {
-  //         if (granted == PermissionStatus.granted) {
-  //           return true;
-  //         } else if (granted == PermissionStatus.deniedForever) {
-  //           return false;
-  //         } else {
-  //           return false;
-  //         }
-  //       });
-  //     }
-  //     return false;
-  //   });
-  // }
 
   Future<bool> hasLocationPermission() async {
     bool serviceEnabled;
