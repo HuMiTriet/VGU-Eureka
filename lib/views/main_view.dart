@@ -35,10 +35,6 @@ Future<bool> showLogOutDialog(BuildContext context) {
   ).then((value) => value ?? false);
 }
 
-// import 'package:location/location.dart';
-
-/* enum MenuAction { signOut } */
-
 class MainView extends StatefulWidget {
   @override
   const MainView({Key? key}) : super(key: key);
@@ -48,19 +44,12 @@ class MainView extends StatefulWidget {
 }
 
 class _MainViewState extends State<MainView> {
-  final AuthUser authUser = AuthUser(
-      uid: 'testUser123',
-      isEmailVerified: true,
-      phoneNumber: '+012345678',
-      email: 'test123@gmail.com');
   late Map map;
 
   Timer? timer;
 
   @override
   Widget build(BuildContext context) {
-    final user = ModalRoute.of(context)!.settings.arguments as AuthUser;
-
     timer = Timer.periodic(const Duration(seconds: 1), (t) {
       setState(() {
         map.updateCurrentMapAddress();
@@ -184,7 +173,9 @@ class _MainViewState extends State<MainView> {
 
   @override
   void initState() {
-    map = Map('GoogleMap', authUser);
+    final user = ModalRoute.of(context)!.settings.arguments as AuthUser;
+
+    map = Map('GoogleMap', user);
     map.setContext(context);
     super.initState();
     hasLocationPermission();
