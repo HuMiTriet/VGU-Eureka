@@ -62,7 +62,7 @@ class _MainViewState extends State<MainView> {
 
   @override
   void initState() {
-    map = Map('GoogleMap');
+    map = Map('GoogleMap', authUser);
     map.setContext(context);
     super.initState();
     hasLocationPermission();
