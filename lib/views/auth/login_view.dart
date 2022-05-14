@@ -2,6 +2,7 @@ import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/auth_exceptions.dart';
 import 'package:etoet/services/auth/auth_service.dart';
 import 'package:etoet/views/auth/error_dialog.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -23,7 +24,8 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
-  GoogleSignInAccount? _currentUser;
+  GoogleSignInAccount? _googleUser;
+  GoogleSignInAuthentication? _googleAuth;
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +108,7 @@ class _LoginViewState extends State<LoginView> {
               color: Colors.green,
               image: const AssetImage('assets/images/google_logo.png'),
               text: 'Login with Google',
-              onPressed: _handleSignIn)
+              onPressed: signInWithGoogle)
         ],
       ),
     );
@@ -126,28 +128,22 @@ class _LoginViewState extends State<LoginView> {
     super.initState();
   }
 
-  Future<void> _handleSignIn() async {
-    try {
-      _googleSignIn.onCurrentUserChanged.listen((account) {
-        setState(() {
-          _currentUser = account;
-        });
-      });
-      await _googleSignIn.signIn();
-      _currentUser = _googleSignIn.currentUser;
-      if (_currentUser != null) {
-        Navigator.of(context).pushNamedAndRemoveUntil(
-          mainRoute,
-          (route) => false,
-        );
-      }
-    } on UserNotFoundAuthException {
-      await showErrorDialog(context, 'User not found');
-    } on WrongPasswordAuthException {
-      await showErrorDialog(context, 'Incorrect password');
-    } on GenericAuthException {
-      await showErrorDialog(context, 'Error');
-    }
+  Future<void> signInWithGoogle() async {
+    // Trigger the authentication flow
+    _googleUser = await GoogleSignIn().signIn();
+
+    // Obtain the auth details from the request
+    _googleAuth = await _googleUser?.authentication;
+
+    // Create a new credential
+    final credential = GoogleAuthProvider.credential(
+      accessToken: _googleAuth?.accessToken,
+      idToken: _googleAuth?.idToken,
+    );
+
+    // Once signed in, return the UserCredential
+    await FirebaseAuth.instance.signInWithCredential(credential);
+    Navigator.of(context).pushNamedAndRemoveUntil(mainRoute, (route) => false);
   }
 }
 
@@ -178,7 +174,7 @@ class _Button extends StatelessWidget {
             border: Border.all(color: color),
             borderRadius: BorderRadius.circular(20),
           ),
-          padding: EdgeInsets.all(10),
+          padding: const EdgeInsets.all(10),
           child: Row(
             children: [
               const SizedBox(width: 5),
