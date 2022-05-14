@@ -6,12 +6,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-final GoogleSignIn _googleSignIn = GoogleSignIn(
-  scopes: <String>[
-    'email',
-  ],
-);
-
 class LoginView extends StatefulWidget {
   const LoginView({
     Key? key,
@@ -108,7 +102,7 @@ class _LoginViewState extends State<LoginView> {
               color: Colors.green,
               image: const AssetImage('assets/images/google_logo.png'),
               text: 'Login with Google',
-              onPressed: signInWithGoogle)
+              onPressed: signInWithGoogle),
         ],
       ),
     );
@@ -174,7 +168,7 @@ class _Button extends StatelessWidget {
             border: Border.all(color: color),
             borderRadius: BorderRadius.circular(20),
           ),
-          padding: const EdgeInsets.all(10),
+          padding: EdgeInsets.all(10),
           child: Row(
             children: [
               const SizedBox(width: 5),
