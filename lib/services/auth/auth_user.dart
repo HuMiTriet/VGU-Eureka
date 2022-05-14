@@ -3,11 +3,13 @@ import 'package:firebase_auth/firebase_auth.dart' show User;
 import 'package:flutter/foundation.dart';
 
 // This annotation immutable tells the compiler that the content of this class
-// and its subclasses will not change. This is done because w
+// and its subclasses will not change.
 @immutable
 class AuthUser {
   //// provide current location of the user
   final Location location = Location(0, 0);
+
+  final Set<String> friendUIDs = {};
 
   final String uid;
   final bool isEmailVerified;

@@ -10,7 +10,7 @@ class Location {
   double latitude;
   double longitude;
 
-  Map<String, dynamic> toJson() {
+  Map<String, double> toJson() {
     return {
       'latitude': latitude,
       'longitude': longitude,
