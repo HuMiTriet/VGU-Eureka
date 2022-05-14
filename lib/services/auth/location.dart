@@ -1,6 +1,6 @@
 class Location {
-  Location(this.latitude, this.longtitude);
+  Location(this.latitude, this.longitude);
 
   double latitude;
-  double longtitude;
+  double longitude;
 }

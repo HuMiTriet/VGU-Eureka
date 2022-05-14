@@ -9,7 +9,7 @@ void main() {
     );
 
     user.location.latitude = 10;
-    user.location.longtitude = 10;
+    user.location.longitude = 10;
 
     expect(user.location.longitude, 10);
   });
