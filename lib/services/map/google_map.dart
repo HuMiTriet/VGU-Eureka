@@ -11,13 +11,12 @@ import 'package:flutter/services.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-// import 'package:location/location.dart' as loc;
 
 /// This is the implementation of the [Map] interface using [GoogleMap].
 ///
 /// # Functions:
 /// - moveToCurrentLocation() - moves the map to the current location
-/// - updateCurrentMapAddress() - shows the current addressList that the map shows
+/// - updateCurrentMapAddress() - update the current addressList that the map shows
 /// - updateScreenSize() - updates the screen size of the device
 /// - initializeMap() - initializes the map(move the map to current location, update addressList)
 class GoogleMapImpl extends StatefulWidget implements Map {
@@ -25,7 +24,6 @@ class GoogleMapImpl extends StatefulWidget implements Map {
   late LatLng _location = const LatLng(11.0551, 106.6657);
   late GoogleMapController? _mapController;
   late StreamSubscription _locationSubscription;
-  // final loc.Location _locationTracker = loc.Location();
   Set<Marker> _markersList = {};
   Set<Polyline> _polylinesList = {};
   late num deviceWidth;
@@ -52,6 +50,7 @@ class GoogleMapImpl extends StatefulWidget implements Map {
     var currentLocation = await _getCurrentLocation();
     authUser.location.latitude = currentLocation.latitude;
     authUser.location.longitude = currentLocation.longitude;
+    updateUserLocation(authUser);
     _moveMap(currentLocation);
     _updateCurrentAddress(currentLocation);
     updateCurrentMapAddress();
@@ -104,7 +103,7 @@ class GoogleMapImpl extends StatefulWidget implements Map {
     TextPainter painter = TextPainter(textDirection: TextDirection.ltr);
     painter.text = TextSpan(
       text: text,
-      style: TextStyle(fontSize: 25.0, color: Colors.white),
+      style: const TextStyle(fontSize: 25.0, color: Colors.white),
     );
     painter.layout();
     painter.paint(
@@ -131,21 +130,20 @@ class GoogleMapImpl extends StatefulWidget implements Map {
         // icon: BitmapDescriptor,
         icon: BitmapDescriptor.fromBytes(loid),
         onTap: () {
-          print('Loid');
           showDialog(
               context: context,
               builder: (_) => AlertDialog(
-                    title: Text('Loid is here'),
-                    content: Text('Need to help with something'),
+                    title: const Text('Loid is here'),
+                    content: const Text('Need to help with something'),
                     actions: [
                       TextButton(
-                        child: Text('Cancel'),
+                        child: const Text('Cancel'),
                         onPressed: () {
                           Navigator.pop(context);
                         },
                       ),
                       TextButton(
-                        child: Text('OK'),
+                        child: const Text('OK'),
                         onPressed: () {
                           Navigator.pop(context);
                         },
@@ -162,21 +160,20 @@ class GoogleMapImpl extends StatefulWidget implements Map {
         ),
         icon: BitmapDescriptor.fromBytes(yor),
         onTap: () {
-          print('Yor');
           showDialog(
               context: context,
               builder: (_) => AlertDialog(
-                    title: Text('Yor is here'),
-                    content: Text('Need to help with something'),
+                    title: const Text('Yor is here'),
+                    content: const Text('Need to help with something'),
                     actions: [
                       TextButton(
-                        child: Text('Cancel'),
+                        child: const Text('Cancel'),
                         onPressed: () {
                           Navigator.pop(context);
                         },
                       ),
                       TextButton(
-                        child: Text('OK'),
+                        child: const Text('OK'),
                         onPressed: () {
                           Navigator.pop(context);
                         },
@@ -186,28 +183,27 @@ class GoogleMapImpl extends StatefulWidget implements Map {
         },
       ),
       Marker(
-        markerId: MarkerId('friend3'),
-        position: LatLng(
+        markerId: const MarkerId('friend3'),
+        position: const LatLng(
           11.0551,
           106.6657,
         ),
         icon: BitmapDescriptor.fromBytes(anya),
         onTap: () {
-          print('Anya');
           showDialog(
               context: context,
               builder: (_) => AlertDialog(
-                    title: Text('Anya'),
-                    content: Text('Need to help with something'),
+                    title: const Text('Anya'),
+                    content: const Text('Need to help with something'),
                     actions: [
                       TextButton(
-                        child: Text('Cancel'),
+                        child: const Text('Cancel'),
                         onPressed: () {
                           Navigator.pop(context);
                         },
                       ),
                       TextButton(
-                        child: Text('OK'),
+                        child: const Text('OK'),
                         onPressed: () {
                           Navigator.pop(context);
                         },
@@ -224,17 +220,17 @@ class GoogleMapImpl extends StatefulWidget implements Map {
             showDialog(
                 context: context,
                 builder: (_) => AlertDialog(
-                      title: Text('Friend'),
-                      content: Text('My car has no gas. Please help me!'),
+                      title: const Text('Friend'),
+                      content: const Text('My car has no gas. Please help me!'),
                       actions: [
                         TextButton(
-                          child: Text('Cancel'),
+                          child: const Text('Cancel'),
                           onPressed: () {
                             Navigator.pop(context);
                           },
                         ),
                         TextButton(
-                          child: Text('OK'),
+                          child: const Text('OK'),
                           onPressed: () {
                             Navigator.pop(context);
                           },
@@ -295,7 +291,6 @@ class GoogleMapImpl extends StatefulWidget implements Map {
   }
 
   Future<LatLng> _getCurrentLocation() async {
-    // var locationData = await loc.Location().getLocation();
     var locationDataGeolocator = await Geolocator.getCurrentPosition();
     _location = LatLng(
         locationDataGeolocator.latitude, locationDataGeolocator.longitude);
@@ -305,11 +300,6 @@ class GoogleMapImpl extends StatefulWidget implements Map {
   }
 
   void _updateLiveLocation() {
-    // _locationSubscription =
-    //     _locationTracker.onLocationChanged.listen((locationData) {
-    //   // devtools.log('locationData: $locationData', name: '_updateLiveLocation');
-    //   _location = LatLng(locationData.latitude!, locationData.longitude!);
-    // });
     _locationSubscription = Geolocator.getPositionStream(
             locationSettings: const LocationSettings(
                 accuracy: LocationAccuracy.high, distanceFilter: 1))
@@ -389,9 +379,6 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
             zoomControlsEnabled: false,
             myLocationButtonEnabled: false,
             mapToolbarEnabled: false,
-            // onCameraMove: (value) {
-            //   widget._updateCurrentAddress(value.target);
-            // },
           );
         } else {
           return const Center(
