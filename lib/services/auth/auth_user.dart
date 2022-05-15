@@ -11,20 +11,21 @@ class AuthUser {
   final String? phoneNumber;
   final String? email;
   final String? displayName;
+  final String? photoURL;
 
-  const AuthUser({
-    required this.isEmailVerified,
-    required this.phoneNumber,
-    required this.uid,
-    this.email,
-    this.displayName,
-  });
+  const AuthUser(
+      {required this.isEmailVerified,
+      required this.phoneNumber,
+      required this.uid,
+      this.email,
+      this.displayName,
+      this.photoURL});
 
   factory AuthUser.fromFirebase(User user) => AuthUser(
-        uid: user.uid,
-        isEmailVerified: user.emailVerified,
-        phoneNumber: user.phoneNumber,
-        email: user.email,
-        displayName: user.displayName,
-      );
+      uid: user.uid,
+      isEmailVerified: user.emailVerified,
+      phoneNumber: user.phoneNumber,
+      email: user.email,
+      displayName: user.displayName,
+      photoURL: user.photoURL);
 }
