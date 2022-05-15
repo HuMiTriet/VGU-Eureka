@@ -82,7 +82,9 @@ class _MainViewState extends State<MainView> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
                 ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(profileRoute);
+                    },
                     style: ElevatedButton.styleFrom(
                       primary: Colors.orange,
                       shape: const CircleBorder(),
