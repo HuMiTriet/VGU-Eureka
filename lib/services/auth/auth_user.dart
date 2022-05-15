@@ -1,3 +1,4 @@
+import 'package:etoet/services/auth/location.dart';
 import 'package:firebase_auth/firebase_auth.dart' show User;
 import 'package:flutter/foundation.dart';
 
@@ -5,6 +6,11 @@ import 'package:flutter/foundation.dart';
 // and its subclasses will not change.
 @immutable
 class AuthUser {
+  //// provide current location of the user
+  final Location location = Location(0, 0);
+
+  final Set<String> friendUIDs = {};
+
   final String uid;
   final bool isEmailVerified;
 
@@ -13,7 +19,7 @@ class AuthUser {
   final String? displayName;
   final String? photoURL;
 
-  const AuthUser(
+  AuthUser(
       {required this.isEmailVerified,
       required this.phoneNumber,
       required this.uid,
