@@ -124,7 +124,13 @@ class _LoginViewState extends State<LoginView> {
 
   Future<void> signInWithGoogle() async {
     // Trigger the authentication flow
-    _googleUser = await GoogleSignIn().signIn();
+    _googleUser = await GoogleSignIn(
+      clientId:
+          '344264346912-1qh85k7a5tpslbfk37p0ojs3hfik6t10.apps.googleusercontent.com',
+      scopes: <String>[
+        'email',
+      ],
+    ).signIn();
 
     // Obtain the auth details from the request
     _googleAuth = await _googleUser?.authentication;
@@ -168,7 +174,7 @@ class _Button extends StatelessWidget {
             border: Border.all(color: color),
             borderRadius: BorderRadius.circular(20),
           ),
-          padding: EdgeInsets.all(10),
+          padding: const EdgeInsets.all(10),
           child: Row(
             children: [
               const SizedBox(width: 5),
