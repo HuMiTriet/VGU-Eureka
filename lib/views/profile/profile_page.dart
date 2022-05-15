@@ -1,11 +1,30 @@
+import 'package:etoet/views/profile/Widgets/edit_image_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
+import '../../services/auth/auth_user.dart';
 import 'change_pass_page.dart';
+
 // import 'package:flutter/cupertino.dart';
 
 class ProfilePage extends StatefulWidget {
+  const ProfilePage({
+    Key? key,
+    // requiredthis.user
+  }) : super(key: key);
+
   @override
   MapScreenState createState() => MapScreenState();
+
+  // final AuthUser user;
+
+  final AuthUser user = const AuthUser(
+      phoneNumber: '1234',
+      isEmailVerified: false,
+      uid: '12352',
+      email: 'mail@gmail.com',
+      displayName: 'display name',
+      photoURL: null);
 }
 
 class MapScreenState extends State<ProfilePage>
@@ -18,9 +37,9 @@ class MapScreenState extends State<ProfilePage>
   void initState() {
     // TODO: implement initState
     super.initState();
-    nameController.text = 'User Name';
-    emailController.text = 'mail@gmail.com';
-    mobileController.text = '12345677';
+    nameController.text = widget.user.displayName ?? '';
+    emailController.text = widget.user.email ?? '';
+    mobileController.text = widget.user.phoneNumber ?? '';
   }
 
   @override
@@ -29,14 +48,14 @@ class MapScreenState extends State<ProfilePage>
       data: ThemeData.light(),
       child: Scaffold(
           body: Container(
-        color: Colors.amber,
+        // color: Colors.amber,
         child: ListView(
           children: <Widget>[
             Column(
               children: <Widget>[
                 Container(
                   height: 250.0,
-                  color: Colors.amber,
+                  color: Colors.white,
                   child: Column(
                     children: <Widget>[
                       Padding(
@@ -78,11 +97,12 @@ class MapScreenState extends State<ProfilePage>
                               Container(
                                   width: 140.0,
                                   height: 140.0,
-                                  decoration: const BoxDecoration(
+                                  decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     image: DecorationImage(
                                       // image: ExactAssetImage(widget.user.img),
-                                      image: NetworkImage(
+                                      image: NetworkImage(widget
+                                              .user.photoURL ??
                                           'https://www.pavilionweb.com/wp-content/uploads/2017/03/man-300x300.png'),
                                       fit: BoxFit.cover,
                                     ),
@@ -94,13 +114,18 @@ class MapScreenState extends State<ProfilePage>
                                   top: 90.0, right: 100.0),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
-                                children: const <Widget>[
-                                  CircleAvatar(
-                                    backgroundColor: Colors.red,
-                                    radius: 25.0,
-                                    child: Icon(
-                                      Icons.camera_alt,
-                                      color: Colors.white,
+                                children: <Widget>[
+                                  TextButton(
+                                    onPressed: () {
+                                      EditImageDialog(context);
+                                    },
+                                    child: const CircleAvatar(
+                                      backgroundColor: Colors.red,
+                                      radius: 25.0,
+                                      child: Icon(
+                                        Icons.camera_alt,
+                                        color: Colors.white,
+                                      ),
                                     ),
                                   )
                                 ],
