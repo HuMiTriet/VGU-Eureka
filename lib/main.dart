@@ -21,22 +21,36 @@ void main() {
       home: const SignPost(),
 
       //define the routes so that the app can navigate to the different views.
-      routes: {
-        loginRoute: (context) => const LoginView(),
-        registerRoute: (context) => const RegisterView(),
-        /* mainRoute: (context) => MainView(), */
-        verifyEmailRoute: (context) => const VerifyEmailView(),
-        recoverAccountRoute: (context) => const RecoverAccountView(),
-        settingsRoute: (context) => const SettingsView(),
-      },
       onGenerateRoute: (settings) {
-        if (settings.name == mainRoute) {
-          final user = settings.arguments as AuthUser;
-          return MaterialPageRoute(
-            builder: (context) => MainView(user: user),
-          );
+        final user = settings.arguments as AuthUser;
+        switch (settings.name) {
+          case mainRoute:
+            return MaterialPageRoute(
+              builder: (context) => MainView(user: user),
+            );
+          case loginRoute:
+            return MaterialPageRoute(
+              builder: (context) => const LoginView(),
+            );
+          case registerRoute:
+            return MaterialPageRoute(
+              builder: (context) => const RegisterView(),
+            );
+          case verifyEmailRoute:
+            return MaterialPageRoute(
+              builder: (context) => const VerifyEmailView(),
+            );
+          case recoverAccountRoute:
+            return MaterialPageRoute(
+              builder: (context) => const RecoverAccountView(),
+            );
+          case settingsRoute:
+            return MaterialPageRoute(
+              builder: (context) => const SettingsView(),
+            );
+          default:
+            return null;
         }
-        return null;
       },
     ),
   );
