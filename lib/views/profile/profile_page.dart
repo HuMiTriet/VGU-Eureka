@@ -6,7 +6,7 @@ import 'change_pass_page.dart';
 // import 'package:flutter/cupertino.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({
+  ProfilePage({
     Key? key,
     // requiredthis.user
   }) : super(key: key);
@@ -16,7 +16,7 @@ class ProfilePage extends StatefulWidget {
 
   // final AuthUser user;
 
-  final AuthUser user = const AuthUser(
+  final AuthUser user = AuthUser(
       phoneNumber: '1234',
       isEmailVerified: false,
       uid: '12352',
