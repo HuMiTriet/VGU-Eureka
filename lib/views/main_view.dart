@@ -68,7 +68,7 @@ class _MainViewState extends State<MainView> {
     hasLocationPermission();
 
     // run after build
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
+    WidgetsBinding.instance?.addPostFrameCallback((_) async {
       setState(() {
         map.initializeMap();
         var screenWidth = MediaQuery.of(context).size.width *
@@ -150,7 +150,11 @@ class _MainViewState extends State<MainView> {
         children: <Widget>[
           FloatingActionButton(
               heroTag: 'goToFriendsFromMain',
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).pushNamed(
+                  friendRoute,
+                );
+              },
               child: const Icon(Icons.group)),
           FloatingActionButton(
               heroTag: 'goToSOSFromMain',
