@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/auth_user.dart';
 import 'package:etoet/services/map/map_factory.dart';
+import 'package:etoet/views/friend/friend_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class MainView extends StatefulWidget {
   @override
@@ -151,8 +153,11 @@ class _MainViewState extends State<MainView> {
           FloatingActionButton(
               heroTag: 'goToFriendsFromMain',
               onPressed: () {
-                Navigator.of(context).pushNamed(
-                  friendRoute,
+                showBarModalBottomSheet(
+                  expand: true,
+                  context: context,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => const FriendView(),
                 );
               },
               child: const Icon(Icons.group)),

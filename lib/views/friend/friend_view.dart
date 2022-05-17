@@ -1,31 +1,80 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-
-import 'package:etoet/views/friend/search_friend_view.dart';
 import 'package:etoet/views/friend/widget/friend_view_widgets.dart';
 import 'package:flutter/material.dart';
 
-class FriendView extends StatefulWidget {
+class FriendView extends StatelessWidget {
   const FriendView({Key? key}) : super(key: key);
 
   @override
-  State<FriendView> createState() => _FriendState();
+  Widget build(BuildContext context) {
+    return Material(
+      child: NestedScrollView(
+        controller: ScrollController(),
+        physics: ScrollPhysics(parent: PageScrollPhysics()),
+        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          return <Widget>[
+            CustomAppBar(),
+          ];
+        },
+        body: ShowFriends(),
+      ),
+    );
+  }
 }
 
-class _FriendState extends State<FriendView> {
-  var _searchedTextController = TextEditingController();
+class CustomAppBar extends StatelessWidget {
+  const CustomAppBar({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(title: Text('Friends')),
-        body: Column(
-          children: [
-            Container(
-                margin: const EdgeInsets.all(15),
-                child:
-                    SearchBar(searchedTextController: _searchedTextController)),
-            const AddFriendButton(),
-            const ShowFriends(),
-          ],
-        ));
+    return SliverPersistentHeader(
+      pinned: true,
+      delegate: MyAppBarDelegate(),
+    );
+  }
+}
+
+class MyAppBarDelegate extends SliverPersistentHeaderDelegate {
+  @override
+  Widget build(BuildContext context, shrinkOffset, bo) {
+    return Container(
+      color: Colors.orange,
+      height: 200,
+      // color: Theme.of(context).primaryColorDark,
+      child: SafeArea(
+        child: Container(
+            margin: EdgeInsets.all(8.0),
+            child: Column(
+              // mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                      decoration: InputDecoration(
+                    fillColor: Color.fromARGB(255, 233, 164, 61),
+                    filled: true,
+                    border: OutlineInputBorder(),
+                    hintText: 'Search',
+                  )),
+                ),
+                AddFriendButton(),
+              ],
+            )),
+      ),
+    );
+  }
+
+  @override
+  // TODO: implement maxExtent
+  double get maxExtent => 150;
+
+  @override
+  // TODO: implement minExtent
+  double get minExtent => 30;
+
+  @override
+  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
+    // TODO: implement shouldRebuild
+    return true;
   }
 }
