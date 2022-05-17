@@ -8,6 +8,7 @@ import 'package:etoet/views/main_view.dart';
 import 'package:etoet/views/settings_view.dart';
 import 'package:etoet/views/sign_post.dart';
 import 'package:flutter/material.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,7 +28,6 @@ void main() {
         verifyEmailRoute: (context) => const VerifyEmailView(),
         recoverAccountRoute: (context) => const RecoverAccountView(),
         settingsRoute: (context) => const SettingsView(),
-        friendRoute: (context) => const FriendView(),
       },
     ),
   );
