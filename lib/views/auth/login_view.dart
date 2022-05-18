@@ -4,6 +4,7 @@ import 'package:etoet/services/auth/auth_service.dart';
 import 'package:etoet/views/auth/error_dialog.dart';
 import 'package:etoet/views/main_view.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({
@@ -17,6 +18,8 @@ class LoginView extends StatefulWidget {
 class _LoginViewState extends State<LoginView> {
   late final TextEditingController _email;
   late final TextEditingController _password;
+  GoogleSignInAccount? _googleUser;
+  GoogleSignInAuthentication? _googleAuth;
 
   @override
   Widget build(BuildContext context) {
@@ -93,12 +96,18 @@ class _LoginViewState extends State<LoginView> {
               },
               child: const Text('Not registered yet ? Sign Up')),
           TextButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed(
-                  recoverAccountRoute,
-                );
-              },
-              child: const Text('Forgot your Password?')),
+            onPressed: () {
+              Navigator.of(context).pushNamed(
+                recoverAccountRoute,
+              );
+            },
+            child: const Text('Forgot your Password?'),
+          ),
+          _Button(
+              color: Colors.green,
+              image: const AssetImage('assets/images/google_logo.png'),
+              text: 'Login with Google',
+              onPressed: signInWithGoogle),
         ],
       ),
     );
@@ -116,5 +125,82 @@ class _LoginViewState extends State<LoginView> {
     _email = TextEditingController();
     _password = TextEditingController();
     super.initState();
+  }
+
+  Future<void> signInWithGoogle() async {
+    // Trigger the authentication flow
+    _googleUser = await GoogleSignIn(
+      clientId:
+          '344264346912-1qh85k7a5tpslbfk37p0ojs3hfik6t10.apps.googleusercontent.com',
+      scopes: <String>[
+        'email',
+      ],
+    ).signIn();
+
+    // Obtain the auth details from the request
+    _googleAuth = await _googleUser?.authentication;
+
+    // Create a new credential
+    final credential = GoogleAuthProvider.credential(
+      accessToken: _googleAuth?.accessToken,
+      idToken: _googleAuth?.idToken,
+    );
+
+    // Once signed in, return the UserCredential
+    await FirebaseAuth.instance.signInWithCredential(credential);
+    Navigator.of(context).pushNamedAndRemoveUntil(mainRoute, (route) => false);
+  }
+}
+
+class _Button extends StatelessWidget {
+  final Color color;
+  final ImageProvider image;
+  final String text;
+  final VoidCallback onPressed;
+
+  const _Button({
+    required this.color,
+    required this.image,
+    required this.text,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 20.0),
+      child: GestureDetector(
+        onTap: () {
+          onPressed();
+        },
+        child: Container(
+          height: 55,
+          decoration: BoxDecoration(
+            border: Border.all(color: color),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          padding: const EdgeInsets.all(10),
+          child: Row(
+            children: [
+              const SizedBox(width: 5),
+              Image(
+                image: image,
+                width: 25,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(text, style: TextStyle(color: color, fontSize: 18)),
+                    const SizedBox(width: 35),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
