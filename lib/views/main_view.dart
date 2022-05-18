@@ -2,9 +2,10 @@ import 'dart:async';
 
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/map/map_factory.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+
+import '../services/auth/auth_user.dart';
 
 class MainView extends StatefulWidget {
   final AuthUser user;
@@ -61,13 +62,13 @@ class _MainViewState extends State<MainView> {
 
   @override
   void initState() {
-    map = Map('GoogleMap', authUser);
+    map = Map('GoogleMap');
     map.setContext(context);
     super.initState();
     hasLocationPermission();
 
     // run after build
-    WidgetsBinding.instance?.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       setState(() {
         map.initializeMap();
         var screenWidth = MediaQuery.of(context).size.width *
@@ -77,12 +78,6 @@ class _MainViewState extends State<MainView> {
         map.updateScreenSize(screenWidth, screenHeight);
       });
     });
-  }
-
-  @override
-  void dispose() {
-    timer?.cancel();
-    super.dispose();
   }
 
   @override
@@ -174,58 +169,4 @@ class _MainViewState extends State<MainView> {
     super.dispose();
   }
 
-  Future<bool> hasLocationPermission() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    // Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
-      return Future.error('Location services are disabled.');
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
-        return Future.error('Location permissions are denied');
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-
-    return true;
-  }
-
-  @override
-  void initState() {
-    map = Map('GoogleMap');
-    map.setContext(context);
-    super.initState();
-    hasLocationPermission();
-
-    // run after build
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      setState(() {
-        map.initializeMap();
-        var screenWidth = MediaQuery.of(context).size.width *
-            MediaQuery.of(context).devicePixelRatio;
-        var screenHeight = MediaQuery.of(context).size.height *
-            MediaQuery.of(context).devicePixelRatio;
-        map.updateScreenSize(screenWidth, screenHeight);
-      });
-    });
-  }
 }
