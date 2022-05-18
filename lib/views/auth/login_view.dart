@@ -2,6 +2,7 @@ import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/auth_exceptions.dart';
 import 'package:etoet/services/auth/auth_service.dart';
 import 'package:etoet/views/auth/error_dialog.dart';
+import 'package:etoet/views/main_view.dart';
 import 'package:flutter/material.dart';
 
 class LoginView extends StatefulWidget {
@@ -56,10 +57,12 @@ class _LoginViewState extends State<LoginView> {
                 final user = AuthService.firebase().currentUser;
                 if (user?.isEmailVerified ?? false) {
                   // user is verified
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    mainRoute,
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MainView(user: user!),
+                    ),
                     (route) => false,
-                    arguments: user,
                   );
                 } else {
                   // user is NOT verified

@@ -1,6 +1,5 @@
 import 'dart:developer' as devtools show log;
 
-import 'package:etoet/main.dart';
 import 'package:etoet/services/auth/auth_service.dart';
 import 'package:etoet/views/auth/login_view.dart';
 import 'package:etoet/views/auth/verified_email_view.dart';
