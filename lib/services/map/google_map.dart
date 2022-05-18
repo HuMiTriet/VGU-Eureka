@@ -31,15 +31,10 @@ class GoogleMapImpl extends StatefulWidget implements Map {
   List<String> addressList = ['', '', '', '', '', '', '', ''];
   late GoogleMap googleMap;
 
-  GoogleMapImpl({Key? key}) : super(key: key);
+  GoogleMapImpl({Key? key, required this.authUser}) : super(key: key);
 
   @override
-  late AuthUser authUser;
-
-  @override
-  void setAuthUser(AuthUser authUser) {
-    this.authUser = authUser;
-  }
+  AuthUser authUser;
 
   @override
   void setContext(BuildContext context) {
@@ -55,7 +50,7 @@ class GoogleMapImpl extends StatefulWidget implements Map {
     var currentLocation = await _getCurrentLocation();
     authUser.location.latitude = currentLocation.latitude;
     authUser.location.longitude = currentLocation.longitude;
-    Database.updateUserLocation(authUser);
+    updateUserLocation(authUser);
     _moveMap(currentLocation);
     _updateCurrentAddress(currentLocation);
     updateCurrentMapAddress();
@@ -312,7 +307,7 @@ class GoogleMapImpl extends StatefulWidget implements Map {
       _location = LatLng(position.latitude, position.longitude);
       authUser.location.latitude = position.latitude;
       authUser.location.longitude = position.longitude;
-      Database.updateUserLocation(authUser);
+      updateUserLocation(authUser);
       devtools.log('locationData: $position',
           name: 'GoogleMap: _updateLiveLocation');
     });

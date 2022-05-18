@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 
 /// The factory class for the map.
 abstract class Map extends Widget {
-  factory Map(String type) {
+  factory Map(String type, AuthUser authUser) {
     if (type == 'GoogleMap') {
-      return GoogleMapImpl();
+      return GoogleMapImpl(authUser: authUser);
     }
     throw 'Can\'t create $type.';
   }
@@ -17,8 +17,6 @@ abstract class Map extends Widget {
   late AuthUser authUser;
 
   void setContext(BuildContext context);
-
-  void setAuthUser(AuthUser authUser);
 
   /// Move the camera to current location of user.
   void moveToCurrentLocation();
