@@ -50,7 +50,7 @@ class GoogleMapImpl extends StatefulWidget implements Map {
     var currentLocation = await _getCurrentLocation();
     authUser.location.latitude = currentLocation.latitude;
     authUser.location.longitude = currentLocation.longitude;
-    updateUserLocation(authUser);
+    Database.updateUserLocation(authUser);
     _moveMap(currentLocation);
     _updateCurrentAddress(currentLocation);
     updateCurrentMapAddress();
@@ -307,7 +307,7 @@ class GoogleMapImpl extends StatefulWidget implements Map {
       _location = LatLng(position.latitude, position.longitude);
       authUser.location.latitude = position.latitude;
       authUser.location.longitude = position.longitude;
-      updateUserLocation(authUser);
+      Database.updateUserLocation(authUser);
       devtools.log('locationData: $position',
           name: 'GoogleMap: _updateLiveLocation');
     });

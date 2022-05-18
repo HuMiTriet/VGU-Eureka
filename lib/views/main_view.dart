@@ -62,7 +62,7 @@ class _MainViewState extends State<MainView> {
 
   @override
   void initState() {
-    map = Map('GoogleMap', user);
+    map = Map('GoogleMap', widget.user);
     map.setContext(context);
     super.initState();
     hasLocationPermission();
@@ -82,7 +82,6 @@ class _MainViewState extends State<MainView> {
 
   @override
   Widget build(BuildContext context) {
-    map.setAuthUser(widget.user);
     timer = Timer.periodic(const Duration(seconds: 1), (t) {
       setState(() {
         map.updateCurrentMapAddress();
