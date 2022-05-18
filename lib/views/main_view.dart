@@ -36,12 +36,12 @@ Future<bool> showLogOutDialog(BuildContext context) {
 }
 
 class MainView extends StatefulWidget {
-  final AuthUser user;
+  final AuthUser? user;
 
   @override
   const MainView({
     Key? key,
-    required this.user,
+    this.user,
   }) : super(key: key);
 
   @override
@@ -55,7 +55,7 @@ class _MainViewState extends State<MainView> {
 
   @override
   Widget build(BuildContext context) {
-    map.setAuthUser(widget.user);
+    map.setAuthUser(widget.user!);
     timer = Timer.periodic(const Duration(seconds: 1), (t) {
       setState(() {
         map.updateCurrentMapAddress();
