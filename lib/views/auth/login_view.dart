@@ -158,7 +158,8 @@ class _LoginViewState extends State<LoginView> {
     );
 
     // Once signed in, return the UserCredential
-    final user = (await FirebaseAuth.instance.signInWithCredential(credential)).user as User;
+    final user = (await FirebaseAuth.instance.signInWithCredential(credential))
+        .user as User;
     final authUser = AuthUser(
         isEmailVerified: user.emailVerified,
         uid: user.uid,
@@ -170,7 +171,7 @@ class _LoginViewState extends State<LoginView> {
       MaterialPageRoute(
         builder: (context) => MainView(user: authUser),
       ),
-          (route) => false,
+      (route) => false,
     );
   }
 
@@ -207,9 +208,21 @@ class _LoginViewState extends State<LoginView> {
           devtools.log('And your email is $email');
         }
         var cred = FacebookAuthProvider.credential(accessToken!.token);
-        await FirebaseAuth.instance.signInWithCredential(cred);
-        Navigator.of(context)
-            .pushNamedAndRemoveUntil(mainRoute, (route) => false);
+        final user = (await FirebaseAuth.instance.signInWithCredential(cred))
+            .user as User;
+        final authUser = AuthUser(
+            isEmailVerified: user.emailVerified,
+            uid: user.uid,
+            email: user.email,
+            phoneNumber: user.phoneNumber,
+            displayName: user.displayName);
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MainView(user: authUser),
+          ),
+          (route) => false,
+        );
         break;
       case FacebookLoginStatus.cancel:
         // User cancel log in
