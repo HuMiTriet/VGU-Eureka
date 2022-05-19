@@ -1,26 +1,26 @@
 import 'dart:async';
 
 import 'package:etoet/constants/routes.dart';
-import 'package:etoet/services/auth/auth_user.dart';
 import 'package:etoet/services/map/map_factory.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
+import '../services/auth/auth_user.dart';
+
 class MainView extends StatefulWidget {
+  final AuthUser user;
+
   @override
-  const MainView({Key? key}) : super(key: key);
+  const MainView({
+    Key? key,
+    required this.user,
+  }) : super(key: key);
 
   @override
   _MainViewState createState() => _MainViewState();
 }
 
 class _MainViewState extends State<MainView> {
-  final AuthUser authUser = AuthUser(
-      uid: 'testUser123',
-      isEmailVerified: true,
-      phoneNumber: '+012345678',
-      email: 'test123@gmail.com');
   late Map map;
 
   Timer? timer;
@@ -62,7 +62,7 @@ class _MainViewState extends State<MainView> {
 
   @override
   void initState() {
-    map = Map('GoogleMap', authUser);
+    map = Map('GoogleMap', widget.user);
     map.setContext(context);
     super.initState();
     hasLocationPermission();
@@ -78,12 +78,6 @@ class _MainViewState extends State<MainView> {
         map.updateScreenSize(screenWidth, screenHeight);
       });
     });
-  }
-
-  @override
-  void dispose() {
-    timer?.cancel();
-    super.dispose();
   }
 
   @override
@@ -169,31 +163,11 @@ class _MainViewState extends State<MainView> {
       ),
     );
   }
-}
 
-Future<bool> showLogOutDialog(BuildContext context) {
-  return showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: const Text('Sign out'),
-        content: const Text('Are you sure you want to sign out ?'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(true);
-              FirebaseAuth.instance.signOut();
-            },
-            child: const Text('Sign out'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(false);
-            },
-            child: const Text('Cancel'),
-          ),
-        ],
-      );
-    },
-  ).then((value) => value ?? false);
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
 }
