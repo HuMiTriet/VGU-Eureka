@@ -1,9 +1,12 @@
+import 'dart:developer' as devtools show log;
+
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/auth_exceptions.dart';
 import 'package:etoet/services/auth/auth_service.dart';
 import 'package:etoet/views/auth/error_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_login_facebook/flutter_login_facebook.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginView extends StatefulWidget {
@@ -103,6 +106,11 @@ class _LoginViewState extends State<LoginView> {
               image: const AssetImage('assets/images/google_logo.png'),
               text: 'Login with Google',
               onPressed: signInWithGoogle),
+          _Button(
+              color: Colors.blue,
+              image: const AssetImage('assets/images/facebook_logo.png'),
+              text: 'Login with Facebook',
+              onPressed: signInWithFacebook),
         ],
       ),
     );
@@ -144,6 +152,55 @@ class _LoginViewState extends State<LoginView> {
     // Once signed in, return the UserCredential
     await FirebaseAuth.instance.signInWithCredential(credential);
     Navigator.of(context).pushNamedAndRemoveUntil(mainRoute, (route) => false);
+  }
+
+  Future<void> signInWithFacebook() async {
+    // Create an instance of FacebookLogin
+    final fb = FacebookLogin(debug: true);
+
+    // Log in
+    final res = await fb.logIn(permissions: [
+      FacebookPermission.publicProfile,
+      FacebookPermission.email,
+    ]);
+    // Check result status
+    switch (res.status) {
+      case FacebookLoginStatus.success:
+        // Logged in
+
+        // Send access token to server for validation and auth
+        final accessToken = res.accessToken;
+        devtools.log('Access token: ${accessToken?.token}');
+
+        // Get profile data
+        final profile = await fb.getUserProfile();
+        devtools.log('Hello, ${profile!.name}! You ID: ${profile.userId}');
+
+        // Get user profile image url
+        final imageUrl = await fb.getProfileImageUrl(width: 100);
+        devtools.log('Your profile image: $imageUrl');
+
+        // Get email (since we request email permission)
+        final email = await fb.getUserEmail();
+        // But user can decline permission
+        if (email != null) {
+          devtools.log('And your email is $email');
+        }
+        var cred = FacebookAuthProvider.credential(accessToken!.token);
+        await FirebaseAuth.instance.signInWithCredential(cred);
+        Navigator.of(context)
+            .pushNamedAndRemoveUntil(mainRoute, (route) => false);
+        break;
+      case FacebookLoginStatus.cancel:
+        // User cancel log in
+        devtools.log('Login aborted',
+            name: 'login_view.dart: signInWithFacebook');
+        break;
+      case FacebookLoginStatus.error:
+        // Log in failed
+        devtools.log('Error while log in: ${res.error}');
+        break;
+    }
   }
 }
 
