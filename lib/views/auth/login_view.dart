@@ -3,7 +3,10 @@ import 'dart:developer' as devtools show log;
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/auth_exceptions.dart';
 import 'package:etoet/services/auth/auth_service.dart';
+import 'package:etoet/services/auth/auth_user.dart';
+import 'package:etoet/services/auth/concrete_providers/firebase_auth_provider.dart';
 import 'package:etoet/views/auth/error_dialog.dart';
+import 'package:etoet/views/main_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_facebook/flutter_login_facebook.dart';
@@ -63,15 +66,20 @@ class _LoginViewState extends State<LoginView> {
                 final user = AuthService.firebase().currentUser;
                 if (user?.isEmailVerified ?? false) {
                   // user is verified
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                    mainRoute,
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MainView(user: user!),
+                    ),
                     (route) => false,
                   );
                 } else {
                   // user is NOT verified
-                  Navigator.of(context).pushNamedAndRemoveUntil(
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
                     verifyEmailRoute,
                     (route) => false,
+                    arguments: user,
                   );
                 }
               } on UserNotFoundAuthException {
@@ -150,8 +158,20 @@ class _LoginViewState extends State<LoginView> {
     );
 
     // Once signed in, return the UserCredential
-    await FirebaseAuth.instance.signInWithCredential(credential);
-    Navigator.of(context).pushNamedAndRemoveUntil(mainRoute, (route) => false);
+    final user = (await FirebaseAuth.instance.signInWithCredential(credential)).user as User;
+    final authUser = AuthUser(
+        isEmailVerified: user.emailVerified,
+        uid: user.uid,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        displayName: user.displayName);
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MainView(user: authUser),
+      ),
+          (route) => false,
+    );
   }
 
   Future<void> signInWithFacebook() async {

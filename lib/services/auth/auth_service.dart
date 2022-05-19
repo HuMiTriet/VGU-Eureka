@@ -3,7 +3,7 @@ import 'package:etoet/services/auth/auth_user.dart';
 
 import 'concrete_providers/firebase_auth_provider.dart';
 
-/// Further abstract the backend from the UI layer.
+/// Using the Factory method design pattern to abstract the backend from UI.
 ///
 /// FirebaseAuthProvider - AuthProvider - AuthService- UI
 ///
@@ -21,10 +21,14 @@ class AuthService implements AuthProvider {
   Future<AuthUser> createUser({
     required String email,
     required String password,
+    String? phoneNumber,
+    String? displayName,
   }) =>
       provider.createUser(
         email: email,
         password: password,
+        phoneNumber: phoneNumber,
+        displayName: displayName,
       );
 
   @override
