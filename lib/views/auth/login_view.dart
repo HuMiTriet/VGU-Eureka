@@ -4,7 +4,6 @@ import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/auth_exceptions.dart';
 import 'package:etoet/services/auth/auth_service.dart';
 import 'package:etoet/services/auth/auth_user.dart';
-import 'package:etoet/services/auth/concrete_providers/firebase_auth_provider.dart';
 import 'package:etoet/views/auth/error_dialog.dart';
 import 'package:etoet/views/main_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
