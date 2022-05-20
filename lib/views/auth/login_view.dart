@@ -208,6 +208,14 @@ class _LoginViewState extends State<LoginView> {
                   image: const AssetImage('assets/images/google_logo.png'),
                   text: 'Sign in with Google',
                   onPressed: signInWithGoogle),
+              const SizedBox(
+                height: 10,
+              ),
+              _Button(
+                  color: Colors.black,
+                  image: const AssetImage('assets/images/facebook_logo.png'),
+                  text: 'Sign in with Facebook',
+                  onPressed: signInWithFacebook),
             ],
           ),
         ),
@@ -374,9 +382,9 @@ class _Button extends StatelessWidget {
                   children: [
                     Text(
                       text,
-                      style: TextStyle(color: Colors.black, fontSize: 18),
+                      style: const TextStyle(color: Colors.black, fontSize: 15),
                     ),
-                    const SizedBox(width: 35),
+                    const SizedBox(width: 15),
                   ],
                 ),
               ),
