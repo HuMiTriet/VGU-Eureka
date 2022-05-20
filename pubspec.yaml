@@ -46,6 +46,8 @@ dependencies:
   firebase_database_web: ^0.2.0+13
   firebase_database: ^9.0.14
   flutter_login_facebook: ^1.4.1
+  pinput: ^2.2.9
+
     #dev dependencies will not be included in the final build
 dev_dependencies:
   flutter_test:
