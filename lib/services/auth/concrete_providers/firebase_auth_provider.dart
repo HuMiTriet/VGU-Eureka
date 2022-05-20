@@ -11,13 +11,28 @@ class FirebaseAuthProvider implements AuthProvider {
   Future<AuthUser> createUser({
     required String email,
     required String password,
+    String? phoneNumber,
+    String? displayName,
   }) async {
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
+
+      /* final referenceUser = FirebaseAuth.instance.currentUser; */
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+      
+     
+      /* FirebaseAuth.instance.userChanges().listen((firebaseUser) { */
+      await firebaseUser?.updateDisplayName(displayName!);
+    /* await firebaseUser?.updatePhoneNumber(phoneNumber); */
+      /* }); */
+
+      FirebaseAuth.instance.currentUser!.reload();
+
       final user = currentUser;
+
       if (user != null) {
         return user;
       } else {
@@ -46,7 +61,13 @@ class FirebaseAuthProvider implements AuthProvider {
   AuthUser? get currentUser {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      return AuthUser.fromFirebase(user);
+      return AuthUser(
+        isEmailVerified: user.emailVerified,
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName,
+        phoneNumber: user.phoneNumber,
+      );
     } else {
       return null;
     }

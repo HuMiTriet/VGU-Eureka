@@ -4,6 +4,7 @@ import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/auth_exceptions.dart';
 import 'package:etoet/services/auth/auth_service.dart';
 import 'package:etoet/views/auth/error_dialog.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class RegisterView extends StatefulWidget {
@@ -14,13 +15,18 @@ class RegisterView extends StatefulWidget {
 }
 
 class _RegisterViewState extends State<RegisterView> {
+  /// Group of controllers that handle each of the text field
+  late final TextEditingController _username;
   late final TextEditingController _email;
   late final TextEditingController _password;
+  late final TextEditingController _phoneNumber;
 
   @override
   void dispose() {
     _email.dispose();
     _password.dispose();
+    _username.dispose();
+    _phoneNumber.dispose();
     super.dispose();
   }
 
@@ -28,6 +34,8 @@ class _RegisterViewState extends State<RegisterView> {
   void initState() {
     _email = TextEditingController();
     _password = TextEditingController();
+    _username = TextEditingController();
+    _phoneNumber = TextEditingController();
     super.initState();
   }
 
@@ -39,6 +47,16 @@ class _RegisterViewState extends State<RegisterView> {
       ),
       body: Column(
         children: [
+          /// user name
+          TextField(
+            controller: _username,
+            enableSuggestions: false,
+            decoration: const InputDecoration(
+              labelText: 'Username',
+            ),
+          ),
+
+          /// email
           TextField(
             controller: _email,
             enableSuggestions: false,
@@ -48,6 +66,7 @@ class _RegisterViewState extends State<RegisterView> {
               hintText: 'Email',
             ),
           ),
+
           TextField(
             controller: _password,
             obscureText: true,
@@ -57,15 +76,23 @@ class _RegisterViewState extends State<RegisterView> {
               hintText: 'Password',
             ),
           ),
+
           TextButton(
             onPressed: () async {
               final email = _email.text;
               final password = _password.text;
+              final username = _username.text;
+
               try {
-                await AuthService.firebase().createUser(
+                var user = await AuthService.firebase().createUser(
                   email: email,
                   password: password,
+                  displayName: username,
                 );
+
+                devtools.log('After User created: ');
+
+                devtools.log(user.toString());
 
                 AuthService.firebase().sendEmailVerification();
 
@@ -76,7 +103,8 @@ class _RegisterViewState extends State<RegisterView> {
                 await showErrorDialog(context, 'Email already in use');
               } on InvalidEmailAuthException {
                 await showErrorDialog(context, 'Invalid email');
-              } on GenericAuthException {
+              } on FirebaseAuthException catch (e) {
+              devtools.log(e.toString());
                 await showErrorDialog(context, 'Unknown error');
               }
             },
@@ -84,7 +112,6 @@ class _RegisterViewState extends State<RegisterView> {
           ),
           TextButton(
               onPressed: () async {
-                await AuthService.firebase().logOut();
                 Navigator.of(context).pushNamedAndRemoveUntil(
                   loginRoute,
                   (route) => false,
