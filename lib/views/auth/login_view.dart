@@ -29,13 +29,13 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(255, 210, 177, 2),
+      backgroundColor: const Color.fromRGBO(255, 210, 177, 2),
       body: SafeArea(
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
+              const Text(
                 ' Welcome to ETOET ',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -43,7 +43,7 @@ class _LoginViewState extends State<LoginView> {
                 ),
               ),
 
-              SizedBox(height: 50),
+              const SizedBox(height: 50),
 
               //Email or phonenumber text field
               Padding(
@@ -59,7 +59,7 @@ class _LoginViewState extends State<LoginView> {
                     enableSuggestions: false,
                     autocorrect: false,
                     keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       border: InputBorder.none,
                       hintText: '  Email or phone number',
                     ),
@@ -67,7 +67,7 @@ class _LoginViewState extends State<LoginView> {
                 ),
               ),
 
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
 
               // password text field
               Padding(
@@ -83,7 +83,7 @@ class _LoginViewState extends State<LoginView> {
                     enableSuggestions: false,
                     obscureText: true,
                     autocorrect: false,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       border: InputBorder.none,
                       hintText: '  Password',
                     ),
@@ -91,19 +91,19 @@ class _LoginViewState extends State<LoginView> {
                 ),
               ),
 
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
 
               // Sign in button
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: Container(
                   alignment: Alignment.center,
-                  constraints: BoxConstraints.tightForFinite(
+                  constraints: const BoxConstraints.tightForFinite(
                     width: 250,
                     height: 40,
                   ),
                   decoration: BoxDecoration(
-                    color: Color.fromARGB(227, 252, 126, 0),
+                    color: const Color.fromARGB(227, 252, 126, 0),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: TextButton(
@@ -143,8 +143,8 @@ class _LoginViewState extends State<LoginView> {
                         await showErrorDialog(context, 'Error');
                       }
                     },
-                    child: Center(
-                        child: const Text(
+                    child: const Center(
+                        child: Text(
                       'Sign in',
                       style: TextStyle(
                         color: Colors.white,
@@ -160,7 +160,7 @@ class _LoginViewState extends State<LoginView> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
+                  const Text(
                     'Do not have an account?',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
