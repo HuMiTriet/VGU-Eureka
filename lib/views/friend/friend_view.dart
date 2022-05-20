@@ -1,3 +1,4 @@
+import 'package:etoet/views/friend/DummyFriends/dummy_friend.dart';
 import 'package:etoet/views/friend/widget/friend_view_widgets.dart';
 import 'package:flutter/material.dart';
 
@@ -9,31 +10,37 @@ class FriendView extends StatelessWidget {
     return Material(
       child: NestedScrollView(
         controller: ScrollController(),
-        physics: ScrollPhysics(parent: PageScrollPhysics()),
+        physics: const ScrollPhysics(parent: PageScrollPhysics()),
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
-            CustomAppBar(),
+            const FriendAppBar(),
           ];
         },
-        body: ShowFriends(),
+        // body: ShowFriendCards(),
+        body: Container(
+        var dummyFriend = DummyFriend();
+
+
+        )
       ),
     );
   }
 }
 
-class CustomAppBar extends StatelessWidget {
-  const CustomAppBar({Key? key}) : super(key: key);
+class FriendAppBar extends StatelessWidget {
+  const FriendAppBar({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return SliverPersistentHeader(
       pinned: true,
-      delegate: MyAppBarDelegate(),
+      delegate: FriendAppBarDelegate(),
     );
   }
 }
 
-class MyAppBarDelegate extends SliverPersistentHeaderDelegate {
+// The app bar of Friend View
+class FriendAppBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   Widget build(BuildContext context, shrinkOffset, bo) {
     return Container(
@@ -46,16 +53,18 @@ class MyAppBarDelegate extends SliverPersistentHeaderDelegate {
             child: Column(
               // mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+              children:  [
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: EdgeInsets.all(8.0),
                   child: TextField(
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                     fillColor: Color.fromARGB(255, 233, 164, 61),
                     filled: true,
                     border: OutlineInputBorder(),
                     hintText: 'Search',
-                  )),
+                  ),
+                    onChanged: searchFriend,
+                  ),
                 ),
                 AddFriendButton(),
               ],
@@ -77,4 +86,20 @@ class MyAppBarDelegate extends SliverPersistentHeaderDelegate {
     // TODO: implement shouldRebuild
     return true;
   }
+
+  void searchFriend(String query)
+  {
+    DummyFriend dummyFriend = DummyFriend();
+    dummyFriend.testFunc();
+    var allFriends = dummyFriend.friendList;
+
+    final suggestions = allFriends.where((friend) {
+      final friendName = friend.displayName!;
+      final input = query;
+
+      return friendName.contains(input);
+    }).toList();
+
+  }
+
 }
