@@ -92,10 +92,9 @@ class _MainViewState extends State<MainView> {
           ),
         ],
       ),
-      floatingActionButton: Wrap(
-        spacing: 105,
-        alignment: WrapAlignment.center,
-        children: <Widget>[
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
           FloatingActionButton(
               heroTag: 'goToFriendsFromMain',
               onPressed: () {},
