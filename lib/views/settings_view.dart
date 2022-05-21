@@ -1,6 +1,14 @@
 import 'package:etoet/constants/routes.dart';
+import 'package:etoet/views/settingUI_lib/src/settings_tile.dart';
+import 'package:etoet/views/settingUI_lib/src/settings_section.dart';
+import 'package:etoet/views/settingUI_lib/src/settings_list.dart';
+import 'package:etoet/views/settingUI_lib/src/custom_section.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+// import 'package:settings_ui/settings_ui.dart';
+
+
+
 
 enum MenuAction { signOut }
 
@@ -13,8 +21,133 @@ class SettingsView extends StatefulWidget {
 }
 
 class _SettingsViewState extends State<SettingsView> {
+  bool notificationsEnabled = true;
+  double _receivedRange = 5.0;
+  String _username = 'Doraemon';
+
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Settings UI')),
+      body: buildSettingsList(),
+    );
+  }
+
+  Widget buildSettingsList() {
+    var value;
+    return SettingsList(
+      contentPadding: EdgeInsets.only(top: 20),
+      sections: [
+        SettingsSection(
+          tiles: [
+            SettingsTile(
+                titleWidget: CircleAvatar(
+                    radius: (50),
+                    backgroundColor: Colors.white,
+                    // backgroundImage: AssetImage('assets/Doraemon_character.png'),
+                    child: ClipRRect(
+                      borderRadius:BorderRadius.circular(49),
+                      //image: const AssetImage('assets/images/google_logo.png')
+                      child: Image.asset('assets/images/Doraemon.png'),
+                    )
+                )
+            ),
+            CustomTile(child: Text(
+              _username,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),),
+          ],
+          titlePadding: EdgeInsets.only(bottom: 50),
+        ),
+        SettingsSection(
+          title: 'Account Setting',
+          //titlePadding: EdgeInsets.only(top: 20),
+          tiles: [
+            SettingsTile(
+                title: 'Edit account',
+                leading: Icon(Icons.collections_bookmark)
+            ),
+            SettingsTile(
+                title: 'Logout',
+                leading: Icon(Icons.collections_bookmark),
+                onTap: () async {
+                  await FirebaseAuth.instance.signOut();
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                  loginRoute,
+                  (_) => false,);}
+            ),
+            SettingsTile.switchTile(
+              title: 'Push notifications',
+              leading: Icon(Icons.phonelink_lock),
+              switchValue: notificationsEnabled,
+              onToggle: (bool value) {
+                setState(() {
+                  notificationsEnabled = value;
+                });
+              },
+            ),
+            SettingsTile(
+              title: 'Notification-received range',
+              titleWidget: Slider(
+                min: 5,
+                max: 20,
+                divisions: 5,
+                activeColor: Colors.blue,
+                inactiveColor: Colors.grey,
+                value: _receivedRange,
+                onChanged: (double value) {
+                  setState(() {
+                    _receivedRange = value;
+                  });
+                },
+              ),
+            )
+          ],
+
+        ),
+        SettingsSection(
+          title: 'More',
+          tiles: [
+            SettingsTile(
+                title: 'About us', leading: Icon(Icons.description)),
+            SettingsTile(
+                title: 'Privacy policy',
+                leading: Icon(Icons.collections_bookmark)),
+            SettingsTile(
+                title: 'Terms of use',
+                leading: Icon(Icons.description)),
+          ],
+        ),
+        CustomSection(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 15, bottom: 8),
+                child: Image.asset(
+                  'assets/images/settings.png',
+                  height: 50,
+                  width: 50,
+                  color: Color(0xFF777777),
+                ),
+              ),
+              Text(
+                'Version: Beta - Not yet integrate with other parts of the app',
+                style: TextStyle(color: Color(0xFF777777)),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/*
+Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
@@ -43,4 +176,4 @@ class _SettingsViewState extends State<SettingsView> {
       ),
     );
   }
-}
+ */

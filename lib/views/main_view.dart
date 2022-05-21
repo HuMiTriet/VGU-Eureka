@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/map/map_factory.dart';
+import 'package:etoet/views/profile/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -101,7 +102,12 @@ class _MainViewState extends State<MainView> {
               children: <Widget>[
                 ElevatedButton(
                     onPressed: () {
-                      Navigator.of(context).pushNamed(profileRoute);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ProfilePage(user: widget.user),
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       primary: Colors.orange,
@@ -140,10 +146,9 @@ class _MainViewState extends State<MainView> {
           ),
         ],
       ),
-      floatingActionButton: Wrap(
-        spacing: 105,
-        alignment: WrapAlignment.center,
-        children: <Widget>[
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
           FloatingActionButton(
               heroTag: 'goToFriendsFromMain',
               onPressed: () {},
@@ -169,5 +174,4 @@ class _MainViewState extends State<MainView> {
     timer?.cancel();
     super.dispose();
   }
-
 }

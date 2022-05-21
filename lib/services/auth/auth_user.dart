@@ -18,19 +18,25 @@ class AuthUser {
   final String? displayName;
   final String? photoURL;
 
-  AuthUser(
-      {required this.isEmailVerified,
-      required this.phoneNumber,
-      required this.uid,
-      this.email,
-      this.displayName,
-      this.photoURL});
+  AuthUser({
+    required this.isEmailVerified,
+    required this.uid,
+    required this.email,
+    this.phoneNumber,
+    this.displayName,
+    this.photoURL,
+  });
 
-  factory AuthUser.fromFirebase(User user) => AuthUser(
-      uid: user.uid,
-      isEmailVerified: user.emailVerified,
-      phoneNumber: user.phoneNumber,
-      email: user.email,
-      displayName: user.displayName,
-      photoURL: user.photoURL);
+  @override
+  String toString() {
+    return '''
+      AuthUser {
+        uid: $uid,
+        isEmailVerified: $isEmailVerified,
+        phoneNumber: $phoneNumber,
+        email: $email,
+        displayName: $displayName,
+      }
+    ''';
+  }
 }

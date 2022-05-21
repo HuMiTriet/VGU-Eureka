@@ -1,4 +1,7 @@
+import 'package:etoet/views/auth/verified_email_view.dart';
 import 'package:etoet/views/profile/Widgets/edit_image_dialog.dart';
+import 'package:etoet/views/profile/change_email_page.dart';
+import 'package:etoet/views/profile/verification_view.dart';
 import 'package:flutter/material.dart';
 import '../../services/auth/auth_user.dart';
 import 'change_pass_page.dart';
@@ -6,34 +9,25 @@ import 'change_pass_page.dart';
 // import 'package:flutter/cupertino.dart';
 
 class ProfilePage extends StatefulWidget {
+  AuthUser user;
+
   ProfilePage({
     Key? key,
-    // requiredthis.user
+    required this.user,
   }) : super(key: key);
 
   @override
   MapScreenState createState() => MapScreenState();
-
-  // final AuthUser user;
-
-  final AuthUser user = AuthUser(
-      phoneNumber: '1234',
-      isEmailVerified: false,
-      uid: '12352',
-      email: 'mail@gmail.com',
-      displayName: 'display name',
-      photoURL: null);
 }
 
 class MapScreenState extends State<ProfilePage>
     with SingleTickerProviderStateMixin {
-  var nameController = TextEditingController();
-  var emailController = TextEditingController();
-  var mobileController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController mobileController = TextEditingController();
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     nameController.text = widget.user.displayName ?? '';
     emailController.text = widget.user.email ?? '';
@@ -45,9 +39,7 @@ class MapScreenState extends State<ProfilePage>
     return Theme(
       data: ThemeData.light(),
       child: Scaffold(
-          body: Container(
-        // color: Colors.amber,
-        child: ListView(
+        body: ListView(
           children: <Widget>[
             Column(
               children: <Widget>[
@@ -57,7 +49,7 @@ class MapScreenState extends State<ProfilePage>
                   child: Column(
                     children: <Widget>[
                       Padding(
-                          padding: EdgeInsets.only(left: 20.0, top: 20.0),
+                          padding: const EdgeInsets.only(left: 20.0, top: 20.0),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -86,7 +78,7 @@ class MapScreenState extends State<ProfilePage>
                             ],
                           )),
                       Padding(
-                        padding: EdgeInsets.only(top: 20.0),
+                        padding: const EdgeInsets.only(top: 20.0),
                         child: Stack(fit: StackFit.loose, children: <Widget>[
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -97,8 +89,8 @@ class MapScreenState extends State<ProfilePage>
                                   height: 140.0,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
+                                    // image: ExactAssetImage(widget.user.img),
                                     image: DecorationImage(
-                                      // image: ExactAssetImage(widget.user.img),
                                       image: NetworkImage(widget
                                               .user.photoURL ??
                                           'https://www.pavilionweb.com/wp-content/uploads/2017/03/man-300x300.png'),
@@ -136,26 +128,34 @@ class MapScreenState extends State<ProfilePage>
                 Container(
                   color: Colors.white,
                   child: Padding(
-                    padding: EdgeInsets.only(bottom: 25.0),
+                    padding: const EdgeInsets.only(bottom: 25.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
                         const Padding(
-                            padding: EdgeInsets.only(
-                                left: 25.0, right: 25.0, top: 25.0),
-                            child: Text(
-                              'Personal Information',
-                              style: TextStyle(
-                                  fontSize: 18.0, fontWeight: FontWeight.bold),
-                            )),
-                        ProfileFieldLabel(label: 'Name'),
+                          padding: EdgeInsets.only(
+                              left: 25.0, right: 25.0, top: 25.0),
+                          child: Text(
+                            'Personal Information',
+                            style: TextStyle(
+                                fontSize: 18.0, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        const ProfileFieldLabel(label: 'Display Name'),
                         ProfileField(controller: nameController),
-                        ProfileFieldLabel(label: 'Email'),
+                        const ProfileFieldLabel(label: 'Email'),
                         ProfileField(controller: emailController),
-                        ProfileFieldLabel(label: 'Mobile'),
+                        EditVerifiableFieldsController(
+                          value: 'Change Email',
+                          user: widget.user,
+                        ),
+                        const ProfileFieldLabel(label: 'Mobile'),
                         ProfileField(controller: mobileController),
-                        EditProfile(value: 'Change Password'),
+                        EditVerifiableFieldsController(
+                          value: 'Change Password',
+                          user: widget.user,
+                        ),
                       ],
                     ),
                   ),
@@ -164,14 +164,49 @@ class MapScreenState extends State<ProfilePage>
             ),
           ],
         ),
-      )),
+      ),
     );
   }
 }
 
-class EditProfile extends StatelessWidget {
-  const EditProfile({Key? key, required this.value}) : super(key: key);
+/// Class to handle Fields that required verification in order to confirm the
+///changes
+///
+/// Since the changes must be verified, upon pressing the button the class
+/// will push a new screen on top
+class EditVerifiableFieldsController extends StatelessWidget {
+  late VerificationView verificationView;
+  AuthUser user;
+
   final String value;
+
+  EditVerifiableFieldsController({
+    Key? key,
+    required this.value,
+    required this.user,
+  }) : super(key: key) {
+    switch (value) {
+      case 'Change Password':
+        verificationView = ChangePassPage(
+          user: user,
+          title: value,
+        );
+        break;
+      case 'Change Email':
+        verificationView = ChangeEmailPage(
+          user: user,
+          title: value,
+        );
+        break;
+      /* case 'Change Phone Number': */
+      /*   verificationView = ChangePhoneNumberPage( */
+      /*     user: user, */
+      /*     title: value, */
+      /*   ); */
+      /*   break; */
+      default:
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -183,7 +218,7 @@ class EditProfile extends StatelessWidget {
             ),
             child: Text(
               value,
-              style: TextStyle(
+              style: const TextStyle(
                   fontSize: 16.0,
                   fontWeight: FontWeight.bold,
                   color: Colors.black),
@@ -191,64 +226,65 @@ class EditProfile extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => Change_Pass_Page()),
+                MaterialPageRoute(builder: (context) => verificationView),
               );
             }));
   }
 }
 
 class ProfileField extends StatelessWidget {
-  ProfileField({Key? key, required this.controller}) : super(key: key);
+  const ProfileField({Key? key, required this.controller}) : super(key: key);
 
-  TextEditingController controller;
+  final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 2.0),
-        child: TextButton(
-          style: TextButton.styleFrom(
-            minimumSize: Size.zero,
-            padding: EdgeInsets.zero,
-            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          ),
-          child: TextFormField(
-              autofocus: false,
-              controller: controller,
-              decoration: InputDecoration(
-                  fillColor: Colors.amber,
-                  contentPadding: EdgeInsets.fromLTRB(10, 10, 10, 0),
-                  filled: true,
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide.none,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide.none,
-                  )
-                  // border: OutlineInputBorder(
-                  //     borderRadius:
-                  //         BorderRadius.circular(32.0))
-                  ),
-              enabled: true,
-              onEditingComplete: () {
-                FocusScope.of(context).unfocus();
-              }),
-          onPressed: () {},
-        ));
+      padding: const EdgeInsets.only(left: 25.0, right: 25.0, top: 2.0),
+      child: TextButton(
+        style: TextButton.styleFrom(
+          minimumSize: Size.zero,
+          padding: EdgeInsets.zero,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+        child: TextFormField(
+            autofocus: false,
+            controller: controller,
+            decoration: const InputDecoration(
+                fillColor: Colors.amber,
+                contentPadding: EdgeInsets.fromLTRB(10, 10, 10, 0),
+                filled: true,
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide.none,
+                )
+                // border: OutlineInputBorder(
+                //     borderRadius:
+                //         BorderRadius.circular(32.0))
+                ),
+            enabled: true,
+            onEditingComplete: () {
+              FocusScope.of(context).unfocus();
+            }),
+        onPressed: () {},
+      ),
+    );
   }
 }
 
 class ProfileFieldLabel extends StatelessWidget {
-  String label;
-  ProfileFieldLabel({Key? key, required this.label}) : super(key: key);
+  final String label;
+  const ProfileFieldLabel({Key? key, required this.label}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 25.0),
+        padding: const EdgeInsets.only(left: 25.0, right: 25.0, top: 25.0),
         child: Text(
           label,
-          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
         ));
   }
 }

@@ -1,7 +1,18 @@
+import 'package:etoet/views/profile/verification_view.dart';
 import 'package:flutter/material.dart';
 
-class Change_Pass_Page extends StatelessWidget {
-  const Change_Pass_Page({Key? key}) : super(key: key);
+import '../../services/auth/auth_user.dart';
+
+class ChangePassPage extends VerificationView {
+  const ChangePassPage({
+    Key? key,
+    required String title,
+    required AuthUser user,
+  }) : super(
+          key: key,
+          title: title,
+          user: user,
+        );
 
   @override
   Widget build(BuildContext context) {
@@ -11,43 +22,43 @@ class Change_Pass_Page extends StatelessWidget {
       /// for the appbar
       Container(
           height: 50,
-          color: Color.fromARGB(255, 247, 224, 120),
+          color: const Color.fromARGB(255, 247, 224, 120),
           child: Row(children: <Widget>[
             TextButton(
-                child: Icon(Icons.close, color: Colors.black),
+                child: const Icon(Icons.close, color: Colors.black),
                 onPressed: () {
                   Navigator.pop(context);
                 }),
-            Text('Change Password', style: TextStyle(fontSize: 20))
+            Text(title, style: const TextStyle(fontSize: 20))
           ])),
 
       Expanded(
         child: Padding(
           padding: const EdgeInsets.only(left: 15, right: 15, top: 25),
-          child: Container(
-              child: Column(children: <Widget>[
+          child: Column(children: <Widget>[
             // text field for input password
-            TextField(
+            const TextField(
                 decoration: InputDecoration(label: Text('Current Password'))),
 
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             // text field for input new password
-            TextField(decoration: InputDecoration(label: Text('New Password'))),
-            SizedBox(height: 20),
+            const TextField(
+                decoration: InputDecoration(label: Text('New Password'))),
+            const SizedBox(height: 20),
 
             // text field for input comfirm password
-            TextField(
+            const TextField(
                 decoration:
                     InputDecoration(label: Text('Confirm New Password'))),
 
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             TextButton(
-                child: Text('Save'),
+                child: const Text('Save'),
                 style: TextButton.styleFrom(
-                    backgroundColor: Color.fromARGB(255, 247, 224, 120)),
+                    backgroundColor: const Color.fromARGB(255, 247, 224, 120)),
                 onPressed: () {})
-          ])),
+          ]),
         ),
       ),
     ])));
