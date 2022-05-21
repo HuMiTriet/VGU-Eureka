@@ -45,6 +45,7 @@ dependencies:
   google_sign_in: ^5.3.1
   firebase_database_web: ^0.2.0+13
   firebase_database: ^9.0.14
+  settings_ui: ^2.0.2
   flutter_login_facebook: ^1.4.1
   pinput: ^2.2.9
 
@@ -75,6 +76,7 @@ flutter:
 
   assets:
       - assets/images/
+      - assets/images/Doraemon.png
   # To add assets to your application, add an assets section, like this:
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
