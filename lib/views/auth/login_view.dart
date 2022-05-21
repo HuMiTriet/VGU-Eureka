@@ -139,7 +139,8 @@ class _LoginViewState extends State<LoginView> {
                         await showErrorDialog(context, 'User not found');
                       } on WrongPasswordAuthException {
                         await showErrorDialog(context, 'Incorrect password');
-                      } on GenericAuthException {
+                      } on FirebaseException catch (e) {
+                        devtools.log(e.toString());
                         await showErrorDialog(context, 'Error');
                       }
                     },
@@ -359,7 +360,7 @@ class _Button extends StatelessWidget {
         },
         child: Container(
           alignment: Alignment.center,
-          constraints: BoxConstraints.tightForFinite(
+          constraints: const BoxConstraints.tightForFinite(
             width: 250,
             height: 43,
           ),

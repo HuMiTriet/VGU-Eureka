@@ -52,4 +52,8 @@ class AuthService implements AuthProvider {
 
   @override
   Future<void> initialize() => provider.initialize();
+
+  @override
+  Future<bool> validateEnteredPassword(String password) async =>
+      provider.validateEnteredPassword(password);
 }

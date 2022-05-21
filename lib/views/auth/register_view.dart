@@ -18,22 +18,6 @@ class _RegisterViewState extends State<RegisterView> {
   late final TextEditingController _password;
 
   @override
-  void dispose() {
-    _email.dispose();
-    _password.dispose();
-    _username.dispose();
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    _email = TextEditingController();
-    _password = TextEditingController();
-    _username = TextEditingController();
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromRGBO(255, 210, 177, 2),
@@ -200,5 +184,21 @@ class _RegisterViewState extends State<RegisterView> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _email.dispose();
+    _password.dispose();
+    _username.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    _email = TextEditingController();
+    _password = TextEditingController();
+    _username = TextEditingController();
+    super.initState();
   }
 }
