@@ -1,3 +1,4 @@
+import 'package:etoet/views/auth/verified_email_view.dart';
 import 'package:etoet/views/profile/verification_view.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +14,12 @@ class ChangeEmailPage extends VerificationView {
           title: title,
           user: user,
         );
+
+  @override
+  _ChangeEmailPageState createState() => _ChangeEmailPageState();
+}
+
+class _ChangeEmailPageState extends State<ChangeEmailPage> {
   @override
   Widget build(BuildContext context) {
     throw UnimplementedError();
