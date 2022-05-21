@@ -1,16 +1,12 @@
 import 'dart:async';
 import 'dart:developer' as devtools show log;
-import 'dart:typed_data';
-import 'dart:ui' as ui;
 
 import 'package:etoet/services/auth/auth_user.dart';
 import 'package:etoet/services/database/database.dart';
 import 'package:etoet/services/map/friend/friend_marker_location.dart';
 import 'package:etoet/services/map/map_factory.dart';
 import 'package:etoet/services/map/osrm/routing.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -28,11 +24,11 @@ class GoogleMapImpl extends StatefulWidget implements Map {
   late StreamSubscription _locationSubscription;
   late final Set<Marker> _markersList = {userMarker};
   late Marker userMarker = Marker(
-    markerId: const MarkerId('user'),
+    markerId: MarkerId(authUser.uid),
     position: _location,
   );
   late Set<Marker> friendMarkers = {};
-  Set<Polyline> _polylinesList = {};
+  final Set<Polyline> _polylinesList = {};
   Routing routing = Routing.getInstance();
   late num deviceWidth = MediaQuery.of(context).size.width *
       MediaQuery.of(context).devicePixelRatio;
@@ -54,22 +50,6 @@ class GoogleMapImpl extends StatefulWidget implements Map {
   String address = 'Unknown';
 
   @override
-  void initializeMap() async {
-    devtools.log('initialize map', name: 'GoogleMap: initializeMap');
-
-    devtools.log('friend: ${authUser.friendUIDs}',
-        name: 'GoogleMap: initializeMap');
-    var currentLocation = await _getCurrentLocation();
-    authUser.location.latitude = currentLocation.latitude;
-    authUser.location.longitude = currentLocation.longitude;
-    Database.updateUserLocation(authUser);
-    _moveMap(currentLocation);
-    _updateCurrentAddress(currentLocation);
-    updateCurrentMapAddress();
-    devtools.log('finish initialize map', name: 'GoogleMap: initializeMap');
-  }
-
-  @override
   void updateCurrentMapAddress() async {
     _updateCurrentAddress(await _mapController!.getLatLng(ScreenCoordinate(
         x: (deviceWidth / 2).round(), y: (deviceHeight / 2).round())));
@@ -78,47 +58,6 @@ class GoogleMapImpl extends StatefulWidget implements Map {
   @override
   void moveToCurrentLocation() {
     _moveMap(_location);
-  }
-
-  Future<Uint8List> getBytesFromAsset(String path, int width) async {
-    ByteData data = await rootBundle.load(path);
-    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
-        targetWidth: width);
-    ui.FrameInfo fi = await codec.getNextFrame();
-    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
-        .buffer
-        .asUint8List();
-  }
-
-  Future<Uint8List> getBytesFromCanvas(String text) async {
-    final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
-    final Canvas canvas = Canvas(pictureRecorder);
-    final Paint paint = Paint()..color = Colors.blue;
-    final Radius radius = Radius.circular(20.0);
-    final int width = 100;
-    final int height = 100;
-    canvas.drawRRect(
-        RRect.fromRectAndCorners(
-          Rect.fromLTWH(0.0, 0.0, width.toDouble(), height.toDouble()),
-          topLeft: radius,
-          topRight: radius,
-          bottomLeft: radius,
-          bottomRight: radius,
-        ),
-        paint);
-    var painter = TextPainter(textDirection: TextDirection.ltr);
-    painter.text = TextSpan(
-      text: text,
-      style: const TextStyle(fontSize: 25.0, color: Colors.white),
-    );
-    painter.layout();
-    painter.paint(
-        canvas,
-        Offset((width * 0.5) - painter.width * 0.5,
-            (height * 0.5) - painter.height * 0.5));
-    final img = await pictureRecorder.endRecording().toImage(width, height);
-    final data = await img.toByteData(format: ui.ImageByteFormat.png);
-    return data!.buffer.asUint8List();
   }
 
   void updateMarkers() async {
@@ -147,7 +86,6 @@ class GoogleMapImpl extends StatefulWidget implements Map {
           latLng, friendUID, context, _polylinesList);
       _markersList.add(friendMarker);
     }
-    devtools.log('update markers of friends', name: 'updateMarkers');
   }
 
   void _updateCurrentAddress(LatLng location) {
@@ -254,11 +192,11 @@ class GoogleMapImpl extends StatefulWidget implements Map {
     _locationSubscription = Geolocator.getPositionStream(
         locationSettings: const LocationSettings(
       accuracy: LocationAccuracy.best,
-      distanceFilter: 10,
+      distanceFilter: 1,
     )).listen((position) {
       _location = LatLng(position.latitude, position.longitude);
       _markersList.add(Marker(
-        markerId: const MarkerId('user'),
+        markerId: MarkerId(authUser.uid),
         position: _location,
       ));
       devtools.log('locationData: $position',
@@ -269,7 +207,7 @@ class GoogleMapImpl extends StatefulWidget implements Map {
     Geolocator.getPositionStream(
         locationSettings: const LocationSettings(
       accuracy: LocationAccuracy.best,
-      distanceFilter: 10,
+      distanceFilter: 20,
     )).listen((position) async {
       authUser.location.latitude = position.latitude;
       authUser.location.longitude = position.longitude;
@@ -304,6 +242,9 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
     // mock friend data(can retrieve this info from the database at start up)
     widget.authUser.friendUIDs.add('DGQqAvqtwyg45GRzGVQSdqGsGhq1');
     widget.authUser.friendUIDs.add('T4AMYi2auOOl3b0jNfGwKOiwEmx1');
+    widget.authUser.friendUIDs.add('AdpcxPmr1LZ9AhmwKSajYiAH49P2');
+    widget.authUser.friendUIDs.add('sRtRZ3WdsnTEju4x6oajJCIFIB82');
+    widget.authUser.friendUIDs.add('qIi8v3onWohxn1ELKsRu9cPH0WF2');
   }
 
   @override
@@ -316,13 +257,11 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
     var currentLocation = await widget._getCurrentLocation();
     widget._moveMap(currentLocation);
     widget._updateCurrentAddress(currentLocation);
-    widget._updateLiveLocation();
     devtools.log('_updateMap', name: 'GoogleMap: _updateMap');
   }
 
   @override
   Widget build(BuildContext context) {
-    widget._updateLiveLocation();
     timer = Timer.periodic(const Duration(seconds: 1), (t) {
       if (mounted) {
         setState(() {
@@ -333,12 +272,12 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
     });
     return FutureBuilder(
       future: widget._getCurrentLocation(),
-      builder: (context, AsyncSnapshot<LatLng> snapshot) {
+      builder: (context, snapshot) {
         if (snapshot.hasData) {
           var location = snapshot.data;
           return GoogleMap(
             initialCameraPosition: CameraPosition(
-              target: location!,
+              target: location as LatLng,
               zoom: 15,
             ),
             onMapCreated: (controler) {

@@ -21,41 +21,73 @@ class FriendMarker {
         snippet: 'Tap to see friend\'s location',
       ),
       onTap: () {
-        showDialog(
+        showModalBottomSheet(
+            isDismissible: true,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
             context: context,
-            builder: (_) => AlertDialog(
-                  title: Text('$uid is here'),
-                  content: const Text('Need to help with something'),
-                  actions: [
-                    TextButton(
-                      child: const Text('Cancel'),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
+            builder: (_) {
+              return Container(
+                height: MediaQuery.of(context).size.height * 0.25,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFffa858),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(10.0),
+                    topRight: Radius.circular(10.0),
+                  ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      uid,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
-                    TextButton(
-                      child: const Text('OK'),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                    TextButton(
-                      child: const Icon(Icons.directions),
-                      onPressed: () async {
-                        polylineList.add(
-                          Polyline(
-                              polylineId: const PolylineId('polyline'),
-                              visible: true,
-                              points:
-                                  await routing.getPointsFromUser(friendLatLng),
-                              width: 5,
-                              color: Colors.blue),
-                        );
-                        Navigator.pop(context);
-                      },
+                    Text(
+                        'Location: ${friendLatLng.latitude}, ${friendLatLng.longitude}',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        )),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 40.0),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          primary: const Color(0xfff46135),
+                          shape: RoundedRectangleBorder(
+                            side: BorderSide.none,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          fixedSize: const Size(320, 50),
+                        ),
+                        child: Text(
+                          'Show direction to $uid',
+                          style:
+                              const TextStyle(fontWeight: ui.FontWeight.bold),
+                        ),
+                        onPressed: () async {
+                          polylineList.add(
+                            Polyline(
+                                polylineId: const PolylineId('polyline'),
+                                visible: true,
+                                points: await routing
+                                    .getPointsFromUser(friendLatLng),
+                                width: 5,
+                                color: Colors.blue),
+                          );
+                        },
+                      ),
                     ),
                   ],
-                ));
+                ),
+              );
+            });
       },
     );
   }
@@ -74,7 +106,7 @@ class FriendMarker {
     final pictureRecorder = ui.PictureRecorder();
     final canvas = Canvas(pictureRecorder);
     final paint = Paint()..color = Colors.blue;
-    final radius = Radius.circular(20.0);
+    const radius = Radius.circular(20.0);
     const width = 100;
     const height = 100;
     canvas.drawRRect(

@@ -23,7 +23,4 @@ abstract class Map extends Widget {
 
   /// Show the current address of the map view.
   void updateCurrentMapAddress();
-
-  /// Initialize the map.
-  void initializeMap();
 }
