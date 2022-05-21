@@ -1,105 +1,90 @@
-import 'package:etoet/views/friend/DummyFriends/dummy_friend.dart';
-import 'package:etoet/views/friend/widget/friend_view_widgets.dart';
+import 'package:etoet/views/friend/dummyUsers.dart';
 import 'package:flutter/material.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
-class FriendView extends StatelessWidget {
+class FriendView extends StatefulWidget {
+  @override
   const FriendView({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Material(
-      child: NestedScrollView(
-        controller: ScrollController(),
-        physics: const ScrollPhysics(parent: PageScrollPhysics()),
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return <Widget>[
-            const FriendAppBar(),
-          ];
-        },
-        // body: ShowFriendCards(),
-        body: Container(
-        var dummyFriend = DummyFriend();
-
-
-        )
-      ),
-    );
-  }
+  _FriendViewState createState() => _FriendViewState();
 }
 
-class FriendAppBar extends StatelessWidget {
-  const FriendAppBar({Key? key}) : super(key: key);
-
+class _FriendViewState extends State<FriendView> {
   @override
   Widget build(BuildContext context) {
-    return SliverPersistentHeader(
-      pinned: true,
-      delegate: FriendAppBarDelegate(),
-    );
+    // TODO: implement build
+
+    //Dummy users for displaying friends in Friend List:
+    DummyUser dummyUser = DummyUser();
+    List<String>? userDisplayNameList = [];
+
+    for (int i = 0; i < dummyUser.userList.length; ++i) {
+      userDisplayNameList.add(dummyUser.userList.elementAt(i).displayName!);
+    }
+
+    //IDK what this does, but it belongs to search function
+    TextEditingController? _textEditingController = TextEditingController();
+
+    //A list of ListTile to display Friends.
+    //final userListWidget = <Widget>[];
+
+    return FractionallySizedBox(
+        heightFactor: 0.9,
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Search and Add Friend
+              Expanded(
+                  flex: 1,
+                  child: Container(
+                    color: Colors.orangeAccent,
+                    child: ListView(
+                      shrinkWrap: true,
+                      children: [
+                        TextField(
+                          decoration: const InputDecoration(
+                            hintText: 'Search',
+                            contentPadding: EdgeInsets.all(20),
+                          ),
+                          controller: _textEditingController,
+                          onChanged: (value) {
+                            //THIS DOESN'T WORK!!!
+                            // setState(() {
+                            //   userDisplayNameList = userDisplayNameList!.where((element) => element.contains(value)).toList();
+                            // });
+                          },
+                        ),
+                        const ListTile(
+                          leading: CircleAvatar(
+                            child: Icon(Icons.add),
+                          ),
+                          title: Text('Add Friend'),
+                        ),
+                      ],
+                    ),
+                  )),
+
+              // Friend List
+              Expanded(
+                  flex: 4,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    // children: userListWidget,
+                    itemCount: userDisplayNameList!.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return ListTile(
+                        leading: const CircleAvatar(
+                          backgroundImage: NetworkImage(
+                              'https://i.guim.co.uk/img/media/26392d05302e02f7bf4eb143bb84c8097d09144b/446_167_3683_2210/master/3683.jpg?width=1200&height=1200&quality=85&auto=format&fit=crop&s=49ed3252c0b2ffb49cf8b508892e452d'),
+                        ),
+                        title: Text(userDisplayNameList!.elementAt(index)),
+                        subtitle: const Text('Status text here.'),
+                      );
+                    },
+                  )),
+            ],
+          ),
+        ));
   }
-}
-
-// The app bar of Friend View
-class FriendAppBarDelegate extends SliverPersistentHeaderDelegate {
-  @override
-  Widget build(BuildContext context, shrinkOffset, bo) {
-    return Container(
-      color: Colors.orange,
-      height: 200,
-      // color: Theme.of(context).primaryColorDark,
-      child: SafeArea(
-        child: Container(
-            margin: EdgeInsets.all(8.0),
-            child: Column(
-              // mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children:  [
-                Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: TextField(
-                      decoration: const InputDecoration(
-                    fillColor: Color.fromARGB(255, 233, 164, 61),
-                    filled: true,
-                    border: OutlineInputBorder(),
-                    hintText: 'Search',
-                  ),
-                    onChanged: searchFriend,
-                  ),
-                ),
-                AddFriendButton(),
-              ],
-            )),
-      ),
-    );
-  }
-
-  @override
-  // TODO: implement maxExtent
-  double get maxExtent => 150;
-
-  @override
-  // TODO: implement minExtent
-  double get minExtent => 30;
-
-  @override
-  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
-    // TODO: implement shouldRebuild
-    return true;
-  }
-
-  void searchFriend(String query)
-  {
-    DummyFriend dummyFriend = DummyFriend();
-    dummyFriend.testFunc();
-    var allFriends = dummyFriend.friendList;
-
-    final suggestions = allFriends.where((friend) {
-      final friendName = friend.displayName!;
-      final input = query;
-
-      return friendName.contains(input);
-    }).toList();
-
-  }
-
 }

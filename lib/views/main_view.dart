@@ -148,7 +148,7 @@ class _MainViewState extends State<MainView> {
               heroTag: 'goToFriendsFromMain',
               onPressed: () {
                 showBarModalBottomSheet(
-                  expand: true,
+                  //expand: true,
                   context: context,
                   backgroundColor: Colors.transparent,
                   builder: (context) => const FriendView(),

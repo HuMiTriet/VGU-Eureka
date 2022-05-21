@@ -26,6 +26,8 @@ void main() {
         verifyEmailRoute: (context) => const VerifyEmailView(),
         recoverAccountRoute: (context) => const RecoverAccountView(),
         settingsRoute: (context) => const SettingsView(),
+        friendRoute: (context) => const FriendView(),
+
       },
     ),
   );
