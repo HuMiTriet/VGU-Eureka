@@ -44,8 +44,10 @@ dependencies:
   image_picker: ^0.8.5+3
   google_sign_in: ^5.3.1
   firebase_database_web: ^0.2.0+13
-  firebase_database:
-    ^9.0.14
+  firebase_database: ^9.0.14
+  permission_handler: ^9.2.0
+  firebase_storage:
+    ^10.2.16
     #dev dependencies will not be included in the final build
 dev_dependencies:
   flutter_test:
@@ -75,6 +77,7 @@ flutter:
     - assets/images/Anya.png
     - assets/images/Loid.png
     - assets/images/Yor.png
+    - assets/images/google_logo.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
   # For details regarding adding assets from package dependencies, see

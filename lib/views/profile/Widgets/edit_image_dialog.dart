@@ -1,5 +1,6 @@
 import 'package:etoet/views/profile/Widgets/edit_image_page.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 EditImageDialog(BuildContext context) {
   // Create SimpleDialog
@@ -8,15 +9,24 @@ EditImageDialog(BuildContext context) {
     children: <Widget>[
       SimpleDialogOption(
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      EditImagePage(imageSource: ImageSource.camera)),
+            );
+            // Navigator.pop(context);
           },
           child: Text('Camera')),
       SimpleDialogOption(
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => EditImagePage()),
+            MaterialPageRoute(
+                builder: (context) =>
+                    EditImagePage(imageSource: ImageSource.gallery)),
           );
+          // Navigator.pop(context);
         },
         child: Text('Gallery'),
       ),
