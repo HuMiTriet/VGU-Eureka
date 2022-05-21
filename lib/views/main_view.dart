@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/map/map_factory.dart';
+import 'package:etoet/views/profile/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -54,7 +55,14 @@ class _MainViewState extends State<MainView> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
                 ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ProfilePage(user: widget.user),
+                        ),
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       primary: Colors.orange,
                       shape: const CircleBorder(),

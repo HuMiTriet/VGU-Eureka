@@ -16,14 +16,16 @@ class AuthUser {
   final String? phoneNumber;
   final String? email;
   final String? displayName;
+  final String? photoURL;
 
-  AuthUser({
-    required this.isEmailVerified,
+  AuthUser({ required this.isEmailVerified,
     required this.uid,
     required this.email,
     this.phoneNumber,
     this.displayName,
+    this.photoURL,
   });
+
 
     
   @override

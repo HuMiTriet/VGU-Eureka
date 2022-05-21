@@ -6,3 +6,4 @@ const mainRoute = '/main/';
 const verifyEmailRoute = '/verify-email/';
 const recoverAccountRoute = '/recover-account/';
 const settingsRoute = '/settings/';
+const profileRoute = '/profile/';
