@@ -2,11 +2,13 @@ import 'package:etoet/views/auth/verified_email_view.dart';
 import 'package:etoet/views/profile/Widgets/edit_image_dialog.dart';
 import 'package:etoet/views/profile/change_email_page.dart';
 import 'package:etoet/views/profile/verification_view.dart';
+// ignore_for_file: prefer_const_constructors
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../services/auth/auth_user.dart';
 import 'change_pass_page.dart';
-
-// import 'package:flutter/cupertino.dart';
+import 'dart:developer';
 
 class ProfilePage extends StatefulWidget {
   AuthUser user;
@@ -22,16 +24,34 @@ class ProfilePage extends StatefulWidget {
 
 class MapScreenState extends State<ProfilePage>
     with SingleTickerProviderStateMixin {
-  TextEditingController nameController = TextEditingController();
-  TextEditingController emailController = TextEditingController();
-  TextEditingController mobileController = TextEditingController();
+  var nameController = TextEditingController();
+  var emailController = TextEditingController();
+  var mobileController = TextEditingController();
+  var photoURL;
+
+  late User user;
 
   @override
   void initState() {
-    super.initState();
-    nameController.text = widget.user.displayName ?? '';
-    emailController.text = widget.user.email ?? '';
-    mobileController.text = widget.user.phoneNumber ?? '';
+    // TODO: implement initState
+
+    user = FirebaseAuth.instance.currentUser!;
+
+    FirebaseAuth.instance.userChanges().listen((event) {
+      if (event != null && mounted) {
+        setState(() {
+          user = event;
+        });
+      }
+
+      log(user.toString());
+      nameController.text = user.displayName ?? '';
+      emailController.text = user.email ?? '';
+      mobileController.text = user.phoneNumber ?? '';
+      photoURL = user.photoURL;
+
+      super.initState();
+    });
   }
 
   @override
@@ -47,6 +67,8 @@ class MapScreenState extends State<ProfilePage>
                   height: 250.0,
                   color: Colors.white,
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
                       Padding(
                           padding: const EdgeInsets.only(left: 20.0, top: 20.0),
@@ -91,8 +113,7 @@ class MapScreenState extends State<ProfilePage>
                                     shape: BoxShape.circle,
                                     // image: ExactAssetImage(widget.user.img),
                                     image: DecorationImage(
-                                      image: NetworkImage(widget
-                                              .user.photoURL ??
+                                      image: NetworkImage(user.photoURL ??
                                           'https://www.pavilionweb.com/wp-content/uploads/2017/03/man-300x300.png'),
                                       fit: BoxFit.cover,
                                     ),
@@ -107,7 +128,7 @@ class MapScreenState extends State<ProfilePage>
                                 children: <Widget>[
                                   TextButton(
                                     onPressed: () {
-                                      EditImageDialog(context);
+                                      EditImageDialog(context, widget.user);
                                     },
                                     child: const CircleAvatar(
                                       backgroundColor: Colors.red,
@@ -166,6 +187,11 @@ class MapScreenState extends State<ProfilePage>
         ),
       ),
     );
+  }
+
+  void updateEmail(String email) {
+    // FirebaseAuth.instance.currentUser
+    //               ?.updateEmail(email);
   }
 }
 

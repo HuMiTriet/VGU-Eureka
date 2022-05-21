@@ -47,8 +47,10 @@ dependencies:
   firebase_database: ^9.0.14
   settings_ui: ^2.0.2
   flutter_login_facebook: ^1.4.1
-  pinput:
-    ^2.2.9
+  pinput: ^2.2.9
+  permission_handler: ^9.2.0
+  firebase_storage:
+    ^10.2.16
     #dev dependencies will not be included in the final build
 dev_dependencies:
   flutter_test:
@@ -80,7 +82,8 @@ flutter:
     - assets/images/Yor.png
     - assets/images/
     - assets/images/Doraemon.png
-  # To add assets to your application, add an assets section, like this:
+    # To add assets to your application, add an assets section, like this:
+    - assets/images/google_logo.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
   # For details regarding adding assets from package dependencies, see

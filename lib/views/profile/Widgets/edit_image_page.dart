@@ -1,17 +1,25 @@
 import 'dart:io';
-
+import 'package:etoet/services/auth/auth_user.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:developer';
 
 class EditImagePage extends StatefulWidget {
-  EditImagePage({Key? key}) : super(key: key);
+  EditImagePage({Key? key, required this.imageSource, required this.user})
+      : super(key: key);
+
+  final imageSource;
+  final AuthUser user;
 
   @override
   _EditImagePageState createState() => _EditImagePageState();
 }
 
 class _EditImagePageState extends State<EditImagePage> {
-  var image;
+  File? image;
+  var imageUrl;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,13 +43,11 @@ class _EditImagePageState extends State<EditImagePage> {
                   width: 330,
                   child: GestureDetector(
                       onTap: () async {
-                        XFile? _image = await ImagePicker()
-                            .pickImage(source: ImageSource.gallery);
-                        setState(() {});
+                        pickImage();
                       },
                       child: image != null
                           ? Image.file(
-                              image,
+                              image!,
                               width: 200.0,
                               height: 200.0,
                               fit: BoxFit.fitHeight,
@@ -63,7 +69,25 @@ class _EditImagePageState extends State<EditImagePage> {
                     width: 330,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        final _firebaseStorage = FirebaseStorage.instance;
+                        try {
+                          var snapshot = await _firebaseStorage
+                              .ref()
+                              .child('images/${widget.user.uid}}')
+                              .putFile(image!);
+                          log(widget.user.uid);
+                          var downloadUrl = await snapshot.ref.getDownloadURL();
+                          setState(() {
+                            imageUrl = downloadUrl;
+                          });
+                        } on FirebaseException catch (e) {}
+                        log('image url: ' + imageUrl);
+                        FirebaseAuth.instance.currentUser
+                            ?.updatePhotoURL(imageUrl);
+
+                        Navigator.pop(context);
+                      },
                       child: const Text(
                         'Update',
                         style: TextStyle(fontSize: 15),
@@ -73,5 +97,16 @@ class _EditImagePageState extends State<EditImagePage> {
         ],
       ),
     );
+  }
+
+  Future<File?> pickImage() async {
+    final _picker = ImagePicker();
+    PickedFile image;
+
+    XFile? _image = await _picker.pickImage(source: widget.imageSource);
+
+    setState(() {
+      this.image = File(_image?.path ?? '');
+    });
   }
 }
