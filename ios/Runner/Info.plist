@@ -47,6 +47,8 @@
     <string>This application requires location services to work</string>
     <key>NSLocationAlwaysUsageDescription</key>
     <string>This application requires location services to work</string>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 </dict>
 </plist>
 <!-- Put me in the [my_project]/ios/Runner/Info.plist file -->
