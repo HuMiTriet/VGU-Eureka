@@ -11,24 +11,31 @@ class FriendView extends StatefulWidget {
 }
 
 class _FriendViewState extends State<FriendView> {
+
+  //Dummy users for displaying friends in Friend List:
+  DummyUser dummyUser = DummyUser();
+  List<String>? userDisplayNameList = [];
+  List<String>? userDisplayNameListOnSearch = [];
+
+  //A list of ListTile to display Friends.
+  //final userListWidget = <Widget>[];
+
+  //IDK what this does, but it belongs to search function
+  var _textEditingController = TextEditingController();
   @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-
-    //Dummy users for displaying friends in Friend List:
-    DummyUser dummyUser = DummyUser();
-    List<String>? userDisplayNameList = [];
-
+  void initState() {
+    super.initState();
     for (int i = 0; i < dummyUser.userList.length; ++i) {
-      userDisplayNameList.add(dummyUser.userList.elementAt(i).displayName!);
+      userDisplayNameList!.add(dummyUser.userList
+          .elementAt(i)
+          .displayName!);
     }
 
-    //IDK what this does, but it belongs to search function
-    TextEditingController? _textEditingController = TextEditingController();
 
-    //A list of ListTile to display Friends.
-    //final userListWidget = <Widget>[];
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return FractionallySizedBox(
         heightFactor: 0.9,
         child: SafeArea(
@@ -43,16 +50,36 @@ class _FriendViewState extends State<FriendView> {
                       shrinkWrap: true,
                       children: [
                         TextField(
-                          decoration: const InputDecoration(
+                          controller: _textEditingController,
+                          decoration: InputDecoration(
                             hintText: 'Search',
                             contentPadding: EdgeInsets.all(20),
+                            suffixIcon: IconButton(
+                              onPressed: ()
+                                {
+                                  if(_textEditingController!=null)
+                                    {
+                                      _textEditingController.clear();
+                                    }
+                                },
+                              icon: Icon(Icons.clear),
+                            ),
                           ),
-                          controller: _textEditingController,
                           onChanged: (value) {
-                            //THIS DOESN'T WORK!!!
-                            // setState(() {
-                            //   userDisplayNameList = userDisplayNameList!.where((element) => element.contains(value)).toList();
-                            // });
+                            setState(() {
+
+                              List<String>? placeholder = [];
+                              for(int i = 0; i < userDisplayNameList!.length; ++i)
+                                {
+
+                                  if(userDisplayNameList!.elementAt(i).toLowerCase().contains(value.toLowerCase()))
+                                    {
+                                      placeholder.add(userDisplayNameList!.elementAt(i));
+                                    }
+                                }
+                              userDisplayNameListOnSearch = placeholder;
+                            });
+
                           },
                         ),
                         const ListTile(
@@ -71,14 +98,14 @@ class _FriendViewState extends State<FriendView> {
                   child: ListView.builder(
                     shrinkWrap: true,
                     // children: userListWidget,
-                    itemCount: userDisplayNameList!.length,
+                    itemCount: _textEditingController.text.isNotEmpty? userDisplayNameListOnSearch!.length : userDisplayNameList!.length,
                     itemBuilder: (BuildContext context, int index) {
                       return ListTile(
                         leading: const CircleAvatar(
                           backgroundImage: NetworkImage(
                               'https://i.guim.co.uk/img/media/26392d05302e02f7bf4eb143bb84c8097d09144b/446_167_3683_2210/master/3683.jpg?width=1200&height=1200&quality=85&auto=format&fit=crop&s=49ed3252c0b2ffb49cf8b508892e452d'),
                         ),
-                        title: Text(userDisplayNameList!.elementAt(index)),
+                        title: Text(_textEditingController.text.isNotEmpty? userDisplayNameListOnSearch!.elementAt(index) : userDisplayNameList!.elementAt(index)),
                         subtitle: const Text('Status text here.'),
                       );
                     },
