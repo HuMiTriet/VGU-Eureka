@@ -1,35 +1,29 @@
 import 'package:etoet/services/auth/location.dart';
+import 'package:etoet/services/auth/user_info.dart';
 import 'package:flutter/foundation.dart';
 
 // This annotation immutable tells the compiler that the content of this class
 // and its subclasses will not change.
 @immutable
-class AuthUser {
+class AuthUser extends UserInfo {
   //// provide current location of the user
   final Location location = Location();
 
   final Set<String> friendUIDs = {};
 
-  final String uid;
   final bool isEmailVerified;
 
-  final String? phoneNumber;
-  final String? email;
-  final String? displayName;
-  final String? photoURL;
-
-  AuthUser({ required this.isEmailVerified,
-    required this.uid,
-    required this.email,
-    this.phoneNumber,
-    this.displayName,
-    this.photoURL,
+  AuthUser({
+    required this.isEmailVerified,
+    required super.uid,
+    required super.email,
+    super.phoneNumber,
+    super.displayName,
+    super.photoURL,
   });
 
-
-    
   @override
-    String toString() {
+  String toString() {
     return '''
       AuthUser {
         uid: $uid,
@@ -39,5 +33,5 @@ class AuthUser {
         displayName: $displayName,
       }
     ''';
-    }
+  }
 }
