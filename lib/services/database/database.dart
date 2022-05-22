@@ -3,13 +3,13 @@ import 'dart:developer' as devtools show log;
 import 'package:etoet/services/auth/auth_user.dart';
 import 'package:firebase_database/firebase_database.dart';
 
-class Database {
+class Realtime {
   /// Points to the remote database
   static final databaseReference = FirebaseDatabase.instance.ref();
 
   /// Private constructor
-  Database._() {
-    devtools.log('NEW DATABASE REFERENCE INSTANCE');
+  Realtime._() {
+    devtools.log('NEW REALTIME DATABASE REFERENCE INSTANCE');
   }
 
   static void updateUserLocation(AuthUser authUser) {

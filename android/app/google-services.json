@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "344264346912-gh7mi3mriqa0q2ihbgnjtvjjbcpomnm8.apps.googleusercontent.com",
+          "client_id": "344264346912-fl7f4ipsv60cq7ktld8c5h8kdgblckkn.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.deltadeer.etoet",
-            "certificate_hash": "51ed932d3646418302b463f710b4d5cb72242eb2"
+            "certificate_hash": "23a92cfaf4a958d3b265d0951b0331974b3208f5"
           }
         },
         {

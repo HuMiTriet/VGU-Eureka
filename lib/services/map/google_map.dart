@@ -71,7 +71,7 @@ class GoogleMapImpl extends StatefulWidget implements Map {
 
     // update markers of all friends every one second
     for (var friendUID in authUser.friendUIDs) {
-      var friendData = await Database.databaseReference
+      var friendData = await Realtime.databaseReference
           .child('users')
           .child(friendUID)
           .child('location')
@@ -211,7 +211,7 @@ class GoogleMapImpl extends StatefulWidget implements Map {
     )).listen((position) async {
       authUser.location.latitude = position.latitude;
       authUser.location.longitude = position.longitude;
-      Database.updateUserLocation(authUser);
+      Realtime.updateUserLocation(authUser);
       devtools.log('update user location to database',
           name: 'GoogleMap: _updateLiveLocation');
     });

@@ -2,6 +2,7 @@ import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/auth_exceptions.dart';
 import 'package:etoet/services/auth/auth_service.dart';
 import 'package:etoet/views/auth/error_dialog.dart';
+import 'package:etoet/views/auth/verified_email_view.dart';
 import 'package:flutter/material.dart';
 
 class RegisterView extends StatefulWidget {
@@ -129,7 +130,12 @@ class _RegisterViewState extends State<RegisterView> {
 
                         AuthService.firebase().sendEmailVerification();
 
-                        Navigator.of(context).pushNamed(verifyEmailRoute);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => VerifyEmailView(user: user),
+                          ),
+                        );
                       } on WeakPassowrdAuthException {
                         await showErrorDialog(context, 'Weak password');
                       } on EmailAlreadyInUsedAuthException {
