@@ -1,4 +1,5 @@
 import 'package:etoet/services/auth/location.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
 // This annotation immutable tells the compiler that the content of this class
@@ -39,4 +40,12 @@ class AuthUser {
       }
     ''';
   }
+
+  factory AuthUser.fromFirebase(User? user) => AuthUser(
+      uid: user!.uid,
+      isEmailVerified: user.emailVerified,
+      phoneNumber: user.phoneNumber,
+      email: user.email,
+      displayName: user.displayName,
+      photoURL: user.photoURL);
 }

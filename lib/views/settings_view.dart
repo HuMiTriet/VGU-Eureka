@@ -7,9 +7,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 // import 'package:settings_ui/settings_ui.dart';
 
-
-
-
 enum MenuAction { signOut }
 
 class SettingsView extends StatefulWidget {
@@ -46,20 +43,20 @@ class _SettingsViewState extends State<SettingsView> {
                     backgroundColor: Colors.white,
                     // backgroundImage: AssetImage('assets/Doraemon_character.png'),
                     child: ClipRRect(
-                      borderRadius:BorderRadius.circular(49),
+                      borderRadius: BorderRadius.circular(49),
                       //image: const AssetImage('assets/images/google_logo.png')
                       child: Image.asset('assets/images/Doraemon.png'),
-                    )
-                )
-            ),
-            CustomTile(child: Text(
-              _username,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+                    ))),
+            CustomTile(
+              child: Text(
+                _username,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),),
+            ),
           ],
           titlePadding: EdgeInsets.only(bottom: 50),
         ),
@@ -69,17 +66,17 @@ class _SettingsViewState extends State<SettingsView> {
           tiles: [
             SettingsTile(
                 title: 'Edit account',
-                leading: Icon(Icons.collections_bookmark)
-            ),
+                leading: Icon(Icons.collections_bookmark)),
             SettingsTile(
                 title: 'Logout',
                 leading: Icon(Icons.collections_bookmark),
                 onTap: () async {
                   await FirebaseAuth.instance.signOut();
                   Navigator.of(context).pushNamedAndRemoveUntil(
-                  loginRoute,
-                  (_) => false,);}
-            ),
+                    loginRoute,
+                    (_) => false,
+                  );
+                }),
             SettingsTile.switchTile(
               title: 'Push notifications',
               leading: Icon(Icons.phonelink_lock),
@@ -107,19 +104,16 @@ class _SettingsViewState extends State<SettingsView> {
               ),
             )
           ],
-
         ),
         SettingsSection(
           title: 'More',
           tiles: [
-            SettingsTile(
-                title: 'About us', leading: Icon(Icons.description)),
+            SettingsTile(title: 'About us', leading: Icon(Icons.description)),
             SettingsTile(
                 title: 'Privacy policy',
                 leading: Icon(Icons.collections_bookmark)),
             SettingsTile(
-                title: 'Terms of use',
-                leading: Icon(Icons.description)),
+                title: 'Terms of use', leading: Icon(Icons.description)),
           ],
         ),
         CustomSection(
@@ -172,6 +166,11 @@ Widget build(BuildContext context) {
               );
             },
           ),
+          ListTile(
+              leading: CircleAvatar(
+                  backgroundImage: NetworkImage(user!.photoURL ?? '')),
+              title: Text(user.displayName ?? 'name'),
+              subtitle: Text(user.email ?? 'email')),
         ],
       ),
     );

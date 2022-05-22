@@ -6,16 +6,14 @@ import 'package:etoet/views/profile/verification_view.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../services/auth/auth_user.dart';
 import 'change_pass_page.dart';
 import 'dart:developer';
 
 class ProfilePage extends StatefulWidget {
-  AuthUser user;
-
   ProfilePage({
     Key? key,
-    required this.user,
   }) : super(key: key);
 
   @override
@@ -29,33 +27,16 @@ class MapScreenState extends State<ProfilePage>
   var mobileController = TextEditingController();
   var photoURL;
 
-  late User user;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-
-    user = FirebaseAuth.instance.currentUser!;
-
-    FirebaseAuth.instance.userChanges().listen((event) {
-      if (event != null && mounted) {
-        setState(() {
-          user = event;
-        });
-      }
-
-      log(user.toString());
-      nameController.text = user.displayName ?? '';
-      emailController.text = user.email ?? '';
-      mobileController.text = user.phoneNumber ?? '';
-      photoURL = user.photoURL;
-
-      super.initState();
-    });
-  }
+  late AuthUser? user;
 
   @override
   Widget build(BuildContext context) {
+    user = context.watch<AuthUser?>();
+    nameController.text = user!.displayName ?? '';
+    emailController.text = user!.email ?? '';
+    mobileController.text = user!.phoneNumber ?? '';
+    photoURL = user!.photoURL;
+
     return Theme(
       data: ThemeData.light(),
       child: Scaffold(
@@ -111,9 +92,10 @@ class MapScreenState extends State<ProfilePage>
                                   height: 140.0,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
+                                    border: Border.all(width: 3),
                                     // image: ExactAssetImage(widget.user.img),
                                     image: DecorationImage(
-                                      image: NetworkImage(user.photoURL ??
+                                      image: NetworkImage(user!.photoURL ??
                                           'https://www.pavilionweb.com/wp-content/uploads/2017/03/man-300x300.png'),
                                       fit: BoxFit.cover,
                                     ),
@@ -128,7 +110,7 @@ class MapScreenState extends State<ProfilePage>
                                 children: <Widget>[
                                   TextButton(
                                     onPressed: () {
-                                      EditImageDialog(context, widget.user);
+                                      EditImageDialog(context, user!);
                                     },
                                     child: const CircleAvatar(
                                       backgroundColor: Colors.red,
@@ -169,13 +151,13 @@ class MapScreenState extends State<ProfilePage>
                         ProfileField(controller: emailController),
                         EditVerifiableFieldsController(
                           value: 'Change Email',
-                          user: widget.user,
+                          user: user!,
                         ),
                         const ProfileFieldLabel(label: 'Mobile'),
                         ProfileField(controller: mobileController),
                         EditVerifiableFieldsController(
                           value: 'Change Password',
-                          user: widget.user,
+                          user: user!,
                         ),
                       ],
                     ),
@@ -187,11 +169,6 @@ class MapScreenState extends State<ProfilePage>
         ),
       ),
     );
-  }
-
-  void updateEmail(String email) {
-    // FirebaseAuth.instance.currentUser
-    //               ?.updateEmail(email);
   }
 }
 
