@@ -16,7 +16,7 @@ class AuthUser extends UserInfo {
   AuthUser({
     required this.isEmailVerified,
     required super.uid,
-    required super.email,
+    super.email,
     super.phoneNumber,
     super.displayName,
     super.photoURL,
