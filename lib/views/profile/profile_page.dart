@@ -3,6 +3,7 @@
 import 'package:etoet/views/profile/Widgets/edit_image_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../services/auth/auth_user.dart';
 import 'change_pass_page.dart';
 import 'dart:developer';
@@ -15,16 +16,6 @@ class ProfilePage extends StatefulWidget {
 
   @override
   MapScreenState createState() => MapScreenState();
-
-  // final AuthUser user;
-
-  final AuthUser user = AuthUser(
-      phoneNumber: '1234',
-      isEmailVerified: false,
-      uid: '12352',
-      email: 'mail@gmail.com',
-      displayName: 'display name',
-      photoURL: null);
 }
 
 class MapScreenState extends State<ProfilePage>
@@ -34,33 +25,23 @@ class MapScreenState extends State<ProfilePage>
   var mobileController = TextEditingController();
   var photoURL;
 
-  late User user;
+  late AuthUser? user;
 
   @override
   void initState() {
-    // TODO: implement initState
-
-    user = FirebaseAuth.instance.currentUser!;
-
-    FirebaseAuth.instance.userChanges().listen((event) {
-      if (event != null && mounted) {
-        setState(() {
-          user = event;
-        });
-      }
-
-      log(user.toString());
-      nameController.text = user.displayName ?? '';
-      emailController.text = user.email ?? '';
-      mobileController.text = user.phoneNumber ?? '';
-      photoURL = user.photoURL;
-
-      super.initState();
-    });
+    super.initState();
+    // });
   }
 
   @override
   Widget build(BuildContext context) {
+    user = context.watch<AuthUser?>();
+
+    nameController.text = user!.displayName ?? '';
+    emailController.text = user!.email ?? '';
+    mobileController.text = user!.phoneNumber ?? '';
+    photoURL = user!.photoURL;
+
     return Scaffold(
         body: Container(
       // color: Colors.amber,
@@ -114,9 +95,10 @@ class MapScreenState extends State<ProfilePage>
                                 height: 140.0,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
+                                  border: Border.all(width: 3),
                                   image: DecorationImage(
                                     // image: ExactAssetImage(widget.user.img),
-                                    image: NetworkImage(user.photoURL ??
+                                    image: NetworkImage(user!.photoURL ??
                                         'https://www.pavilionweb.com/wp-content/uploads/2017/03/man-300x300.png'),
                                     fit: BoxFit.cover,
                                   ),

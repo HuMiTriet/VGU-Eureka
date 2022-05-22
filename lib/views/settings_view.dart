@@ -1,6 +1,8 @@
 import 'package:etoet/constants/routes.dart';
+import 'package:etoet/services/auth/auth_user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 enum MenuAction { signOut }
 
@@ -15,6 +17,7 @@ class SettingsView extends StatefulWidget {
 class _SettingsViewState extends State<SettingsView> {
   @override
   Widget build(BuildContext context) {
+    var user = context.watch<AuthUser?>();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
@@ -39,6 +42,11 @@ class _SettingsViewState extends State<SettingsView> {
               );
             },
           ),
+          ListTile(
+              leading: CircleAvatar(
+                  backgroundImage: NetworkImage(user!.photoURL ?? '')),
+              title: Text(user.displayName ?? 'name'),
+              subtitle: Text(user.email ?? 'email')),
         ],
       ),
     );

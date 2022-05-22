@@ -1,5 +1,6 @@
 import 'package:etoet/services/auth/auth_provider.dart';
 import 'package:etoet/services/auth/auth_user.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'concrete_providers/firebase_auth_provider.dart';
 
@@ -30,6 +31,12 @@ class AuthService implements AuthProvider {
         phoneNumber: phoneNumber,
         displayName: displayName,
       );
+
+  Stream<AuthUser?> get stream {
+    return FirebaseAuth.instance
+        .userChanges()
+        .map((user) => AuthUser.fromFirebase(user));
+  }
 
   @override
   AuthUser? get currentUser => provider.currentUser;
