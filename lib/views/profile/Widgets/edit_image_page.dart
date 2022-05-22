@@ -70,6 +70,8 @@ class _EditImagePageState extends State<EditImagePage> {
                     height: 50,
                     child: ElevatedButton(
                       onPressed: () async {
+                        if (image == null) return;
+
                         final _firebaseStorage = FirebaseStorage.instance;
                         try {
                           var snapshot = await _firebaseStorage
@@ -83,10 +85,10 @@ class _EditImagePageState extends State<EditImagePage> {
                           });
                         } on FirebaseException catch (e) {}
                         log('image url: ' + imageUrl);
+                        Navigator.pop(context);
+
                         FirebaseAuth.instance.currentUser
                             ?.updatePhotoURL(imageUrl);
-
-                        Navigator.pop(context);
                       },
                       child: const Text(
                         'Update',
@@ -106,7 +108,7 @@ class _EditImagePageState extends State<EditImagePage> {
     XFile? _image = await _picker.pickImage(source: widget.imageSource);
 
     setState(() {
-      this.image = File(_image?.path ?? '');
+      this.image = File(_image!.path);
     });
   }
 }
