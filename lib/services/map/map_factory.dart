@@ -23,10 +23,4 @@ abstract class Map extends Widget {
 
   /// Show the current address of the map view.
   void updateCurrentMapAddress();
-
-  /// Update the screen size of the device.
-  void updateScreenSize(num width, num height);
-
-  /// Initialize the map.
-  void initializeMap();
 }

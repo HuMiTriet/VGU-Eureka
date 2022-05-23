@@ -1,12 +1,67 @@
+import 'dart:developer' as devtools show log;
+
 import 'package:etoet/firebase_options.dart';
 import 'package:etoet/services/auth/auth_exceptions.dart';
 import 'package:etoet/services/auth/auth_provider.dart';
 import 'package:etoet/services/auth/auth_user.dart';
 import 'package:firebase_auth/firebase_auth.dart'
-    show FirebaseAuth, FirebaseAuthException;
+    show EmailAuthProvider, FirebaseAuth, FirebaseAuthException;
 import 'package:firebase_core/firebase_core.dart';
 
 class FirebaseAuthProvider implements AuthProvider {
+  /* @override */
+  /* Future<bool> validateEnteredPassword(String password) async { */
+  /*   var firebaseUser = FirebaseAuth.instance.currentUser; */
+
+  /*   if (firebaseUser == null) { */
+  /*     /// User is not logged in */
+  /*     return false; */
+  /*   } else { */
+  /*     var authCredential = EmailAuthProvider.credential( */
+  /*       email: firebaseUser.email ?? '', */
+  /*       password: password, */
+  /*     ); */
+  /*     try { */
+  /*       var authResult = await firebaseUser.reauthenticateWithCredential( */
+  /*         authCredential, */
+
+  /*       return authResult.user != null; */
+  /*       ); */
+  /*     } catch (e) { */
+  /*       devtools.log(e.toString()); */
+  /*       return false; */
+  /*     } */
+  /*   } */
+
+  /* } */
+
+  @override
+  Future<bool> validateEnteredPassword(String password) async {
+    var firebaseUser = FirebaseAuth.instance.currentUser;
+
+    var authCredential = EmailAuthProvider.credential(
+      email: firebaseUser?.email ?? '',
+      password: password,
+    );
+
+    try {
+      var authResult = await firebaseUser?.reauthenticateWithCredential(
+        authCredential,
+      );
+
+      devtools.log(authResult.toString(), name: 'validate user password');
+
+      if (authResult != null) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      devtools.log(e.toString(), name: 'validate user password');
+      return false;
+    }
+  }
+
   @override
   Future<AuthUser> createUser({
     required String email,
@@ -21,12 +76,11 @@ class FirebaseAuthProvider implements AuthProvider {
       );
 
       /* final referenceUser = FirebaseAuth.instance.currentUser; */
-    final firebaseUser = FirebaseAuth.instance.currentUser;
-      
-     
+      final firebaseUser = FirebaseAuth.instance.currentUser;
+
       /* FirebaseAuth.instance.userChanges().listen((firebaseUser) { */
       await firebaseUser?.updateDisplayName(displayName!);
-    /* await firebaseUser?.updatePhoneNumber(phoneNumber); */
+      /* await firebaseUser?.updatePhoneNumber(phoneNumber); */
       /* }); */
 
       FirebaseAuth.instance.currentUser!.reload();

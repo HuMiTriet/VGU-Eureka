@@ -1,10 +1,14 @@
 import 'package:etoet/constants/routes.dart';
+import 'package:etoet/services/database/firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../../services/auth/auth_service.dart';
+import '../../services/auth/auth_user.dart';
 
 class VerifyEmailView extends StatefulWidget {
-  const VerifyEmailView({Key? key}) : super(key: key);
+  final AuthUser user;
+
+  const VerifyEmailView({Key? key, required this.user}) : super(key: key);
 
   @override
   _VerifyEmailViewState createState() => _VerifyEmailViewState();
@@ -13,6 +17,7 @@ class VerifyEmailView extends StatefulWidget {
 class _VerifyEmailViewState extends State<VerifyEmailView> {
   @override
   Widget build(BuildContext context) {
+    Firestore.addUserInfo(widget.user);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Verifiy Email'),
