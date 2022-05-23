@@ -26,6 +26,15 @@ class _RegisterViewState extends State<RegisterView> {
           {double ratio = 0.02}) =>
       getWidgetHeight(context) * ratio;
 
+  bool emailAlreadyInUse = false;
+  bool invalidEmail = false;
+  bool userNotFound = false;
+
+  bool passwordRestrictionsSatisfied = false;
+  bool weakPassword = false;
+  bool passwordMatches = false;
+  bool genericException = false;
+
   /// Group of controllers that handle each of the text field
   late final TextEditingController _username;
   late final TextEditingController _email;
@@ -42,7 +51,7 @@ class _RegisterViewState extends State<RegisterView> {
         child: Center(
           child: SingleChildScrollView(
             child: Form(
-              autovalidateMode: AutovalidateMode.always,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               key: _formKey,
               child: Column(
                 children: [
@@ -108,6 +117,12 @@ class _RegisterViewState extends State<RegisterView> {
                         validator: (value) {
                           if (value!.isEmpty) {
                             return 'Please enter an email';
+                          } else if (invalidEmail) {
+                            return 'Please enter a valid email';
+                          } else if (emailAlreadyInUse) {
+                            return 'Email already in use';
+                          } else if (userNotFound) {
+                            return 'User not found';
                           }
                           return null;
                         },
@@ -138,9 +153,10 @@ class _RegisterViewState extends State<RegisterView> {
                           validator: (value) {
                             if (value!.isEmpty) {
                               return 'Please enter a password';
-                            } else {
-                              return null;
+                            } else if (passwordRestrictionsSatisfied == false) {
+                              return 'Please enter a valid password';
                             }
+                            return null;
                           }),
                     ),
                   ),
@@ -159,7 +175,9 @@ class _RegisterViewState extends State<RegisterView> {
                     defaultColor: Colors.black,
                     // if in langscape mode should be getWidgetWidth(context) * 0.6
                     // but i dont know how to dynamically assigned it yet
-                    onSuccess: () {},
+                    onSuccess: () {
+                      passwordRestrictionsSatisfied = true;
+                    },
                   ),
 
                   SizedBox(height: getSpaceRatioToWidgetHeight(context)),
@@ -186,7 +204,8 @@ class _RegisterViewState extends State<RegisterView> {
                           if (value!.isEmpty) {
                             return 'Please enter a password';
                           }
-                          if (value != _password.text) {
+                          if (value != _password.text ||
+                              passwordMatches == false) {
                             return 'Passwords do not match';
                           }
                           return null;
@@ -217,7 +236,15 @@ class _RegisterViewState extends State<RegisterView> {
                           final confirmPassword = _confirmPassword.text;
                           final username = _username.text;
 
-                          setState(() {});
+                          if (passwordRestrictionsSatisfied == false) {
+                            return;
+                          }
+
+                          if (password != confirmPassword) {
+                            passwordMatches = false;
+                            setState(() {});
+                            return;
+                          }
 
                           try {
                             var user = await AuthService.firebase().createUser(
@@ -226,19 +253,30 @@ class _RegisterViewState extends State<RegisterView> {
                               displayName: username,
                             );
 
+                            setState(() {});
+
                             if (_formKey.currentState!.validate()) {
                               AuthService.firebase().sendEmailVerification();
                               Navigator.of(context).pushNamed(verifyEmailRoute);
                             }
-                          } on WeakPassowrdAuthException {
-                            await showErrorDialog(context, 'Weak password');
-                          } on EmailAlreadyInUsedAuthException {
-                            await showErrorDialog(
-                                context, 'Email already in use');
-                          } on InvalidEmailAuthException {
-                            await showErrorDialog(context, 'Invalid email');
-                          } on GenericAuthException {
-                            await showErrorDialog(context, 'Unknown error');
+                          } on FirebaseAuthException catch (e) {
+                            if (e.code == 'email-already-in-use') {
+                              emailAlreadyInUse = true;
+                              setState(() {});
+                            } else if (e.code == 'user-not-found') {
+                              userNotFound = true;
+                              setState(() {});
+                            } else if (e.code == 'invalid-email') {
+                              invalidEmail = true;
+                              setState(() {});
+                            } else if (e.code == 'weak-password') {
+                              weakPassword = false;
+                              setState(() {});
+                            } else {
+                              AlertDialog(
+                                title: Text(e.message ?? 'Error'),
+                              );
+                            }
                           }
                         },
                         child: const Text(

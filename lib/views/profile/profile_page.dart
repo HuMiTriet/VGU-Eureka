@@ -1,18 +1,15 @@
-import 'package:etoet/views/auth/verified_email_view.dart';
 import 'package:etoet/views/profile/Widgets/edit_image_dialog.dart';
 import 'package:etoet/views/profile/change_email_page.dart';
 import 'package:etoet/views/profile/verification_view.dart';
 // ignore_for_file: prefer_const_constructors
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/auth/auth_user.dart';
 import 'change_pass_page.dart';
-import 'dart:developer';
 
 class ProfilePage extends StatefulWidget {
-  ProfilePage({
+  const ProfilePage({
     Key? key,
   }) : super(key: key);
 
@@ -22,10 +19,10 @@ class ProfilePage extends StatefulWidget {
 
 class MapScreenState extends State<ProfilePage>
     with SingleTickerProviderStateMixin {
-  var nameController = TextEditingController();
-  var emailController = TextEditingController();
-  var mobileController = TextEditingController();
-  var photoURL;
+  TextEditingController nameController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController mobileController = TextEditingController();
+  String? photoURL;
 
   late AuthUser? user;
 
