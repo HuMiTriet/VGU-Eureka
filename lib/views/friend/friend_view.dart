@@ -80,6 +80,9 @@ class _FriendViewState extends State<FriendView> {
                             suffixIcon: IconButton(
                               onPressed: () {
                                 _searchBarController.clear();
+                                setState(() {
+                                  userDisplayNameListOnSearch = userDisplayNameList;
+                                });
                               },
                               icon: const Icon(Icons.clear),
                             ),
