@@ -1,10 +1,7 @@
-import 'dart:async';
-
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/map/map_factory.dart';
 import 'package:etoet/views/profile/profile_page.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 
 import '../services/auth/auth_user.dart';
 
@@ -24,32 +21,21 @@ class MainView extends StatefulWidget {
 class _MainViewState extends State<MainView> {
   late Map map;
 
-  Timer? timer;
-
   @override
   void initState() {
     super.initState();
     map = Map('GoogleMap', widget.user);
-    map.setContext(context);
+    map.context = context;
   }
 
   @override
   Widget build(BuildContext context) {
-    timer = Timer.periodic(const Duration(seconds: 1), (t) {
-      if (mounted) {
-        setState(() {
-          map.updateCurrentMapAddress();
-        });
-      }
-      timer?.cancel();
-    });
-
     return Scaffold(
       body: Stack(
         children: <Widget>[
           map,
           Padding(
-            padding: const EdgeInsets.fromLTRB(0.0, 30.0, 10.0, 0.0),
+            padding: const EdgeInsets.fromLTRB(200.0, 30.0, 10.0, 0.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -90,18 +76,9 @@ class _MainViewState extends State<MainView> {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10.0, 40.0, 10.0, 0.0),
-            child: Text(map.address,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  backgroundColor: Color.fromARGB(104, 220, 155, 69),
-                  decoration: TextDecoration.underline,
-                )),
-          ),
         ],
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -127,7 +104,6 @@ class _MainViewState extends State<MainView> {
 
   @override
   void dispose() {
-    timer?.cancel();
     super.dispose();
   }
 }
