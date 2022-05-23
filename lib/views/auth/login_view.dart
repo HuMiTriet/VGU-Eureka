@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors, unnecessary_new, prefer_single_quotes
+
 import 'dart:developer' as devtools show log;
 
 import 'package:etoet/constants/routes.dart';
@@ -35,15 +37,37 @@ class _LoginViewState extends State<LoginView> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                ' Welcome to ETOET ',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    ' Welcome to ',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                    ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.orange,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                    child: Text(
+                      'ETOET',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromRGBO(255, 210, 177, 2),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-
-              SizedBox(height: 50),
+              Image.asset(
+                'assets/images/helpinghands.png',
+                width: 50,
+                height: 70,
+              ),
 
               //Email or phonenumber text field
               Padding(
@@ -150,10 +174,71 @@ class _LoginViewState extends State<LoginView> {
                   ),
                 ),
               ),
-              //switch to the register view
 
+              // Forgot password?
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(
+                        recoverAccountRoute,
+                      );
+                    },
+                    child: const Text(
+                      'Forgot password?',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.orange,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: new Container(
+                        margin: const EdgeInsets.only(left: 10.0, right: 15.0),
+                        child: Divider(
+                          color: Colors.black,
+                          height: 0.3,
+                        )),
+                  ),
+                  Text(
+                    "OR",
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Expanded(
+                    child: new Container(
+                        margin: const EdgeInsets.only(left: 10.0, right: 15.0),
+                        child: Divider(
+                          color: Colors.black,
+                          height: 0.3,
+                        )),
+                  ),
+                ],
+              ),
+              SizedBox(height: 5),
+
+              _Button(
+                  color: Colors.black,
+                  image: const AssetImage('assets/images/google_logo.png'),
+                  text: 'Sign in with Google',
+                  onPressed: signInWithGoogle),
+              SizedBox(height: 10),
+              _Button(
+                  color: Colors.black,
+                  image: const AssetImage('assets/images/facebook_logo.png'),
+                  text: 'Sign in with Facebook',
+                  onPressed: signInWithFacebook),
+              //switch to the register view
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     'Do not have an account?',
@@ -170,7 +255,7 @@ class _LoginViewState extends State<LoginView> {
                         );
                       },
                       child: const Text(
-                        'Sign Up',
+                        'Create an account',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.orange,
@@ -178,31 +263,6 @@ class _LoginViewState extends State<LoginView> {
                       )),
                 ],
               ),
-              // Forgot password?
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pushNamed(
-                        recoverAccountRoute,
-                      );
-                    },
-                    child: const Text(
-                      'Forgot your Password?',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              _Button(
-                  color: Colors.black,
-                  image: const AssetImage('assets/images/google_logo.png'),
-                  text: 'Sign in with Google',
-                  onPressed: signInWithGoogle),
             ],
           ),
         ),
@@ -361,6 +421,7 @@ class _Button extends StatelessWidget {
               Image(
                 image: image,
                 width: 25,
+                height: 30,
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -369,7 +430,7 @@ class _Button extends StatelessWidget {
                   children: [
                     Text(
                       text,
-                      style: TextStyle(color: Colors.black, fontSize: 18),
+                      style: TextStyle(color: Colors.black, fontSize: 13),
                     ),
                     const SizedBox(width: 35),
                   ],

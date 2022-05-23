@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'dart:developer' as devtools show log;
 
 import 'package:etoet/constants/routes.dart';
@@ -48,13 +50,18 @@ class _RegisterViewState extends State<RegisterView> {
           child: Column(
             children: [
               Text(
-                'Create Account ',
+                'Create Account',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 24,
                 ),
               ),
-              SizedBox(height: 100),
+
+              Image.asset(
+                'assets/images/helpinghands.png',
+                width: 50,
+                height: 70,
+              ),
 
               /// user name
               Padding(
@@ -146,17 +153,17 @@ class _RegisterViewState extends State<RegisterView> {
                 ),
               ),
               // Register button
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: Container(
                   alignment: Alignment.center,
-                  constraints: BoxConstraints.tightForFinite(
+                  constraints: const BoxConstraints.tightForFinite(
                     width: 250,
                     height: 40,
                   ),
                   decoration: BoxDecoration(
-                    color: Color.fromARGB(227, 252, 126, 0),
+                    color: const Color.fromARGB(227, 252, 126, 0),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: TextButton(
@@ -196,11 +203,12 @@ class _RegisterViewState extends State<RegisterView> {
                   ),
                 ),
               ),
+              SizedBox(height: 20),
               // Already registered ? Login
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
+                  const Text(
                     'Already have an account?',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
@@ -215,7 +223,7 @@ class _RegisterViewState extends State<RegisterView> {
                       );
                     },
                     child: const Text(
-                      'Login',
+                      'Sign in',
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.orange,
