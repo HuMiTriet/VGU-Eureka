@@ -26,67 +26,21 @@ class _MainViewState extends State<MainView> {
 
   Timer? timer;
 
-  Future<bool> hasLocationPermission() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    // Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // App to enable the location services.
-      // accessing the position and request users of the
-      return Future.error('Location services are disabled.');
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
-        return Future.error('Location permissions are denied');
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-
-    return true;
-  }
-
   @override
   void initState() {
+    super.initState();
     map = Map('GoogleMap', widget.user);
     map.setContext(context);
-    super.initState();
-    hasLocationPermission();
-
-    // run after build
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      setState(() {
-        map.initializeMap();
-        var screenWidth = MediaQuery.of(context).size.width *
-            MediaQuery.of(context).devicePixelRatio;
-        var screenHeight = MediaQuery.of(context).size.height *
-            MediaQuery.of(context).devicePixelRatio;
-        map.updateScreenSize(screenWidth, screenHeight);
-      });
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     timer = Timer.periodic(const Duration(seconds: 1), (t) {
-      setState(() {
-        map.updateCurrentMapAddress();
-      });
+      if (mounted) {
+        setState(() {
+          map.updateCurrentMapAddress();
+        });
+      }
       timer?.cancel();
     });
 
@@ -135,9 +89,11 @@ class _MainViewState extends State<MainView> {
             padding: const EdgeInsets.fromLTRB(10.0, 40.0, 10.0, 0.0),
             child: Text(map.address,
                 style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    backgroundColor: Color.fromARGB(104, 220, 155, 69))),
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  backgroundColor: Color.fromARGB(104, 220, 155, 69),
+                  decoration: TextDecoration.underline,
+                )),
           ),
         ],
       ),
