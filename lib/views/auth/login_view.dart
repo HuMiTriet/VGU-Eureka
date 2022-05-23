@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, unnecessary_new
 
 import 'dart:developer' as devtools show log;
 
@@ -58,33 +58,36 @@ class _LoginViewState extends State<LoginView> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    ' Welcome to ',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 24,
-                    ),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.orange,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                    child: Text(
-                      'ETOET',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromRGBO(255, 210, 177, 2),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        ' Welcome to ',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24,
+                        ),
                       ),
-                    ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.orange,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                        child: Text(
+                          'ETOET',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromRGBO(255, 210, 177, 2),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-
-                  SizedBox(
-                    height: getSpaceRatioToWidgetHeight(
-                      context,
-                      ratio: 0.075,
-                    ),
+                  Image.asset(
+                    'assets/images/helpinghands.png',
+                    height: 100,
+                    width: 100,
                   ),
 
                   //Email or phonenumber text field
@@ -265,11 +268,11 @@ class _LoginViewState extends State<LoginView> {
                                 const EdgeInsets.only(left: 10.0, right: 15.0),
                             child: Divider(
                               color: Colors.black,
-                              height: 0.3,
+                              height: 0.5,
                             )),
                       ),
                       Text(
-                        "OR",
+                        'OR',
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
@@ -281,10 +284,13 @@ class _LoginViewState extends State<LoginView> {
                                 const EdgeInsets.only(left: 10.0, right: 15.0),
                             child: Divider(
                               color: Colors.black,
-                              height: 0.3,
+                              height: 0.5,
                             )),
                       ),
                     ],
+                  ),
+                  const SizedBox(
+                    height: 15,
                   ),
                   _Button(
                       color: Colors.black,

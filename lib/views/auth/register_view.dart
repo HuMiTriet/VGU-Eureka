@@ -61,11 +61,12 @@ class _RegisterViewState extends State<RegisterView> {
                       fontSize: 24,
                     ),
                   ),
-                  SizedBox(
-                      height: getSpaceRatioToWidgetHeight(
-                    context,
-                    ratio: 0.15,
-                  )),
+
+                  Image.asset(
+                    'assets/images/helpinghands.png',
+                    height: 100,
+                    width: 100,
+                  ),
 
                   /// user name
                   Padding(
