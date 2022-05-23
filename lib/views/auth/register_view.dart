@@ -28,7 +28,6 @@ class _RegisterViewState extends State<RegisterView> {
 
   bool emailAlreadyInUse = false;
   bool invalidEmail = false;
-  bool userNotFound = false;
 
   bool passwordRestrictionsSatisfied = false;
   bool weakPassword = false;
@@ -121,8 +120,6 @@ class _RegisterViewState extends State<RegisterView> {
                             return 'Please enter a valid email';
                           } else if (emailAlreadyInUse) {
                             return 'Email already in use';
-                          } else if (userNotFound) {
-                            return 'User not found';
                           }
                           return null;
                         },
@@ -204,8 +201,7 @@ class _RegisterViewState extends State<RegisterView> {
                           if (value!.isEmpty) {
                             return 'Please enter a password';
                           }
-                          if (value != _password.text ||
-                              passwordMatches == false) {
+                          if (value != _password.text) {
                             return 'Passwords do not match';
                           }
                           return null;
@@ -247,36 +243,36 @@ class _RegisterViewState extends State<RegisterView> {
                           }
 
                           try {
+                            /// show loading while wating for response
+
                             var user = await AuthService.firebase().createUser(
                               email: email,
                               password: password,
                               displayName: username,
                             );
 
+                            devtools.log(user.toString());
+
                             setState(() {});
 
-                            if (_formKey.currentState!.validate()) {
-                              AuthService.firebase().sendEmailVerification();
-                              Navigator.of(context).pushNamed(verifyEmailRoute);
-                            }
-                          } on FirebaseAuthException catch (e) {
-                            if (e.code == 'email-already-in-use') {
-                              emailAlreadyInUse = true;
-                              setState(() {});
-                            } else if (e.code == 'user-not-found') {
-                              userNotFound = true;
-                              setState(() {});
-                            } else if (e.code == 'invalid-email') {
-                              invalidEmail = true;
-                              setState(() {});
-                            } else if (e.code == 'weak-password') {
-                              weakPassword = false;
-                              setState(() {});
-                            } else {
-                              AlertDialog(
-                                title: Text(e.message ?? 'Error'),
-                              );
-                            }
+                            AuthService.firebase().sendEmailVerification();
+                            Navigator.of(context).pushNamed(verifyEmailRoute);
+                          } on EmailAlreadyInUsedAuthException {
+                            devtools.log('email already in use');
+                            emailAlreadyInUse = true;
+                            setState(() {});
+                          } on InvalidEmailAuthException {
+                            devtools.log('invalid email');
+                            invalidEmail = true;
+                            setState(() {});
+                          } on WeakPassowrdAuthException {
+                            devtools.log('weak password');
+                            weakPassword = false;
+                            setState(() {});
+                          } on GenericAuthException {
+                            const AlertDialog(
+                              title: Text('Generic Error'),
+                            );
                           }
                         },
                         child: const Text(
