@@ -3,8 +3,6 @@ import 'dart:developer' as devtools show log;
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/auth_exceptions.dart';
 import 'package:etoet/services/auth/auth_service.dart';
-import 'package:etoet/views/auth/error_dialog.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pw_validator/flutter_pw_validator.dart';
 
@@ -50,7 +48,7 @@ class _RegisterViewState extends State<RegisterView> {
         child: Center(
           child: SingleChildScrollView(
             child: Form(
-              autovalidateMode: AutovalidateMode.onUserInteraction,
+              autovalidateMode: AutovalidateMode.always,
               key: _formKey,
               child: Column(
                 children: [
