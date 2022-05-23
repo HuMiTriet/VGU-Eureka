@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/map/map_factory.dart';
+import 'package:etoet/views/profile/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -25,67 +26,21 @@ class _MainViewState extends State<MainView> {
 
   Timer? timer;
 
-  Future<bool> hasLocationPermission() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    // Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
-      return Future.error('Location services are disabled.');
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
-        return Future.error('Location permissions are denied');
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-
-    return true;
-  }
-
   @override
   void initState() {
+    super.initState();
     map = Map('GoogleMap', widget.user);
     map.setContext(context);
-    super.initState();
-    hasLocationPermission();
-
-    // run after build
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      setState(() {
-        map.initializeMap();
-        var screenWidth = MediaQuery.of(context).size.width *
-            MediaQuery.of(context).devicePixelRatio;
-        var screenHeight = MediaQuery.of(context).size.height *
-            MediaQuery.of(context).devicePixelRatio;
-        map.updateScreenSize(screenWidth, screenHeight);
-      });
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     timer = Timer.periodic(const Duration(seconds: 1), (t) {
-      setState(() {
-        map.updateCurrentMapAddress();
-      });
+      if (mounted) {
+        setState(() {
+          map.updateCurrentMapAddress();
+        });
+      }
       timer?.cancel();
     });
 
@@ -100,7 +55,9 @@ class _MainViewState extends State<MainView> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
                 ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).pushNamed(profileRoute);
+                    },
                     style: ElevatedButton.styleFrom(
                       primary: Colors.orange,
                       shape: const CircleBorder(),
@@ -132,16 +89,17 @@ class _MainViewState extends State<MainView> {
             padding: const EdgeInsets.fromLTRB(10.0, 40.0, 10.0, 0.0),
             child: Text(map.address,
                 style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    backgroundColor: Color.fromARGB(104, 220, 155, 69))),
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  backgroundColor: Color.fromARGB(104, 220, 155, 69),
+                  decoration: TextDecoration.underline,
+                )),
           ),
         ],
       ),
-      floatingActionButton: Wrap(
-        spacing: 105,
-        alignment: WrapAlignment.center,
-        children: <Widget>[
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
           FloatingActionButton(
               heroTag: 'goToFriendsFromMain',
               onPressed: () {},
@@ -167,5 +125,4 @@ class _MainViewState extends State<MainView> {
     timer?.cancel();
     super.dispose();
   }
-
 }

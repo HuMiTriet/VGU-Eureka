@@ -1,4 +1,5 @@
 import 'package:etoet/services/auth/location.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
 // This annotation immutable tells the compiler that the content of this class
@@ -16,6 +17,7 @@ class AuthUser {
   final String? phoneNumber;
   final String? email;
   final String? displayName;
+  final String? photoURL;
 
   AuthUser({
     required this.isEmailVerified,
@@ -23,11 +25,11 @@ class AuthUser {
     required this.email,
     this.phoneNumber,
     this.displayName,
+    this.photoURL,
   });
 
-    
   @override
-    String toString() {
+  String toString() {
     return '''
       AuthUser {
         uid: $uid,
@@ -37,5 +39,13 @@ class AuthUser {
         displayName: $displayName,
       }
     ''';
-    }
+  }
+
+  factory AuthUser.fromFirebase(User? user) => AuthUser(
+      uid: user!.uid,
+      isEmailVerified: user.emailVerified,
+      phoneNumber: user.phoneNumber,
+      email: user.email,
+      displayName: user.displayName,
+      photoURL: user.photoURL);
 }
