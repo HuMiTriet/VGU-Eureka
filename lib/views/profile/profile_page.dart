@@ -1,19 +1,16 @@
-import 'package:etoet/views/auth/verified_email_view.dart';
 import 'package:etoet/views/profile/Widgets/edit_image_dialog.dart';
 import 'package:etoet/views/profile/change_email_page.dart';
 import 'package:etoet/views/profile/verification_view.dart';
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../services/auth/auth_user.dart';
 import 'change_pass_page.dart';
 
-// import 'package:flutter/cupertino.dart';
-
 class ProfilePage extends StatefulWidget {
-  AuthUser user;
-
-  ProfilePage({
+  const ProfilePage({
     Key? key,
-    required this.user,
   }) : super(key: key);
 
   @override
@@ -25,17 +22,18 @@ class MapScreenState extends State<ProfilePage>
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController mobileController = TextEditingController();
+  String? photoURL;
 
-  @override
-  void initState() {
-    super.initState();
-    nameController.text = widget.user.displayName ?? '';
-    emailController.text = widget.user.email ?? '';
-    mobileController.text = widget.user.phoneNumber ?? '';
-  }
+  late AuthUser? user;
 
   @override
   Widget build(BuildContext context) {
+    user = context.watch<AuthUser?>();
+    nameController.text = user!.displayName ?? '';
+    emailController.text = user!.email ?? '';
+    mobileController.text = user!.phoneNumber ?? '';
+    photoURL = user!.photoURL;
+
     return Theme(
       data: ThemeData.light(),
       child: Scaffold(
@@ -47,6 +45,8 @@ class MapScreenState extends State<ProfilePage>
                   height: 250.0,
                   color: Colors.white,
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
                       Padding(
                           padding: const EdgeInsets.only(left: 20.0, top: 20.0),
@@ -89,10 +89,10 @@ class MapScreenState extends State<ProfilePage>
                                   height: 140.0,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
+                                    border: Border.all(width: 3),
                                     // image: ExactAssetImage(widget.user.img),
                                     image: DecorationImage(
-                                      image: NetworkImage(widget
-                                              .user.photoURL ??
+                                      image: NetworkImage(user!.photoURL ??
                                           'https://www.pavilionweb.com/wp-content/uploads/2017/03/man-300x300.png'),
                                       fit: BoxFit.cover,
                                     ),
@@ -107,7 +107,7 @@ class MapScreenState extends State<ProfilePage>
                                 children: <Widget>[
                                   TextButton(
                                     onPressed: () {
-                                      EditImageDialog(context);
+                                      EditImageDialog(context, user!);
                                     },
                                     child: const CircleAvatar(
                                       backgroundColor: Colors.red,
@@ -148,13 +148,13 @@ class MapScreenState extends State<ProfilePage>
                         ProfileField(controller: emailController),
                         EditVerifiableFieldsController(
                           value: 'Change Email',
-                          user: widget.user,
+                          user: user!,
                         ),
                         const ProfileFieldLabel(label: 'Mobile'),
                         ProfileField(controller: mobileController),
                         EditVerifiableFieldsController(
                           value: 'Change Password',
-                          user: widget.user,
+                          user: user!,
                         ),
                       ],
                     ),

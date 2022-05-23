@@ -36,4 +36,12 @@ class AuthUser extends UserInfo {
       }
     ''';
   }
+
+  factory AuthUser.fromFirebase(User? user) => AuthUser(
+      uid: user!.uid,
+      isEmailVerified: user.emailVerified,
+      phoneNumber: user.phoneNumber,
+      email: user.email,
+      displayName: user.displayName,
+      photoURL: user.photoURL);
 }

@@ -72,6 +72,7 @@ class _ChangePassPageState extends State<ChangePassPage> {
             Expanded(
               child: SingleChildScrollView(
                 child: Form(
+                  autovalidateMode: AutovalidateMode.always,
                   key: _formKey,
                   child: Padding(
                     padding:
@@ -117,6 +118,7 @@ class _ChangePassPageState extends State<ChangePassPage> {
                         SizedBox(
                           height: getSpaceRatioToWidgetHeight(context),
                         ),
+
                         FlutterPwValidator(
                           controller: _newPasswordController,
                           minLength: 6,
