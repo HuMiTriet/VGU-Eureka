@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'dart:developer' as devtools show log;
 
 import 'package:etoet/constants/routes.dart';
@@ -23,6 +25,17 @@ class _RegisterViewState extends State<RegisterView> {
   double getSpaceRatioToWidgetHeight(BuildContext context,
           {double ratio = 0.02}) =>
       getWidgetHeight(context) * ratio;
+
+  bool inlandScapeMode(BuildContext context) =>
+      MediaQuery.of(context).orientation == Orientation.landscape;
+
+  double getHeightForPasswordValidator(BuildContext context) {
+    if (inlandScapeMode(context)) {
+      return getSpaceRatioToWidgetHeight(context, ratio: 0.6);
+    } else {
+      return getSpaceRatioToWidgetHeight(context, ratio: 0.15);
+    }
+  }
 
   bool emailAlreadyInUse = false;
   bool invalidEmail = false;
@@ -59,11 +72,12 @@ class _RegisterViewState extends State<RegisterView> {
                       fontSize: 24,
                     ),
                   ),
-                  SizedBox(
-                      height: getSpaceRatioToWidgetHeight(
-                    context,
-                    ratio: 0.15,
-                  )),
+
+                  Image.asset(
+                    'assets/images/helpinghands.png',
+                    height: 100,
+                    width: 100,
+                  ),
 
                   /// user name
                   Padding(
@@ -166,7 +180,7 @@ class _RegisterViewState extends State<RegisterView> {
                     numericCharCount: 3,
                     specialCharCount: 1,
                     width: getWidgetWidth(context) * 0.8,
-                    height: getWidgetHeight(context) * 0.15,
+                    height: getHeightForPasswordValidator(context),
                     defaultColor: Colors.black,
                     // if in langscape mode should be getWidgetWidth(context) * 0.6
                     // but i dont know how to dynamically assigned it yet
