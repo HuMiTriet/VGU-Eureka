@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+
+@immutable
 class UserInfo {
   final String uid;
 
@@ -6,7 +9,7 @@ class UserInfo {
   final String? displayName;
   final String? photoURL;
 
-  UserInfo({
+  const UserInfo({
     required this.uid,
     this.email,
     this.phoneNumber,
