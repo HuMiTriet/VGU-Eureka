@@ -1,6 +1,6 @@
 import 'package:etoet/services/auth/auth_user.dart';
 
-class DummyUser{
+class DummyDatabase{
   AuthUser user1 = AuthUser(isEmailVerified: true, uid: 'id001', email: 'testEmail01@gmail.com', displayName:'Anya Forger');
   AuthUser user2 = AuthUser(isEmailVerified: true, uid: 'id002', email: 'testEmail02@gmail.com', displayName:'Loid Forger');
   AuthUser user3 = AuthUser(isEmailVerified: true, uid: 'id003', email: 'testEmail03@gmail.com', displayName:'Yor Forger');
@@ -14,7 +14,7 @@ class DummyUser{
   late List<AuthUser> userList;
   late List<AuthUser> addAsFriendUserList;
 
-  DummyUser()
+  DummyDatabase()
   {
     userList = [user1]; // Needs to Initialize?
     userList.add(user2);
