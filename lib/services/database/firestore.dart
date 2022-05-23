@@ -20,14 +20,14 @@ class Firestore {
     );
   }
 
-  Future<etoet.UserInfo> getUserInfo(String uid) async {
+  static Future<etoet.UserInfo> getUserInfo(String uid) async {
     final userDocument =
         await firestoreReference.collection('users').doc(uid).get();
 
     final data = userDocument.data() as Map<String, dynamic>;
 
     return etoet.UserInfo(
-      uid: data['uid'],
+      uid: uid,
       email: data['email'],
       displayName: data['displayName'],
       photoURL: data['photoUrl'],

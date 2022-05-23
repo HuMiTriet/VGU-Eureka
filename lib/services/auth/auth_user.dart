@@ -1,6 +1,7 @@
 import 'package:etoet/services/auth/location.dart';
 import 'package:etoet/services/auth/user_info.dart';
 import 'package:flutter/foundation.dart';
+import 'package:tuple/tuple.dart';
 
 // This annotation immutable tells the compiler that the content of this class
 // and its subclasses will not change.
@@ -13,6 +14,7 @@ class AuthUser extends UserInfo {
 
   final bool isEmailVerified;
 
+  final Set<Tuple2<String, Location>> setFriendUIDLocation = {};
   AuthUser({
     required this.isEmailVerified,
     required super.uid,
