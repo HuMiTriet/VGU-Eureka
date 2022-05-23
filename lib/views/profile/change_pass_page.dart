@@ -117,6 +117,7 @@ class _ChangePassPageState extends State<ChangePassPage> {
                         SizedBox(
                           height: getSpaceRatioToWidgetHeight(context),
                         ),
+
                         FlutterPwValidator(
                           controller: _newPasswordController,
                           minLength: 6,

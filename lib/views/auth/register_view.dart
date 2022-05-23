@@ -6,6 +6,7 @@ import 'package:etoet/services/auth/auth_service.dart';
 import 'package:etoet/views/auth/error_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_pw_validator/flutter_pw_validator.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({Key? key}) : super(key: key);
@@ -15,6 +16,12 @@ class RegisterView extends StatefulWidget {
 }
 
 class _RegisterViewState extends State<RegisterView> {
+  double getWidgetWidth(BuildContext context) =>
+      MediaQuery.of(context).size.width;
+
+  double getWidgetHeight(BuildContext context) =>
+      MediaQuery.of(context).size.height;
+
   /// Group of controllers that handle each of the text field
   late final TextEditingController _username;
   late final TextEditingController _email;
@@ -104,6 +111,21 @@ class _RegisterViewState extends State<RegisterView> {
                 ),
               ),
               // Register button
+              const SizedBox(height: 20),
+
+              FlutterPwValidator(
+                controller: _password,
+                minLength: 6,
+                uppercaseCharCount: 2,
+                numericCharCount: 3,
+                specialCharCount: 1,
+                width: getWidgetWidth(context) * 0.8,
+                height: getWidgetHeight(context) * 0.15,
+                // if in langscape mode should be getWidgetWidth(context) * 0.6
+                // but i dont know how to dynamically assigned it yet
+                onSuccess: () {},
+              ),
+
               const SizedBox(height: 20),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
