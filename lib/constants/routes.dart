@@ -7,4 +7,5 @@ const verifyEmailRoute = '/verify-email/';
 const recoverAccountRoute = '/recover-account/';
 const settingsRoute = '/settings/';
 const friendRoute = '/friend/';
+const addFriendRoute = '/add-friend/';
 const profileRoute = '/profile/';

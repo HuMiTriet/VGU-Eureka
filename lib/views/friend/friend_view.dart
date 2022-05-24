@@ -1,5 +1,8 @@
 import 'package:etoet/views/friend/dummyDatabase.dart';
 import 'package:flutter/material.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+
+import 'add_friend_view.dart';
 
 class FriendView extends StatefulWidget {
   @override
@@ -48,11 +51,12 @@ class _FriendViewState extends State<FriendView> {
   final Color topListViewColor = Colors.orangeAccent; // The background color of search and add friend part.
   final Color bottomListViewColor = Colors.white; // The background color of friend list.
   static const IconData addFriendIcon = Icons.add;
+  static const IconData pendingFriendRequestIcon = Icons.group_add;
 
 
   // The relative height of topListView and bottomListView
-  final int topListViewFlex = 1;
-  final int bottomListViewFlex = 4;
+  final int topListViewFlex = 39;
+  final int bottomListViewFlex = 100;
 
 
 
@@ -63,7 +67,7 @@ class _FriendViewState extends State<FriendView> {
         child: SafeArea(
           child: Column(
             children: [
-              // Search and Add Friend
+              // Search, Add Friend and Pending Friend Request.
               Expanded(
                   flex: topListViewFlex,
                   child: Container(
@@ -93,11 +97,27 @@ class _FriendViewState extends State<FriendView> {
                             });
                           },
                         ),
-                        const ListTile(
+                         ListTile(
                           leading: CircleAvatar(
                             child: Icon(addFriendIcon),
                           ),
                           title: Text('Add Friend'),
+                          onTap: ()
+                          {
+                            showBarModalBottomSheet(
+                              context: context,
+                              backgroundColor: Colors.transparent,
+                              builder: (context) => const AddFriendView(),
+                            );
+                          },
+
+
+                        ),
+                        const ListTile(
+                          leading: CircleAvatar(
+                            child: Icon(pendingFriendRequestIcon),
+                          ),
+                          title: Text('Pending Friend Request'),
                         ),
                       ],
                     ),
