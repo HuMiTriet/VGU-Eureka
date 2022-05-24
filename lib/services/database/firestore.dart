@@ -113,4 +113,21 @@ class Firestore {
     firestoreReference.collection('users').doc(senderUID).collection('friends').doc(receiverUID).update({'requestConfirmed': true});
   }
 
+  static Future<Set<etoet.UserInfo>> getFriendInfoList(String uid) async{
+    var friendData = await firestoreReference.collection('users').doc(uid).collection('friends')
+        .where('requestConfirmed', isEqualTo: true)
+        .get();
+
+    var friendInfoList = <etoet.UserInfo>{};
+    for(var i = 0; i < friendData.docs.length; ++i)
+      {
+        var data = friendData.docs.elementAt(i).data();
+        friendInfoList.add(
+            await getUserInfo(data['friendUID'])
+        );
+      }
+
+    return friendInfoList;
+  }
+
 }
