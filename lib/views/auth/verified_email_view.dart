@@ -18,6 +18,7 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
   @override
   Widget build(BuildContext context) {
     Firestore.addUserInfo(widget.user);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Verifiy Email'),
