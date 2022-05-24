@@ -36,4 +36,13 @@ class Firestore {
       phoneNumber: data['phoneNumber'],
     );
   }
+
+  static Future<bool> userExists(String uid) async {
+    final userDocument = await firestoreReference
+        .collection('users')
+        .where('uid', isEqualTo: uid)
+        .get(const GetOptions(source: Source.serverAndCache));
+
+    return userDocument.docs.isNotEmpty;
+  }
 }

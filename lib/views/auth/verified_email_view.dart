@@ -1,4 +1,5 @@
 import 'package:etoet/constants/routes.dart';
+import 'package:etoet/services/database/database.dart';
 import 'package:etoet/services/database/firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -17,10 +18,13 @@ class VerifyEmailView extends StatefulWidget {
 class _VerifyEmailViewState extends State<VerifyEmailView> {
   @override
   Widget build(BuildContext context) {
-    Firestore.addUserInfo(widget.user);
+    var userExists = Firestore.userExists(widget.user.uid) as bool;
+    if (!userExists) {
+      Firestore.addUserInfo(widget.user);
+    }
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Verifiy Email'),
+        title: const Text('Verify Email'),
       ),
       body: Column(
         children: [
