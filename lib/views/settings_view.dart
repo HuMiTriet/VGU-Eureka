@@ -1,8 +1,8 @@
 import 'package:etoet/constants/routes.dart';
-import 'package:etoet/views/settingUI_lib/src/settings_tile.dart';
-import 'package:etoet/views/settingUI_lib/src/settings_section.dart';
-import 'package:etoet/views/settingUI_lib/src/settings_list.dart';
 import 'package:etoet/views/settingUI_lib/src/custom_section.dart';
+import 'package:etoet/views/settingUI_lib/src/settings_list.dart';
+import 'package:etoet/views/settingUI_lib/src/settings_section.dart';
+import 'package:etoet/views/settingUI_lib/src/settings_tile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 // import 'package:settings_ui/settings_ui.dart';
@@ -20,20 +20,19 @@ class SettingsView extends StatefulWidget {
 class _SettingsViewState extends State<SettingsView> {
   bool notificationsEnabled = true;
   double _receivedRange = 5.0;
-  String _username = 'Doraemon';
+  final String _username = 'Doraemon';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Settings UI')),
+      appBar: AppBar(title: const Text('Settings UI')),
       body: buildSettingsList(),
     );
   }
 
   Widget buildSettingsList() {
-    var value;
     return SettingsList(
-      contentPadding: EdgeInsets.only(top: 20),
+      contentPadding: const EdgeInsets.only(top: 20),
       sections: [
         SettingsSection(
           tiles: [
@@ -50,7 +49,7 @@ class _SettingsViewState extends State<SettingsView> {
             CustomTile(
               child: Text(
                 _username,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -58,19 +57,19 @@ class _SettingsViewState extends State<SettingsView> {
               ),
             ),
           ],
-          titlePadding: EdgeInsets.only(bottom: 50),
+          titlePadding: const EdgeInsets.only(bottom: 50),
         ),
         SettingsSection(
           title: 'Account Setting',
           //titlePadding: EdgeInsets.only(top: 20),
           tiles: [
-            SettingsTile(
+            const SettingsTile(
                 title: 'Edit account',
                 leading: Icon(Icons.collections_bookmark)),
             SettingsTile(
                 title: 'Logout',
-                leading: Icon(Icons.collections_bookmark),
-                onTap: () async {
+                leading: const Icon(Icons.collections_bookmark),
+                onPressed: (_) async {
                   await FirebaseAuth.instance.signOut();
                   Navigator.of(context).pushNamedAndRemoveUntil(
                     loginRoute,
@@ -79,9 +78,9 @@ class _SettingsViewState extends State<SettingsView> {
                 }),
             SettingsTile.switchTile(
               title: 'Push notifications',
-              leading: Icon(Icons.phonelink_lock),
+              leading: const Icon(Icons.phonelink_lock),
               switchValue: notificationsEnabled,
-              onToggle: (bool value) {
+              onToggle: (var value) {
                 setState(() {
                   notificationsEnabled = value;
                 });
@@ -96,7 +95,7 @@ class _SettingsViewState extends State<SettingsView> {
                 activeColor: Colors.blue,
                 inactiveColor: Colors.grey,
                 value: _receivedRange,
-                onChanged: (double value) {
+                onChanged: (var value) {
                   setState(() {
                     _receivedRange = value;
                   });
@@ -107,7 +106,7 @@ class _SettingsViewState extends State<SettingsView> {
         ),
         SettingsSection(
           title: 'More',
-          tiles: [
+          tiles: const [
             SettingsTile(title: 'About us', leading: Icon(Icons.description)),
             SettingsTile(
                 title: 'Privacy policy',
@@ -125,10 +124,10 @@ class _SettingsViewState extends State<SettingsView> {
                   'assets/images/settings.png',
                   height: 50,
                   width: 50,
-                  color: Color(0xFF777777),
+                  color: const Color(0xFF777777),
                 ),
               ),
-              Text(
+              const Text(
                 'Version: Beta - Not yet integrate with other parts of the app',
                 style: TextStyle(color: Color(0xFF777777)),
               ),

@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 import '../auth/auth_user.dart';
 import '../auth/user_info.dart' as etoet;

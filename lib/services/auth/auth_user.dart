@@ -1,6 +1,5 @@
 import 'package:etoet/services/auth/location.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:tuple/tuple.dart';
 
