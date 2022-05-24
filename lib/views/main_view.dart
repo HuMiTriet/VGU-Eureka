@@ -1,6 +1,5 @@
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/map/map_factory.dart';
-import 'package:etoet/views/profile/profile_page.dart';
 import 'package:flutter/material.dart';
 
 import '../services/auth/auth_user.dart';

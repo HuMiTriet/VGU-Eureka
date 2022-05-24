@@ -16,6 +16,7 @@ class AuthUser extends etoet.UserInfo {
   final bool isEmailVerified;
 
   final Set<Tuple2<String, Location>> setFriendUIDLocation = {};
+
   AuthUser({
     required this.isEmailVerified,
     required super.uid,
@@ -37,12 +38,4 @@ class AuthUser extends etoet.UserInfo {
       }
     ''';
   }
-
-  factory AuthUser.fromFirebase(User? user) => AuthUser(
-      uid: user!.uid,
-      isEmailVerified: user.emailVerified,
-      phoneNumber: user.phoneNumber,
-      email: user.email,
-      displayName: user.displayName,
-      photoURL: user.photoURL);
 }

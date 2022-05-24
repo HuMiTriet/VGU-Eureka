@@ -33,9 +33,14 @@ class AuthService implements AuthProvider {
       );
 
   Stream<AuthUser?> get stream {
-    return FirebaseAuth.instance
-        .userChanges()
-        .map((user) => AuthUser.fromFirebase(user));
+    return FirebaseAuth.instance.userChanges().map((user) => AuthUser(
+          uid: user!.uid,
+          isEmailVerified: user.emailVerified,
+          email: user.email,
+          displayName: user.displayName,
+          phoneNumber: user.phoneNumber,
+          photoURL: user.photoURL,
+        ));
   }
 
   @override
