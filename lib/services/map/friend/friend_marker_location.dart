@@ -7,9 +7,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../marker/marker.dart';
 
+/// This class is used to create a marker for a friend
 class FriendMarker {
   static Routing routing = Routing.getInstance();
-  late Polyline polyline;
   late UserInfo info;
   late Future<BitmapDescriptor> icon =
       GoogleMapMarker.getIconFromUrl(info.photoURL ?? 'assets/images/Anya.png');
@@ -20,7 +20,7 @@ class FriendMarker {
       UserInfo userInfo,
       BuildContext context,
       Set<Polyline> polylineList) async {
-    var marker = Marker(
+    return Marker(
       markerId: MarkerId(uid),
       position: friendLatLng,
       icon: await icon,
@@ -80,15 +80,14 @@ class FriendMarker {
                               const TextStyle(fontWeight: ui.FontWeight.bold),
                         ),
                         onPressed: () async {
-                          polylineList.add(
-                            Polyline(
-                                polylineId: const PolylineId('polyline'),
-                                visible: true,
-                                points: await routing
-                                    .getPointsFromUser(friendLatLng),
-                                width: 5,
-                                color: Colors.blue),
-                          );
+                          polylineList.clear();
+                          polylineList.add(Polyline(
+                              polylineId: const PolylineId('polyline'),
+                              visible: true,
+                              points:
+                                  await routing.getPointsFromUser(friendLatLng),
+                              width: 5,
+                              color: Colors.blue));
                         },
                       ),
                     ),
@@ -98,6 +97,5 @@ class FriendMarker {
             });
       },
     );
-    return marker;
   }
 }

@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:etoet/views/settingUI_lib/src/abstract_section.dart';
+import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class CustomSection extends AbstractSection {

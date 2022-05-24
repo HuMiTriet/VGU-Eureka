@@ -1,8 +1,10 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+// ignore_for_file: unnecessary_import
+
 import 'package:etoet/views/settingUI_lib/src/abstract_section.dart';
 import 'package:etoet/views/settingUI_lib/src/cupertino_settings_section.dart';
 import 'package:etoet/views/settingUI_lib/src/settings_tile.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 import 'defines.dart';
 
@@ -33,6 +35,40 @@ class SettingsSection extends AbstractSection {
           titleWidget: titleWidget,
           titlePadding: titlePadding,
         );
+
+  Widget androidSection(BuildContext context) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      if (title != null)
+        Padding(
+          padding: titlePadding!,
+          child: Text(
+            title!,
+            style: titleTextStyle ??
+                TextStyle(
+                  color: Theme.of(context).colorScheme.secondary,
+                  fontWeight: FontWeight.bold,
+                ),
+            maxLines: maxLines,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      if (subtitle != null)
+        Padding(
+          padding: subtitlePadding,
+          child: subtitle,
+        ),
+      ListView.separated(
+        physics: const NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: tiles!.length,
+        separatorBuilder: (context, index) => const Divider(height: 1),
+        itemBuilder: (context, index) {
+          return tiles![index];
+        },
+      ),
+      if (showBottomDivider) const Divider(height: 1)
+    ]);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,40 +113,5 @@ class SettingsSection extends AbstractSection {
       ),
       headerPadding: titlePadding!,
     );
-  }
-
-  Widget androidSection(BuildContext context) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      if (title != null)
-        Padding(
-          padding: titlePadding!,
-          child: Text(
-            title!,
-            style: titleTextStyle ??
-                TextStyle(
-                  color: Theme.of(context).accentColor,
-                  fontWeight: FontWeight.bold,
-                ),
-            maxLines: maxLines,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      if (subtitle != null)
-        Padding(
-          padding: subtitlePadding,
-          child: subtitle,
-        ),
-      ListView.separated(
-        physics: NeverScrollableScrollPhysics(),
-        shrinkWrap: true,
-        itemCount: tiles!.length,
-        separatorBuilder: (BuildContext context, int index) =>
-            Divider(height: 1),
-        itemBuilder: (BuildContext context, int index) {
-          return tiles![index];
-        },
-      ),
-      if (showBottomDivider) Divider(height: 1)
-    ]);
   }
 }

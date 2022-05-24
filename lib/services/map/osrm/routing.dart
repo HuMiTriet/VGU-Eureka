@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:routing_client_dart/routing_client_dart.dart';
 
@@ -13,10 +15,10 @@ class Routing {
   Routing._();
 
   Future<List<LatLng>> getPointsFromUser(LatLng to) async {
-    return getPoints(location, to);
+    return _getPoints(location, to);
   }
 
-  Future<List<LatLng>> getPoints(LatLng from, LatLng to) async {
+  Future<List<LatLng>> _getPoints(LatLng from, LatLng to) async {
     var road = await manager.getRoad(
       waypoints: [
         LngLat(lat: from.latitude, lng: from.longitude),
@@ -26,7 +28,8 @@ class Routing {
       steps: true,
       languageCode: 'en',
     );
-    return _toLatLng(road.polyline!);
+    log('polyline: ${road.polyline!}', name: 'Routing: getPoints');
+    return _toLatLngList(road.polyline!);
   }
 
   List<LatLng> _decodeEncodedPolyline(String encoded) {
@@ -59,7 +62,7 @@ class Routing {
     return poly;
   }
 
-  List<LatLng> _toLatLng(List<LngLat> lngLatList) {
+  List<LatLng> _toLatLngList(List<LngLat> lngLatList) {
     var latLngList = <LatLng>[];
     latLngList.clear();
     for (var element in lngLatList) {

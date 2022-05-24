@@ -29,6 +29,7 @@ class MapScreenState extends State<ProfilePage>
   @override
   Widget build(BuildContext context) {
     user = context.watch<AuthUser?>();
+
     nameController.text = user!.displayName ?? '';
     emailController.text = user!.email ?? '';
     mobileController.text = user!.phoneNumber ?? '';

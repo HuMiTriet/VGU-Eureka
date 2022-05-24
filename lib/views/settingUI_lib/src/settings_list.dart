@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:etoet/views/settingUI_lib/src/abstract_section.dart';
 import 'package:etoet/views/settingUI_lib/src/colors.dart';
+import 'package:flutter/material.dart';
 
 class SettingsList extends StatelessWidget {
   final bool shrinkWrap;
@@ -35,7 +35,7 @@ class SettingsList extends StatelessWidget {
           padding: contentPadding,
           itemCount: sections!.length,
           itemBuilder: (context, index) {
-            AbstractSection current = sections![index];
+            var current = sections![index];
             AbstractSection? futureOne;
             if (index + 1 != sections!.length) {
               futureOne = sections![index + 1];
