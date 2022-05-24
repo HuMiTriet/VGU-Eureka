@@ -16,7 +16,7 @@ abstract class Map extends Widget {
 
   late AuthUser authUser;
 
-  void setContext(BuildContext context);
+  late BuildContext context;
 
   /// Move the camera to current location of user.
   void moveToCurrentLocation();

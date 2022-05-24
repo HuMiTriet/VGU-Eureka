@@ -16,6 +16,7 @@ class AuthUser extends etoet.UserInfo {
   final bool isEmailVerified;
 
   final Set<Tuple2<String, Location>> setFriendUIDLocation = {};
+
   AuthUser({
     required this.isEmailVerified,
     required super.uid,
