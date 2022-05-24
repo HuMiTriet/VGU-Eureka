@@ -1,6 +1,8 @@
+// ignore_for_file: unnecessary_import
+
+import 'package:etoet/views/settingUI_lib/src/cupertino_settings_item.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:etoet/views/settingUI_lib/src/cupertino_settings_item.dart';
 
 import 'defines.dart';
 
@@ -204,7 +206,8 @@ class SettingsTile extends AbstractTile {
 class CustomTile extends AbstractTile {
   final Widget child;
 
-  CustomTile({
+  const CustomTile({
+    super.key,
     required this.child,
   });
   @override

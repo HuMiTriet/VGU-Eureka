@@ -9,10 +9,11 @@ enum SettingsItemType {
   modal,
 }
 
-typedef void PressOperationCallback();
+typedef PressOperationCallback = void Function();
 
 class CupertinoSettingsItem extends StatefulWidget {
   const CupertinoSettingsItem({
+    super.key,
     required this.type,
     this.label,
     this.labelWidget,
@@ -62,7 +63,7 @@ class CupertinoSettingsItem extends StatefulWidget {
   final Color? switchActiveColor;
 
   @override
-  State<StatefulWidget> createState() => new CupertinoSettingsItemState();
+  State<StatefulWidget> createState() => CupertinoSettingsItemState();
 }
 
 class CupertinoSettingsItemState extends State<CupertinoSettingsItem> {
@@ -76,11 +77,13 @@ class CupertinoSettingsItemState extends State<CupertinoSettingsItem> {
     /// The width of iPad. This is used to make circular borders on iPad and web
     final isLargeScreen = MediaQuery.of(context).size.width >= 768;
 
-    final ThemeData theme = Theme.of(context);
-    final ListTileThemeData tileTheme = ListTileTheme.of(context);
+    final theme = Theme.of(context);
+    final tileTheme = ListTileTheme.of(context);
 
     final iconThemeData = IconThemeData(
-      color: widget.enabled ? _iconColor(theme, tileTheme) : CupertinoColors.inactiveGray,
+      color: widget.enabled
+          ? _iconColor(theme, tileTheme)
+          : CupertinoColors.inactiveGray,
     );
 
     Widget? leadingIcon;
@@ -91,7 +94,7 @@ class CupertinoSettingsItemState extends State<CupertinoSettingsItem> {
       );
     }
 
-    List<Widget> rowChildren = [];
+    var rowChildren = <Widget>[];
     if (leadingIcon != null) {
       rowChildren.add(
         Padding(
@@ -134,7 +137,7 @@ class CupertinoSettingsItemState extends State<CupertinoSettingsItem> {
                 maxLines: widget.subtitleMaxLines,
                 overflow: TextOverflow.ellipsis,
                 style: widget.subtitleTextStyle ??
-                    TextStyle(
+                    const TextStyle(
                       fontSize: 12.0,
                       letterSpacing: -0.2,
                     ),
@@ -155,23 +158,23 @@ class CupertinoSettingsItemState extends State<CupertinoSettingsItem> {
 
     switch (widget.type) {
       case SettingsItemType.toggle:
-        rowChildren
-          ..add(
-            Padding(
-              padding: const EdgeInsetsDirectional.only(end: 11.0),
-              child: CupertinoSwitch(
-                value: widget.switchValue!,
-                activeColor: widget.enabled
-                    ? (widget.switchActiveColor ?? Theme.of(context).accentColor)
-                    : CupertinoColors.inactiveGray,
-                onChanged: !widget.enabled
-                    ? null
-                    : (bool value) {
-                        widget.onToggle!(value);
-                      },
-              ),
+        rowChildren.add(
+          Padding(
+            padding: const EdgeInsetsDirectional.only(end: 11.0),
+            child: CupertinoSwitch(
+              value: widget.switchValue!,
+              activeColor: widget.enabled
+                  ? (widget.switchActiveColor ??
+                      Theme.of(context).colorScheme.secondary)
+                  : CupertinoColors.inactiveGray,
+              onChanged: !widget.enabled
+                  ? null
+                  : (value) {
+                      widget.onToggle!(value);
+                    },
             ),
-          );
+          ),
+        );
         break;
 
       case SettingsItemType.modal:
@@ -189,7 +192,7 @@ class CupertinoSettingsItemState extends State<CupertinoSettingsItem> {
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.end,
                       style: widget.valueTextStyle ??
-                          TextStyle(
+                          const TextStyle(
                             color: CupertinoColors.inactiveGray,
                             fontSize: 16,
                           ),
@@ -199,7 +202,7 @@ class CupertinoSettingsItemState extends State<CupertinoSettingsItem> {
           );
         }
 
-        final List<Widget> endRowChildren = [];
+        final endRowChildren = <Widget>[];
         if (widget.trailing != null) {
           endRowChildren.add(
             Padding(
@@ -239,7 +242,8 @@ class CupertinoSettingsItemState extends State<CupertinoSettingsItem> {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        if ((widget.onPress != null || widget.onToggle != null) && widget.enabled) {
+        if ((widget.onPress != null || widget.onToggle != null) &&
+            widget.enabled) {
           if (mounted) {
             setState(() {
               pressed = true;
@@ -291,10 +295,14 @@ class CupertinoSettingsItemState extends State<CupertinoSettingsItem> {
       },
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: isLargeScreen ? BorderRadius.all(Radius.circular(20)) : null,
+          borderRadius: isLargeScreen
+              ? const BorderRadius.all(Radius.circular(20))
+              : null,
           color: calculateBackgroundColor(context),
         ),
-        height: widget.subtitle == null && widget.subtitleWidget == null ? 44.0 : 57.0,
+        height: widget.subtitle == null && widget.subtitleWidget == null
+            ? 44.0
+            : 57.0,
         child: Row(
           children: rowChildren,
         ),

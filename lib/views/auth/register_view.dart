@@ -5,6 +5,7 @@ import 'dart:developer' as devtools show log;
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/auth_exceptions.dart';
 import 'package:etoet/services/auth/auth_service.dart';
+import 'package:etoet/views/auth/verified_email_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pw_validator/flutter_pw_validator.dart';
 
@@ -25,6 +26,17 @@ class _RegisterViewState extends State<RegisterView> {
   double getSpaceRatioToWidgetHeight(BuildContext context,
           {double ratio = 0.02}) =>
       getWidgetHeight(context) * ratio;
+
+  bool inlandScapeMode(BuildContext context) =>
+      MediaQuery.of(context).orientation == Orientation.landscape;
+
+  double getHeightForPasswordValidator(BuildContext context) {
+    if (inlandScapeMode(context)) {
+      return getSpaceRatioToWidgetHeight(context, ratio: 0.6);
+    } else {
+      return getSpaceRatioToWidgetHeight(context, ratio: 0.15);
+    }
+  }
 
   bool emailAlreadyInUse = false;
   bool invalidEmail = false;
@@ -169,7 +181,7 @@ class _RegisterViewState extends State<RegisterView> {
                     numericCharCount: 3,
                     specialCharCount: 1,
                     width: getWidgetWidth(context) * 0.8,
-                    height: getWidgetHeight(context) * 0.15,
+                    height: getHeightForPasswordValidator(context),
                     defaultColor: Colors.black,
                     // if in langscape mode should be getWidgetWidth(context) * 0.6
                     // but i dont know how to dynamically assigned it yet
@@ -257,7 +269,16 @@ class _RegisterViewState extends State<RegisterView> {
                             setState(() {});
 
                             AuthService.firebase().sendEmailVerification();
-                            Navigator.of(context).pushNamed(verifyEmailRoute);
+
+                            /* Navigator.of(context).pushNamed(verifyEmailRoute); */
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => VerifyEmailView(
+                                  user: user,
+                                ),
+                              ),
+                            );
                           } on EmailAlreadyInUsedAuthException {
                             devtools.log('email already in use');
                             emailAlreadyInUse = true;
