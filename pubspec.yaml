@@ -49,7 +49,10 @@ dependencies:
   settings_ui: ^2.0.2
   flutter_login_facebook: ^1.4.1
   pinput: ^2.2.9
+  permission_handler: ^9.2.0
+  firebase_storage: ^10.2.16
   flutter_pw_validator: ^1.4.2
+  provider: ^6.0.2
   modal_bottom_sheet: ^2.0.1
   tuple: ^2.0.0
   http: ^0.13.4
@@ -77,11 +80,15 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
-
-  assets:
-      - assets/images/
-      - assets/images/Doraemon.png
   # To add assets to your application, add an assets section, like this:
+  assets:
+    - assets/images/Anya.png
+    - assets/images/Loid.png
+    - assets/images/Yor.png
+    - assets/images/
+    - assets/images/Doraemon.png
+    # To add assets to your application, add an assets section, like this:
+    - assets/images/google_logo.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
   # For details regarding adding assets from package dependencies, see

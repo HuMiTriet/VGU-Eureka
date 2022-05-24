@@ -58,12 +58,7 @@ class _MainViewState extends State<MainView> {
               children: <Widget>[
                 ElevatedButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ProfilePage(user: widget.user),
-                        ),
-                      );
+                      Navigator.of(context).pushNamed(profileRoute);
                     },
                     style: ElevatedButton.styleFrom(
                       primary: Colors.orange,

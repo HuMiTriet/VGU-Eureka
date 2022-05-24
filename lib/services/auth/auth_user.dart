@@ -1,5 +1,6 @@
 import 'package:etoet/services/auth/location.dart';
 import 'package:etoet/services/auth/user_info.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:tuple/tuple.dart';
 
@@ -36,4 +37,12 @@ class AuthUser extends UserInfo {
       }
     ''';
   }
+
+  factory AuthUser.fromFirebase(User? user) => AuthUser(
+      uid: user!.uid,
+      isEmailVerified: user.emailVerified,
+      phoneNumber: user.phoneNumber,
+      email: user.email,
+      displayName: user.displayName,
+      photoURL: user.photoURL);
 }
