@@ -1,21 +1,18 @@
 import 'package:etoet/constants/routes.dart';
+import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:etoet/services/database/firestore.dart';
 import 'package:etoet/services/map/map_factory.dart';
 import 'package:etoet/views/friend/friend_view.dart';
-import 'package:etoet/views/profile/profile_page.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:provider/provider.dart';
 
 import '../services/auth/auth_user.dart';
 
 class MainView extends StatefulWidget {
-  final AuthUser user;
-
   @override
   const MainView({
     Key? key,
-    required this.user,
   }) : super(key: key);
 
   @override
@@ -24,95 +21,112 @@ class MainView extends StatefulWidget {
 
 class _MainViewState extends State<MainView> {
   late Map map;
+  late AuthUser? authUser;
 
 
   @override
   void initState() {
     super.initState();
-    map = Map('GoogleMap', widget.user);
+    map = Map('GoogleMap');
     map.context = context;
   }
 
   @override
   Widget build(BuildContext context) {
-
-    return Scaffold(
-      body: Stack(
-        children: <Widget>[
-          map,
-          Padding(
-            padding: const EdgeInsets.fromLTRB(200.0, 30.0, 10.0, 0.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: <Widget>[
-                ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pushNamed(profileRoute);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.orange,
-                      shape: const CircleBorder(),
-                      fixedSize: const Size(50, 50),
+    authUser = context.watch<AuthUser?>();
+    return FutureBuilder(
+        future: Firestore.getFriendInfoList(authUser!.uid),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            var friendInfoList = snapshot.data as Set<etoet.UserInfo>;
+            for (var friendInfo in friendInfoList) {
+              authUser?.friendInfoList.add(friendInfo);
+            }
+            return Scaffold(
+              body: Stack(
+                children: <Widget>[
+                  map,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(200.0, 30.0, 10.0, 0.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: <Widget>[
+                        ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).pushNamed(profileRoute);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.orange,
+                              shape: const CircleBorder(),
+                              fixedSize: const Size(50, 50),
+                            ),
+                            child: const Icon(
+                              Icons.account_box_rounded,
+                              size: 24.0,
+                            )),
+                        ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).pushNamed(
+                                settingsRoute,
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.orange,
+                              shape: const CircleBorder(),
+                              fixedSize: const Size(50, 50),
+                            ),
+                            child: const Icon(
+                              Icons.settings,
+                              size: 24.0,
+                            )),
+                      ],
                     ),
-                    child: const Icon(
-                      Icons.account_box_rounded,
-                      size: 24.0,
-                    )),
-                ElevatedButton(
+                  ),
+                ],
+              ),
+              floatingActionButtonLocation:
+                  FloatingActionButtonLocation.centerFloat,
+              floatingActionButton: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  FloatingActionButton(
+                      heroTag: 'goToFriendsFromMain',
+                      onPressed: () {
+                        showBarModalBottomSheet(
+                          //expand: true,
+                          context: context,
+                          backgroundColor: Colors.transparent,
+                          builder: (context) => const FriendView(),
+                        );
+                      },
+                      child: const Icon(Icons.group)),
+                  FloatingActionButton(
+                      heroTag: 'goToSOSFromMain',
+                      onPressed: () {},
+                      child: const Icon(Icons.add_alert)),
+                  FloatingActionButton(
+                    heroTag: 'getCurrentLocationFromMain',
                     onPressed: () {
-                      Navigator.of(context).pushNamed(
-                        settingsRoute,
-                      );
+                      map.moveToCurrentLocation();
                     },
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.orange,
-                      shape: const CircleBorder(),
-                      fixedSize: const Size(50, 50),
-                    ),
-                    child: const Icon(
-                      Icons.settings,
-                      size: 24.0,
-                    )),
-              ],
-            ),
-          ),
-        ],
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          FloatingActionButton(
-              heroTag: 'goToFriendsFromMain',
-              onPressed: () {
-                showBarModalBottomSheet(
-                  //expand: true,
-                  context: context,
-                  backgroundColor: Colors.transparent,
-                  builder: (context) => const FriendView(),
-                );
-              },
-              child: const Icon(Icons.group)),
-          FloatingActionButton(
-              heroTag: 'goToSOSFromMain',
-              onPressed: () {},
-              child: const Icon(Icons.add_alert)),
-          FloatingActionButton(
-            heroTag: 'getCurrentLocationFromMain',
-            onPressed: () {
-              map.moveToCurrentLocation();
-            },
-            child: const Icon(Icons.location_on),
-          ),
-        ],
-      ),
-    );
+                    child: const Icon(Icons.location_on),
+                  ),
+                ],
+              ),
+            );
+          } else {
+            return const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+        });
   }
 
   @override
   void dispose() {
     super.dispose();
   }
-
 }
