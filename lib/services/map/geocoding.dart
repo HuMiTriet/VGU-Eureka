@@ -28,16 +28,16 @@ class Geocoding {
         addressList[6] = '$subAdministrativeArea';
         addressList[7] = '$subThoroughfare';
         devtools.log('geocoding of location: $addressList',
-            name: 'GoogleMap: getGeocoding');
+            name: 'Geocoding: getGeocoding');
         return _getAddress();
       });
     } catch (e) {
-      devtools.log('getGeocoding error: $e', name: 'GoogleMap: getGeocoding');
+      devtools.log('get Geocoding error: $e', name: 'Geocoding: getGeocoding');
     }
     return _getAddress();
   }
 
-  /// [_getAddress] is used to get the address from the addressList with priority from: city > administrativeArea > subAdministrativeArea > .
+  /// [_getAddress] is used to get the address from the addressList with priority from: city > administrativeArea > subAdministrativeArea > subThoroughfare > country.
   String _getAddress() {
     var address = 'Unknown';
     // city
@@ -60,8 +60,7 @@ class Geocoding {
     } else if (addressList[0] != '') {
       address = addressList[0];
     }
-    devtools.log('update map address, address: $address',
-        name: 'GoogleMap: _getAddress');
+    devtools.log('get address: $address', name: 'Geocoding: _getAddress');
     return address;
   }
 }

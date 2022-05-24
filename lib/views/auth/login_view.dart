@@ -197,7 +197,7 @@ class _LoginViewState extends State<LoginView> {
                               Navigator.pushAndRemoveUntil(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => MainView(user: user!),
+                                  builder: (context) => MainView(),
                                 ),
                                 (route) => false,
                               );
@@ -387,7 +387,7 @@ class _LoginViewState extends State<LoginView> {
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(
-        builder: (context) => MainView(user: authUser),
+        builder: (context) => MainView(),
       ),
       (route) => false,
     );
@@ -437,7 +437,7 @@ class _LoginViewState extends State<LoginView> {
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
-            builder: (context) => MainView(user: authUser),
+            builder: (context) => MainView(),
           ),
           (route) => false,
         );

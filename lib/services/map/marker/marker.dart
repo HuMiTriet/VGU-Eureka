@@ -34,8 +34,9 @@ class GoogleMapMarker {
 
     var targetByteData =
         await targetUiImage.toByteData(format: ui.ImageByteFormat.png);
-    devtools
-        .log('target image ByteData size is ${targetByteData?.lengthInBytes}');
+    devtools.log(
+        'target image ByteData size is ${targetByteData?.lengthInBytes}',
+        name: 'GoogleMapMarker: getBytesFromUrlResize');
     var targetlUinit8List = targetByteData?.buffer.asUint8List();
     return targetlUinit8List!;
   }

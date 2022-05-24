@@ -1,6 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'dart:developer' as devtools show log;
 
 import '../auth/auth_user.dart';
 import '../auth/user_info.dart' as etoet;
@@ -15,7 +13,8 @@ class Firestore {
         'uid': user.uid,
         'email': user.email,
         'displayName': user.displayName,
-        'photoUrl': user.photoURL ?? 'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977',
+        'photoUrl': user.photoURL ??
+            'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977',
       },
     );
   }
@@ -38,96 +37,130 @@ class Firestore {
     );
   }
 
-  static Future<Set<etoet.UserInfo>> getUserInfoFromEmail(String emailQuery, String userUID) async {
-
+  static Future<Set<etoet.UserInfo>> getUserInfoFromEmail(
+      String emailQuery, String userUID) async {
     //
     emailQuery = emailQuery.toLowerCase();
 
-    var res = await firestoreReference.collection('users')
+    var res = await firestoreReference
+        .collection('users')
         .where('email', isGreaterThanOrEqualTo: emailQuery)
         .where('email', isLessThanOrEqualTo: emailQuery + '\uf8ff')
-         // .where('uid', )
+        // .where('uid', )
         .get();
 
     var searchedUserInfoList = <etoet.UserInfo>{};
 
-    for(var i = 0; i < res.docs.length; ++i)
-      {
-        var data = res.docs.elementAt(i).data();
-        var userInfo = etoet.UserInfo(
-          uid: data['uid'],
-          displayName: data['displayName'],
-          email: data['email'],
-          photoURL: data['photoUrl'],
-        );
-        if(userInfo.uid == userUID)
-          {
-            continue;
-          }
-
-        searchedUserInfoList.add(userInfo);
-
+    for (var i = 0; i < res.docs.length; ++i) {
+      var data = res.docs.elementAt(i).data();
+      var userInfo = etoet.UserInfo(
+        uid: data['uid'],
+        displayName: data['displayName'],
+        email: data['email'],
+        photoURL: data['photoUrl'],
+      );
+      if (userInfo.uid == userUID) {
+        continue;
       }
+
+      searchedUserInfoList.add(userInfo);
+    }
 
     //devtools.log('$res', name: 'Firestore: getUserInfoFromDisplayName');
 
     return searchedUserInfoList;
   }
 
-  static void sendFriendRequest(String senderUID, String receiverUID)
-  {
-    var senderData = {'isSender': true,'requestConfirmed': false, 'friendUID': receiverUID};
-    var receiverData = {'isSender': false,'requestConfirmed': false, 'friendUID': senderUID};
-    firestoreReference.collection('users').doc(senderUID).collection('friends').doc(receiverUID).set(senderData);
-    firestoreReference.collection('users').doc(receiverUID).collection('friends').doc(senderUID).set(receiverData);
+  static void sendFriendRequest(String senderUID, String receiverUID) {
+    var senderData = {
+      'isSender': true,
+      'requestConfirmed': false,
+      'friendUID': receiverUID
+    };
+    var receiverData = {
+      'isSender': false,
+      'requestConfirmed': false,
+      'friendUID': senderUID
+    };
+    firestoreReference
+        .collection('users')
+        .doc(senderUID)
+        .collection('friends')
+        .doc(receiverUID)
+        .set(senderData);
+    firestoreReference
+        .collection('users')
+        .doc(receiverUID)
+        .collection('friends')
+        .doc(senderUID)
+        .set(receiverData);
   }
 
-  static Future<Set<etoet.UserInfo>> getPendingRequestUserInfo(String userUID) async {
-    
-    var pendingFriendRequestData = await firestoreReference.collection('users').doc(userUID).collection('friends')
+  static Future<Set<etoet.UserInfo>> getPendingRequestUserInfo(
+      String userUID) async {
+    var pendingFriendRequestData = await firestoreReference
+        .collection('users')
+        .doc(userUID)
+        .collection('friends')
         .where('isSender', isEqualTo: false)
         .where('requestConfirmed', isEqualTo: false)
         .get();
 
     var pendingFriendInfoList = <etoet.UserInfo>{};
-    for(var i = 0; i<pendingFriendRequestData.docs.length; ++i)
-      {
-        var data = pendingFriendRequestData.docs.elementAt(i).data();
+    for (var i = 0; i < pendingFriendRequestData.docs.length; ++i) {
+      var data = pendingFriendRequestData.docs.elementAt(i).data();
 
-        var pendingFriendInfo = await getUserInfo(data['friendUID']);
-        pendingFriendInfoList.add(pendingFriendInfo);
-      }
+      var pendingFriendInfo = await getUserInfo(data['friendUID']);
+      pendingFriendInfoList.add(pendingFriendInfo);
+    }
 
     return pendingFriendInfoList;
   }
 
-  static void deleteFriendRequest(String receiverUID, String senderUID)
-  {
-    firestoreReference.collection('users').doc(receiverUID).collection('friends').doc(senderUID).delete();
-    firestoreReference.collection('users').doc(senderUID).collection('friends').doc(receiverUID).delete();
+  static void deleteFriendRequest(String receiverUID, String senderUID) {
+    firestoreReference
+        .collection('users')
+        .doc(receiverUID)
+        .collection('friends')
+        .doc(senderUID)
+        .delete();
+    firestoreReference
+        .collection('users')
+        .doc(senderUID)
+        .collection('friends')
+        .doc(receiverUID)
+        .delete();
   }
 
-  static void acceptFriendRequest(String receiverUID, String senderUID)
-  {
-    firestoreReference.collection('users').doc(receiverUID).collection('friends').doc(senderUID).update({'requestConfirmed': true});
-    firestoreReference.collection('users').doc(senderUID).collection('friends').doc(receiverUID).update({'requestConfirmed': true});
+  static void acceptFriendRequest(String receiverUID, String senderUID) {
+    firestoreReference
+        .collection('users')
+        .doc(receiverUID)
+        .collection('friends')
+        .doc(senderUID)
+        .update({'requestConfirmed': true});
+    firestoreReference
+        .collection('users')
+        .doc(senderUID)
+        .collection('friends')
+        .doc(receiverUID)
+        .update({'requestConfirmed': true});
   }
 
-  static Future<Set<etoet.UserInfo>> getFriendInfoList(String uid) async{
-    var friendData = await firestoreReference.collection('users').doc(uid).collection('friends')
+  static Future<Set<etoet.UserInfo>> getFriendInfoList(String uid) async {
+    var friendData = await firestoreReference
+        .collection('users')
+        .doc(uid)
+        .collection('friends')
         .where('requestConfirmed', isEqualTo: true)
         .get();
 
     var friendInfoList = <etoet.UserInfo>{};
-    for(var i = 0; i < friendData.docs.length; ++i)
-      {
-        var data = friendData.docs.elementAt(i).data();
-        friendInfoList.add(
-            await getUserInfo(data['friendUID'])
-        );
-      }
+    for (var i = 0; i < friendData.docs.length; ++i) {
+      var data = friendData.docs.elementAt(i).data();
+      friendInfoList.add(await getUserInfo(data['friendUID']));
+    }
 
     return friendInfoList;
   }
-
 }
