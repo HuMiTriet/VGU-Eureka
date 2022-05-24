@@ -1,4 +1,5 @@
 import 'package:etoet/constants/routes.dart';
+import 'package:etoet/services/database/firestore.dart';
 import 'package:etoet/services/map/map_factory.dart';
 import 'package:etoet/views/friend/friend_view.dart';
 import 'package:etoet/views/profile/profile_page.dart';
@@ -24,6 +25,7 @@ class MainView extends StatefulWidget {
 class _MainViewState extends State<MainView> {
   late Map map;
 
+
   @override
   void initState() {
     super.initState();
@@ -33,6 +35,7 @@ class _MainViewState extends State<MainView> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       body: Stack(
         children: <Widget>[

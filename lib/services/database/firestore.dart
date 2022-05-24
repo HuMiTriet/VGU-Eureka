@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:developer' as devtools show log;
@@ -38,6 +40,7 @@ class Firestore {
     );
   }
 
+  //Function name is abit misleading, only used for finding friends using email
   static Future<Set<etoet.UserInfo>> getUserInfoFromEmail(String emailQuery, String userUID) async {
 
     //
@@ -129,5 +132,24 @@ class Firestore {
 
     return friendInfoList;
   }
+
+  static StreamSubscription<QuerySnapshot<Map<String, dynamic>>> pendingFriendRequestReceiverListener(String uid)
+  {
+    var subscriber =  firestoreReference
+        .collection("users").doc(uid).collection('friends')
+        .where("isSender", isEqualTo: false)
+        .where("requestConfirmed", isEqualTo: false)
+        .snapshots()
+        .listen((querySnapshot) {
+          for(var i = 0; i < querySnapshot.docChanges.length; ++i)
+            {
+              var changes = querySnapshot.docChanges.elementAt(i).doc.data()!;
+              print(changes['friendUID']);
+            }
+    });
+
+    return subscriber;
+  }
+
 
 }

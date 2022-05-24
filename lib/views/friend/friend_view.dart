@@ -73,9 +73,7 @@ class _FriendViewState extends State<FriendView> {
 
   @override
   Widget build(BuildContext context) {
-
     user = context.watch<AuthUser>();
-    Firestore.getFriendInfoList(user.uid);
 
     return FutureBuilder(
         future: Firestore.getFriendInfoList(user.uid),

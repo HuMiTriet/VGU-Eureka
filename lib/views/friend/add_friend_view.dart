@@ -71,8 +71,6 @@ class _AddFriendViewState extends State<AddFriendView>{
                                   }
                                 setState(() {
                                 });
-                                print('Add friend view get UserInfoList, length:' + searchedUserInfoList.length.toString());
-
                               },
                               icon: const Icon(Icons.search),
                             ),
