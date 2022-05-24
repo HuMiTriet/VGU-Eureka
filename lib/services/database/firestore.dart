@@ -7,7 +7,6 @@ import '../auth/user_info.dart' as etoet;
 
 class Firestore {
   static final firestoreReference = FirebaseFirestore.instance;
-
   Firestore._();
 
   static void addUserInfo(AuthUser user) {
@@ -39,7 +38,7 @@ class Firestore {
     );
   }
 
-  static Future<Set<etoet.UserInfo>> getUserInfoFromEmail(String emailQuery) async {
+  static Future<Set<etoet.UserInfo>> getUserInfoFromEmail(String emailQuery, String userUID) async {
 
     //
     emailQuery = emailQuery.toLowerCase();
@@ -47,6 +46,7 @@ class Firestore {
     var res = await firestoreReference.collection('users')
         .where('email', isGreaterThanOrEqualTo: emailQuery)
         .where('email', isLessThanOrEqualTo: emailQuery + '\uf8ff')
+         // .where('uid', )
         .get();
 
     var searchedUserInfoList = <etoet.UserInfo>{};
@@ -60,6 +60,10 @@ class Firestore {
           email: data['email'],
           photoURL: data['photoUrl'],
         );
+        if(userInfo.uid == userUID)
+          {
+            continue;
+          }
 
         searchedUserInfoList.add(userInfo);
 
@@ -76,6 +80,37 @@ class Firestore {
     var receiverData = {'isSender': false,'requestConfirmed': false, 'friendUID': senderUID};
     firestoreReference.collection('users').doc(senderUID).collection('friends').doc(receiverUID).set(senderData);
     firestoreReference.collection('users').doc(receiverUID).collection('friends').doc(senderUID).set(receiverData);
+  }
+
+  static Future<Set<etoet.UserInfo>> getPendingRequestUserInfo(String userUID) async {
+    
+    var pendingFriendRequestData = await firestoreReference.collection('users').doc(userUID).collection('friends')
+        .where('isSender', isEqualTo: false)
+        .where('requestConfirmed', isEqualTo: false)
+        .get();
+
+    var pendingFriendInfoList = <etoet.UserInfo>{};
+    for(var i = 0; i<pendingFriendRequestData.docs.length; ++i)
+      {
+        var data = pendingFriendRequestData.docs.elementAt(i).data();
+
+        var pendingFriendInfo = await getUserInfo(data['friendUID']);
+        pendingFriendInfoList.add(pendingFriendInfo);
+      }
+
+    return pendingFriendInfoList;
+  }
+
+  static void deleteFriendRequest(String receiverUID, String senderUID)
+  {
+    firestoreReference.collection('users').doc(receiverUID).collection('friends').doc(senderUID).delete();
+    firestoreReference.collection('users').doc(senderUID).collection('friends').doc(receiverUID).delete();
+  }
+
+  static void acceptFriendRequest(String receiverUID, String senderUID)
+  {
+    firestoreReference.collection('users').doc(receiverUID).collection('friends').doc(senderUID).update({'requestConfirmed': true});
+    firestoreReference.collection('users').doc(senderUID).collection('friends').doc(receiverUID).update({'requestConfirmed': true});
   }
 
 }

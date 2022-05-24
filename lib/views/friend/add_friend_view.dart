@@ -63,7 +63,7 @@ class _AddFriendViewState extends State<AddFriendView>{
                               onPressed:  () async {
                                 if(_searchBarController.text.isNotEmpty)
                                   {
-                                    searchedUserInfoList = await Firestore.getUserInfoFromEmail(_searchBarController.text);
+                                    searchedUserInfoList = await Firestore.getUserInfoFromEmail(_searchBarController.text, user.uid);
                                   }
                                 else
                                   {

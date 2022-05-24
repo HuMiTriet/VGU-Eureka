@@ -1,7 +1,10 @@
 import 'package:etoet/views/friend/dummyDatabase.dart';
+import 'package:etoet/views/friend/pending_friend_view.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:etoet/services/auth/user_info.dart' as etoet;
 
+import '../../services/auth/auth_user.dart';
 import 'add_friend_view.dart';
 
 class FriendView extends StatefulWidget {
@@ -17,6 +20,11 @@ class _FriendViewState extends State<FriendView> {
   DummyDatabase dummyDatabase = DummyDatabase();
   List<String> userDisplayNameList = [];
   List<String> userDisplayNameListOnSearch = [];
+
+
+  late AuthUser user;
+
+
 
   //A list of ListTile to display Friends.
   //final userListWidget = <Widget>[];
@@ -113,11 +121,20 @@ class _FriendViewState extends State<FriendView> {
 
 
                         ),
-                        const ListTile(
-                          leading: CircleAvatar(
+                         ListTile(
+                          leading: const CircleAvatar(
                             child: Icon(pendingFriendRequestIcon),
                           ),
-                          title: Text('Pending Friend Request'),
+                          title: const Text('Pending Friend Request'),
+                          onTap: ()
+                          {
+                            showBarModalBottomSheet(
+                              context: context,
+                              backgroundColor: Colors.transparent,
+                              builder: (context) => const PendingFriendView(),
+                            );
+                          },
+
                         ),
                       ],
                     ),
