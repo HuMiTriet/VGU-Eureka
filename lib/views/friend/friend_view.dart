@@ -34,9 +34,9 @@ class _FriendViewState extends State<FriendView> {
   List<String> getListContainsIgnoreCase({required List<String> list, required String value})
   {
     var result = <String>[];
-    for (var i = 0; i < userDisplayNameList.length; ++i) {
-      if (userDisplayNameList.elementAt(i).toLowerCase().contains(value.toLowerCase())) {
-        result.add(userDisplayNameList.elementAt(i));
+    for (var i = 0; i < list.length; ++i) {
+      if (list.elementAt(i).toLowerCase().contains(value.toLowerCase())) {
+        result.add(list.elementAt(i));
       }
     }
     return result;
@@ -53,7 +53,6 @@ class _FriendViewState extends State<FriendView> {
   // The relative height of topListView and bottomListView
   final int topListViewFlex = 1;
   final int bottomListViewFlex = 4;
-
 
 
 
