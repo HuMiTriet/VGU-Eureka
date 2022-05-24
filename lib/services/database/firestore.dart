@@ -16,7 +16,7 @@ class Firestore {
         'uid': user.uid,
         'email': user.email,
         'displayName': user.displayName,
-        'photoUrl': user.photoURL,
+        'photoUrl': user.photoURL ?? 'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977',
       },
     );
   }
@@ -62,11 +62,20 @@ class Firestore {
         );
 
         searchedUserInfoList.add(userInfo);
+
       }
 
     //devtools.log('$res', name: 'Firestore: getUserInfoFromDisplayName');
 
     return searchedUserInfoList;
+  }
+
+  static void sendFriendRequest(String senderUID, String receiverUID)
+  {
+    var senderData = {'isSender': true,'requestConfirmed': false};
+    var receiverData = {'isSender': false,'requestConfirmed': false};
+    firestoreReference.collection('users').doc(senderUID).collection('friends').doc(senderUID).set(senderData);
+    firestoreReference.collection('users').doc(receiverUID).collection('friends').doc(senderUID).set(receiverData);
   }
 
 }

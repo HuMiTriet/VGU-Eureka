@@ -1,8 +1,11 @@
 
+import 'package:etoet/services/auth/auth_user.dart';
 import 'package:etoet/services/database/firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:provider/provider.dart';
 
 
 class AddFriendView extends StatefulWidget {
@@ -14,7 +17,7 @@ class AddFriendView extends StatefulWidget {
 }
 
 class _AddFriendViewState extends State<AddFriendView>{
-
+  late AuthUser user;
   //Used to implements some of the search bar's function
   final _searchBarController = TextEditingController();
   Set<etoet.UserInfo> searchedUserInfoList = {};
@@ -38,12 +41,12 @@ class _AddFriendViewState extends State<AddFriendView>{
 
   @override
   Widget build(BuildContext context) {
+    user = context.watch<AuthUser>();
     return FractionallySizedBox(
         heightFactor: addFriendViewHeight,
         child: SafeArea(
           child: Column(
             children: [
-              // Search, Add Friend and Pending Friend Request.
               Expanded(
                   flex: topListViewFlex,
                   child: Container(
@@ -58,10 +61,18 @@ class _AddFriendViewState extends State<AddFriendView>{
                             contentPadding: const EdgeInsets.all(20),
                             suffixIcon: IconButton(
                               onPressed:  () async {
-                                searchedUserInfoList = await Firestore.getUserInfoFromEmail(_searchBarController.text);
+                                if(_searchBarController.text.isNotEmpty)
+                                  {
+                                    searchedUserInfoList = await Firestore.getUserInfoFromEmail(_searchBarController.text);
+                                  }
+                                else
+                                  {
+                                    searchedUserInfoList.clear();
+                                  }
                                 setState(() {
                                 });
                                 print('Add friend view get UserInfoList, length:' + searchedUserInfoList.length.toString());
+
                               },
                               icon: const Icon(Icons.search),
                             ),
@@ -83,7 +94,7 @@ class _AddFriendViewState extends State<AddFriendView>{
                         leading: CircleAvatar(
                           backgroundImage: NetworkImage
                             (
-                            searchedUserInfoList.elementAt(index).photoURL!
+                              searchedUserInfoList.elementAt(index).photoURL!
                               ),
                         ),
                         title: Text(
@@ -92,6 +103,29 @@ class _AddFriendViewState extends State<AddFriendView>{
                         subtitle: Text(
                           searchedUserInfoList.elementAt(index).email!,
                         ),
+                        trailing: IconButton(
+                          onPressed: ()
+                          {
+                            Firestore.sendFriendRequest(user.uid, searchedUserInfoList.elementAt(index).uid);
+                            showDialog(
+                                context: context,
+                                 builder:  (BuildContext context) {
+                                return  AlertDialog(
+                                  title: const Text('Friend Request Sent!'),
+                                  actions: [
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context, true);
+                                        },
+                                        child: const Text('Confirm'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          }, icon: Icon(Icons.add),
+                          
+                        )
                       );
                     }
                     ,
