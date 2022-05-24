@@ -1,7 +1,7 @@
 // ignore_for_file: prefer_const_constructors
+import 'dart:developer' as devtools show log;
 
 import 'package:etoet/constants/routes.dart';
-import 'package:etoet/services/database/database.dart';
 import 'package:etoet/services/database/firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -20,10 +20,17 @@ class VerifyEmailView extends StatefulWidget {
 class _VerifyEmailViewState extends State<VerifyEmailView> {
   @override
   Widget build(BuildContext context) {
-    var userExists = Firestore.userExists(widget.user.uid) as bool;
-    if (!userExists) {
-      Firestore.addUserInfo(widget.user);
-    }
+    // ignore: omit_local_variable_types
+    Future<bool> userExists = Firestore.userExists(widget.user.uid);
+    userExists.then((value) => {
+          if (value)
+            {
+              devtools.log('User already exists in Firestore',
+                  name: 'VerifyEmailView')
+            }
+          else
+            {Firestore.addUserInfo(widget.user)}
+        });
     return Scaffold(
       backgroundColor: Color.fromRGBO(255, 210, 177, 2),
       body: SafeArea(
