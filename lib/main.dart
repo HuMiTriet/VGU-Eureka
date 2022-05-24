@@ -6,6 +6,7 @@ import 'package:etoet/views/auth/recover_account_view.dart';
 import 'package:etoet/views/auth/register_view.dart';
 import 'package:etoet/views/friend/add_friend_view.dart';
 import 'package:etoet/views/friend/friend_view.dart';
+import 'package:etoet/views/friend/pending_friend_view.dart';
 import 'package:etoet/views/profile/profile_page.dart';
 import 'package:etoet/views/settings_view.dart';
 import 'package:etoet/views/sign_post.dart';
@@ -37,6 +38,7 @@ void main() {
           profileRoute: (context) => const ProfilePage(),
           friendRoute: (context) => const FriendView(),
           addFriendRoute: (context) => const AddFriendView(),
+          pendingFriendRoute: (context) => const PendingFriendView(),
         },
       ),
     ),

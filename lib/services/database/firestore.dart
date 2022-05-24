@@ -72,9 +72,9 @@ class Firestore {
 
   static void sendFriendRequest(String senderUID, String receiverUID)
   {
-    var senderData = {'isSender': true,'requestConfirmed': false};
-    var receiverData = {'isSender': false,'requestConfirmed': false};
-    firestoreReference.collection('users').doc(senderUID).collection('friends').doc(senderUID).set(senderData);
+    var senderData = {'isSender': true,'requestConfirmed': false, 'friendUID': receiverUID};
+    var receiverData = {'isSender': false,'requestConfirmed': false, 'friendUID': senderUID};
+    firestoreReference.collection('users').doc(senderUID).collection('friends').doc(receiverUID).set(senderData);
     firestoreReference.collection('users').doc(receiverUID).collection('friends').doc(senderUID).set(receiverData);
   }
 
