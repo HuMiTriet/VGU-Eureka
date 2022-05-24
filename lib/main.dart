@@ -22,7 +22,8 @@ void main() {
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.orange)
+              .copyWith(secondary: Colors.orangeAccent),
         ),
         home: const SignPost(),
 
