@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 
 /// The factory class for the map.
 abstract class Map extends Widget {
-  factory Map(String type, AuthUser authUser) {
+  factory Map(String type) {
     if (type == 'GoogleMap') {
-      return GoogleMapImpl(authUser: authUser);
+      return GoogleMapImpl();
     }
     throw 'Can\'t create $type.';
   }
@@ -14,7 +14,7 @@ abstract class Map extends Widget {
   /// The address of the current map view.
   late String address;
 
-  late AuthUser authUser;
+  late AuthUser? authUser;
 
   late BuildContext context;
 

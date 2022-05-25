@@ -6,4 +6,7 @@ const mainRoute = '/main/';
 const verifyEmailRoute = '/verify-email/';
 const recoverAccountRoute = '/recover-account/';
 const settingsRoute = '/settings/';
+const friendRoute = '/friend/';
+const addFriendRoute = '/add-friend/';
+const pendingFriendRoute = '/pending-friend';
 const profileRoute = '/profile/';

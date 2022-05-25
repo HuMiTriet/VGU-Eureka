@@ -15,11 +15,6 @@ void main() {
     user.location.latitude = 10;
     user.location.longitude = 10;
 
-    user.friendUIDs.add('123');
-    user.friendUIDs.add('456');
-
-    user.friendUIDs.forEach((uid) => print(uid));
-
     expect(user.location.longitude, 10);
   });
 }
