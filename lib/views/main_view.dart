@@ -1,7 +1,10 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:etoet/services/database/firestore.dart';
-import 'package:etoet/services/map/map_factory.dart';
+import 'package:etoet/services/map/map_factory.dart' as etoet;
 import 'package:etoet/views/friend/friend_view.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -20,25 +23,38 @@ class MainView extends StatefulWidget {
 }
 
 class _MainViewState extends State<MainView> {
-  late Map map;
+  late etoet.Map map;
   late AuthUser? authUser;
+  // late StreamSubscription<QuerySnapshot<Map<String, dynamic>>> pendingFriendRequestReceiverListener;
+  // late StreamSubscription<QuerySnapshot<Map<String, dynamic>>> pendingFriendRequestSenderListener;
 
 
   @override
   void initState() {
     super.initState();
-    map = Map('GoogleMap');
+    map = etoet.Map('GoogleMap');
     map.context = context;
+
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) {
+       // pendingFriendRequestSenderListener = Firestore.pendingFriendRequestSenderListener(authUser!.uid, context);
+      // pendingFriendRequestReceiverListener = Firestore.pendingFriendRequestReceiverListener(authUser!.uid, context);
+        });
   }
 
   @override
   Widget build(BuildContext context) {
     authUser = context.watch<AuthUser?>();
+    // pendingFriendRequestReceiverListener = Firestore.pendingFriendRequestReceiverListener(authUser!.uid);
+    // pendingFriendRequestSenderListener = Firestore.pendingFriendRequestSenderListener(authUser!.uid);
+    
+
     return FutureBuilder(
         future: Firestore.getFriendInfoList(authUser!.uid),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             var friendInfoList = snapshot.data as Set<etoet.UserInfo>;
+            authUser!.friendInfoList.clear();
             for (var friendInfo in friendInfoList) {
               authUser?.friendInfoList.add(friendInfo);
             }
@@ -127,6 +143,8 @@ class _MainViewState extends State<MainView> {
 
   @override
   void dispose() {
+    // pendingFriendRequestReceiverListener.cancel();
+    // pendingFriendRequestSenderListener.cancel();
     super.dispose();
   }
 }

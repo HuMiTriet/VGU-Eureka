@@ -16,6 +16,8 @@ class AuthUser extends etoet.UserInfo {
 
   final Set<etoet.UserInfo> friendInfoList = {};
 
+  final Set<etoet.UserInfo> pendingFriendInfoList = {};
+
   AuthUser({
     required this.isEmailVerified,
     required super.uid,

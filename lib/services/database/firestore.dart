@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../auth/auth_user.dart';
 import '../auth/user_info.dart' as etoet;
@@ -8,6 +10,8 @@ import '../auth/user_info.dart' as etoet;
 class Firestore {
   static final firestoreReference = FirebaseFirestore.instance;
   Firestore._();
+
+  late AuthUser user;
 
   static void addUserInfo(AuthUser user) {
     firestoreReference.collection('users').doc(user.uid).set(
@@ -167,19 +171,54 @@ class Firestore {
     return friendInfoList;
   }
 
-  static StreamSubscription<QuerySnapshot<Map<String, dynamic>>> pendingFriendRequestReceiverListener(String uid)
+  static StreamSubscription<QuerySnapshot<Map<String, dynamic>>> pendingFriendRequestReceiverListener(String uid, BuildContext context)
   {
+
     var subscriber =  firestoreReference
         .collection("users").doc(uid).collection('friends')
         .where("isSender", isEqualTo: false)
         .where("requestConfirmed", isEqualTo: false)
         .snapshots()
         .listen((querySnapshot) {
-          for(var i = 0; i < querySnapshot.docChanges.length; ++i)
-            {
-              var changes = querySnapshot.docChanges.elementAt(i).doc.data()!;
-              print(changes['friendUID']);
+      for(var i = 0; i < querySnapshot.docChanges.length; ++i)
+      {
+        var changes = querySnapshot.docChanges.elementAt(i).doc.data()!;
+        print(changes['friendUID']);
+        showDialog(
+            context: context,
+            builder: (context){
+              return AlertDialog(
+                title: Text('Received a friend request from:' +changes['friendUID']),
+              );
             }
+        );
+      }
+    });
+
+    return subscriber;
+  }
+
+  static StreamSubscription<QuerySnapshot<Map<String, dynamic>>> pendingFriendRequestSenderListener(String uid, BuildContext context)
+  {
+    var subscriber =  firestoreReference
+        .collection("users").doc(uid).collection('friends')
+        .where("isSender", isEqualTo: true)
+        .where("requestConfirmed", isEqualTo: false)
+        .snapshots()
+        .listen((querySnapshot) {
+      for(var i = 0; i < querySnapshot.docChanges.length; ++i)
+      {
+        var changes = querySnapshot.docChanges.elementAt(i).doc.data()!;
+        print(changes['friendUID']);
+        showDialog(
+            context: context,
+            builder: (context){
+           return AlertDialog(
+             title: Text('Friend request sent to' +changes['friendUID']),
+           );
+        }
+        );
+      }
     });
 
     return subscriber;

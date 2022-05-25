@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:etoet/services/database/firestore.dart';
 import 'package:etoet/views/friend/dummyDatabase.dart';
 import 'package:etoet/views/friend/pending_friend_view.dart';
@@ -10,6 +13,7 @@ import '../../services/auth/auth_user.dart';
 import 'add_friend_view.dart';
 
 class FriendView extends StatefulWidget {
+
   @override
   const FriendView({Key? key}) : super(key: key);
 
@@ -26,6 +30,9 @@ class _FriendViewState extends State<FriendView> {
 
   late AuthUser user;
 
+
+  late StreamSubscription<QuerySnapshot<Map<String, dynamic>>> pendingFriendRequestReceiverListener;
+
   //A list of ListTile to display Friends.
   //final userListWidget = <Widget>[];
 
@@ -35,13 +42,11 @@ class _FriendViewState extends State<FriendView> {
   @override
   void initState() {
     super.initState();
-    // for (var i = 0; i < dummyDatabase.userList.length; ++i) {
-    //   userDisplayNameList
-    //       .add(dummyDatabase.userList.elementAt(i).displayName!);
-    // }
+    // WidgetsBinding.instance
+    //     .addPostFrameCallback((_) {
+    //    pendingFriendRequestReceiverListener = Firestore.pendingFriendRequestReceiverListener(user.uid, context);
+    // });
   }
-
-
 
 
   //Use for filtering list when searching
@@ -74,13 +79,8 @@ class _FriendViewState extends State<FriendView> {
   @override
   Widget build(BuildContext context) {
     user = context.watch<AuthUser>();
-
-    return FutureBuilder(
-        future: Firestore.getFriendInfoList(user.uid),
-        builder: (context, snapshot){
-          if(snapshot.hasData)
-            {
-              var friendInfoList = snapshot.data as Set<etoet.UserInfo>;
+    pendingFriendRequestReceiverListener = Firestore.pendingFriendRequestReceiverListener(user.uid, context);
+    //Firestore.pendingFriendRequestReceiverListener(user.uid, context);
               return FractionallySizedBox(
                   heightFactor: friendViewHeight,
                   child: SafeArea(
@@ -145,6 +145,7 @@ class _FriendViewState extends State<FriendView> {
                                         builder: (context) => const PendingFriendView(),
                                       );
                                     },
+                                    trailing: Text('1'),
 
                                   ),
                                 ],
@@ -157,32 +158,31 @@ class _FriendViewState extends State<FriendView> {
                             child: ListView.builder(
                               shrinkWrap: true,
                               // children: userListWidget,
-                              itemCount: friendInfoList.length,
+                              itemCount: user.friendInfoList.length,
                               itemBuilder: (context, index) {
                                 return ListTile(
                                   leading: CircleAvatar(
                                     backgroundImage: NetworkImage(
-                                        friendInfoList.elementAt(index).photoURL!
+                                        user.friendInfoList.elementAt(index).photoURL!
                                     ),
                                   ),
-                                  title: Text(friendInfoList.elementAt(index).displayName!),
-                                  subtitle: Text(friendInfoList.elementAt(index).email!),
+                                  title: Text(user.friendInfoList.elementAt(index).displayName!),
+                                  subtitle: Text(user.friendInfoList.elementAt(index).email!),
                                 );
                               },
                             )),
                       ],
                     ),
                   ));
-            }
-          else
-            {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-        }
-    );
 
 
+
+
+  }
+
+  @override
+  void dispose() {
+    pendingFriendRequestReceiverListener.cancel();
+    super.dispose();
   }
 }
