@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:etoet/views/profile/Widgets/edit_image_dialog.dart';
+import 'package:etoet/views/profile/change_phone_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:etoet/views/profile/change_email_page.dart';
 import 'package:etoet/views/profile/verification_view.dart';
@@ -25,6 +26,8 @@ class MapScreenState extends State<ProfilePage>
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController mobileController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+
   String? photoURL;
 
   late AuthUser? user;
@@ -130,7 +133,6 @@ class MapScreenState extends State<ProfilePage>
                   ),
                 ),
                 Container(
-                  color: Colors.white,
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: 25.0),
                     child: Column(
@@ -149,17 +151,21 @@ class MapScreenState extends State<ProfilePage>
                         const ProfileFieldLabel(label: 'Display Name'),
                         ProfileField(controller: nameController),
                         const ProfileFieldLabel(label: 'Email'),
-                        ProfileField(controller: emailController),
                         EditVerifiableFieldsController(
-                          value: 'Change Email',
-                          user: user!,
+                          controller: emailController,
+                          verificationView: ChangeEmailPage(
+                              user: user!, title: 'Change Email'),
                         ),
                         const ProfileFieldLabel(label: 'Mobile'),
-                        ProfileField(controller: mobileController),
                         EditVerifiableFieldsController(
-                          value: 'Change Password',
-                          user: user!,
+                          controller: mobileController,
+                          verificationView: ChangePhoneNumberPage(
+                              user: user!, title: 'Change Phone'),
                         ),
+                        EditVerifiableLinksController(
+                            text: 'Change Password',
+                            verificationView: ChangePassPage(
+                                user: user!, title: 'Change Password')),
                       ],
                     ),
                   ),
@@ -171,11 +177,6 @@ class MapScreenState extends State<ProfilePage>
       ),
     );
   }
-
-  void updateEmail(String email) {
-    // FirebaseAuth.instance.currentUser
-    //               ?.updateEmail(email);
-  }
 }
 
 /// Class to handle Fields that required verification in order to confirm the
@@ -185,59 +186,56 @@ class MapScreenState extends State<ProfilePage>
 /// will push a new screen on top
 class EditVerifiableFieldsController extends StatelessWidget {
   late VerificationView verificationView;
-  AuthUser user;
 
-  final String value;
+  final TextEditingController controller;
 
-  EditVerifiableFieldsController({
-    Key? key,
-    required this.value,
-    required this.user,
-  }) : super(key: key) {
-    switch (value) {
-      case 'Change Password':
-        verificationView = ChangePassPage(
-          user: user,
-          title: value,
-        );
-        break;
-      case 'Change Email':
-        verificationView = ChangeEmailPage(
-          user: user,
-          title: value,
-        );
-        break;
-      /* case 'Change Phone Number': */
-      /*   verificationView = ChangePhoneNumberPage( */
-      /*     user: user, */
-      /*     title: value, */
-      /*   ); */
-      /*   break; */
-      default:
-    }
-  }
+  EditVerifiableFieldsController(
+      {Key? key, required this.controller, required this.verificationView})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: const EdgeInsets.only(left: 25.0, right: 25.0, top: 14.0),
-        child: TextButton(
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.all(0.0),
-            ),
-            child: Text(
-              value,
-              style: const TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black),
-            ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => verificationView),
-              );
-            }));
+      padding: const EdgeInsets.only(left: 25.0, right: 25.0, top: 2.0),
+      child: TextButton(
+          style: TextButton.styleFrom(
+            minimumSize: Size.zero,
+            padding: EdgeInsets.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          child: ProfileTextField(controller: controller),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => verificationView),
+            );
+          }),
+    );
+  }
+}
+
+class EditVerifiableLinksController extends StatelessWidget {
+  late VerificationView verificationView;
+  final String text;
+
+  EditVerifiableLinksController(
+      {Key? key, required this.text, required this.verificationView})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 15, right: 25.0, top: 25.0),
+      child: ListTile(
+          title: Text(text),
+          leading: Icon(Icons.lock),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => verificationView),
+            );
+          }),
+    );
   }
 }
 
@@ -256,27 +254,7 @@ class ProfileField extends StatelessWidget {
           padding: EdgeInsets.zero,
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
-        child: TextFormField(
-            autofocus: false,
-            controller: controller,
-            decoration: const InputDecoration(
-                fillColor: Colors.amber,
-                contentPadding: EdgeInsets.fromLTRB(10, 10, 10, 0),
-                filled: true,
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide.none,
-                )
-                // border: OutlineInputBorder(
-                //     borderRadius:
-                //         BorderRadius.circular(32.0))
-                ),
-            enabled: true,
-            onEditingComplete: () {
-              FocusScope.of(context).unfocus();
-            }),
+        child: ProfileTextField(controller: controller),
         onPressed: () {},
       ),
     );
@@ -295,5 +273,31 @@ class ProfileFieldLabel extends StatelessWidget {
           label,
           style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
         ));
+  }
+}
+
+class ProfileTextField extends StatelessWidget {
+  const ProfileTextField({
+    Key? key,
+    required this.controller,
+  }) : super(key: key);
+
+  final TextEditingController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      autofocus: false,
+      controller: controller,
+      decoration: InputDecoration(
+        fillColor: Colors.amber,
+        contentPadding: EdgeInsets.fromLTRB(10, 10, 10, 0),
+        filled: true,
+        disabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(32.0),
+            borderSide: BorderSide(width: 1)),
+      ),
+      enabled: false,
+    );
   }
 }
