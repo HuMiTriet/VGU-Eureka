@@ -43,6 +43,15 @@ class Firestore {
     );
   }
 
+  static Future<bool> userExists(String uid) async {
+    final userDocument = await firestoreReference
+        .collection('users')
+        .where('uid', isEqualTo: uid)
+        .get(const GetOptions(source: Source.serverAndCache));
+
+    return userDocument.docs.isNotEmpty;
+  }
+
   //Function name is abit misleading, only used for finding friends using email
   static Future<Set<etoet.UserInfo>> getUserInfoFromEmail(String emailQuery, String userUID) async {
 
