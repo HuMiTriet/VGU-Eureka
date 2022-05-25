@@ -39,13 +39,19 @@ class _FriendViewState extends State<FriendView> {
   //Used to implements some of the search bar's function
   final _searchBarController = TextEditingController();
 
+
+  //Listener & Stream related
+  late Stream<QuerySnapshot> _userFriendStream;
+  late int pendingFriendRequestCount;
+
   @override
   void initState() {
     super.initState();
-    // WidgetsBinding.instance
-    //     .addPostFrameCallback((_) {
-    //    pendingFriendRequestReceiverListener = Firestore.pendingFriendRequestReceiverListener(user.uid, context);
-    // });
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) {
+          //_userFriendStream = Firestore.firestoreReference.collection('users').doc(user.uid).collection('friends').snapshots();
+       // pendingFriendRequestReceiverListener = Firestore.pendingFriendRequestReceiverListener(user.uid, context);
+    });
   }
 
 
@@ -79,101 +85,118 @@ class _FriendViewState extends State<FriendView> {
   @override
   Widget build(BuildContext context) {
     user = context.watch<AuthUser>();
-    pendingFriendRequestReceiverListener = Firestore.pendingFriendRequestReceiverListener(user.uid, context);
-    //Firestore.pendingFriendRequestReceiverListener(user.uid, context);
-              return FractionallySizedBox(
-                  heightFactor: friendViewHeight,
-                  child: SafeArea(
-                    child: Column(
-                      children: [
-                        // Search, Add Friend and Pending Friend Request.
-                        Expanded(
-                            flex: topListViewFlex,
-                            child: Container(
-                              color: topListViewColor,
-                              child: ListView(
-                                shrinkWrap: true,
-                                children: [
-                                  TextField(
-                                    controller: _searchBarController,
-                                    decoration: InputDecoration(
-                                      hintText: 'Search',
-                                      contentPadding: const EdgeInsets.all(20),
-                                      suffixIcon: IconButton(
-                                        onPressed: () {
-                                          _searchBarController.clear();
+    _userFriendStream = Firestore.firestoreReference.collection('users').doc(user.uid).collection('friends')
+    .where('isSender', isEqualTo: false)
+    .where('requestConfirmed', isEqualTo: false)
+    .snapshots();
+    // pendingFriendRequestReceiverListener = Firestore.pendingFriendRequestReceiverListener(user.uid, context);
+    
+              return StreamBuilder<QuerySnapshot>(
+                stream: _userFriendStream,
+                builder: (context, snapshot) {
+                  pendingFriendRequestCount = (snapshot.data?.docs.length)!;
+                  if (snapshot.hasError) {
+                    return const Text('Something went wrong');
+                  }
+
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Text('Loading');
+                  }
+                  return FractionallySizedBox(
+                      heightFactor: friendViewHeight,
+                      child: SafeArea(
+                        child: Column(
+                          children: [
+                            // Search, Add Friend and Pending Friend Request.
+                            Expanded(
+                                flex: topListViewFlex,
+                                child: Container(
+                                  color: topListViewColor,
+                                  child: ListView(
+                                    shrinkWrap: true,
+                                    children: [
+                                      TextField(
+                                        controller: _searchBarController,
+                                        decoration: InputDecoration(
+                                          hintText: 'Search',
+                                          contentPadding: const EdgeInsets.all(20),
+                                          suffixIcon: IconButton(
+                                            onPressed: () {
+                                              _searchBarController.clear();
+                                              setState(() {
+                                                // userDisplayNameListOnSearch = userDisplayNameList;
+                                              });
+                                            },
+                                            icon: const Icon(Icons.clear),
+                                          ),
+                                        ),
+                                        onChanged: (searchText) {
                                           setState(() {
-                                            // userDisplayNameListOnSearch = userDisplayNameList;
+                                            // userDisplayNameListOnSearch =
+                                            //     getListContainsIgnoreCase(list: userDisplayNameList, value: searchText);
                                           });
                                         },
-                                        icon: const Icon(Icons.clear),
                                       ),
-                                    ),
-                                    onChanged: (searchText) {
-                                      setState(() {
-                                        // userDisplayNameListOnSearch =
-                                        //     getListContainsIgnoreCase(list: userDisplayNameList, value: searchText);
-                                      });
-                                    },
-                                  ),
-                                  ListTile(
-                                    leading: const CircleAvatar(
-                                      child: Icon(addFriendIcon),
-                                    ),
-                                    title: Text('Add Friend'),
-                                    onTap: ()
-                                    {
-                                      showBarModalBottomSheet(
-                                        context: context,
-                                        backgroundColor: Colors.transparent,
-                                        builder: (context) => const AddFriendView(),
-                                      );
-                                    },
+                                      ListTile(
+                                        leading: const CircleAvatar(
+                                          child: Icon(addFriendIcon),
+                                        ),
+                                        title: Text('Add Friend'),
+                                        onTap: ()
+                                        {
+                                          showBarModalBottomSheet(
+                                            context: context,
+                                            backgroundColor: Colors.transparent,
+                                            builder: (context) => const AddFriendView(),
+                                          );
+                                        },
 
 
-                                  ),
-                                  ListTile(
-                                    leading: const CircleAvatar(
-                                      child: Icon(pendingFriendRequestIcon),
-                                    ),
-                                    title: const Text('Pending Friend Request'),
-                                    onTap: ()
-                                    {
-                                      showBarModalBottomSheet(
-                                        context: context,
-                                        backgroundColor: Colors.transparent,
-                                        builder: (context) => const PendingFriendView(),
-                                      );
-                                    },
-                                    trailing: Text('1'),
+                                      ),
+                                      ListTile(
+                                        leading: const CircleAvatar(
+                                          child: Icon(pendingFriendRequestIcon),
+                                        ),
+                                        title: const Text('Pending Friend Request'),
+                                        onTap: ()
+                                        {
+                                          showBarModalBottomSheet(
+                                            context: context,
+                                            backgroundColor: Colors.transparent,
+                                            builder: (context) => const PendingFriendView(),
+                                          );
+                                        },
+                                        trailing: Text(pendingFriendRequestCount.toString()),
 
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            )),
+                                )),
 
-                        // Friend List
-                        Expanded(
-                            flex: bottomListViewFlex,
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              // children: userListWidget,
-                              itemCount: user.friendInfoList.length,
-                              itemBuilder: (context, index) {
-                                return ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundImage: NetworkImage(
-                                        user.friendInfoList.elementAt(index).photoURL!
-                                    ),
-                                  ),
-                                  title: Text(user.friendInfoList.elementAt(index).displayName!),
-                                  subtitle: Text(user.friendInfoList.elementAt(index).email!),
-                                );
-                              },
-                            )),
-                      ],
-                    ),
-                  ));
+                            // Friend List
+                            Expanded(
+                                flex: bottomListViewFlex,
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  // children: userListWidget,
+                                  itemCount: user.friendInfoList.length,
+                                  itemBuilder: (context, index) {
+                                    return ListTile(
+                                      leading: CircleAvatar(
+                                        backgroundImage: NetworkImage(
+                                            user.friendInfoList.elementAt(index).photoURL!
+                                        ),
+                                      ),
+                                      title: Text(user.friendInfoList.elementAt(index).displayName!),
+                                      subtitle: Text(user.friendInfoList.elementAt(index).email!),
+                                    );
+                                  },
+                                )),
+                          ],
+                        ),
+                      ));
+                }
+              );
 
 
 
