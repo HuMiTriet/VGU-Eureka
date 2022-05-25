@@ -28,9 +28,6 @@ class _FriendViewState extends State<FriendView> {
 
   late AuthUser user;
 
-  late StreamSubscription<QuerySnapshot<Map<String, dynamic>>>
-      pendingFriendRequestReceiverListener;
-
   //A list of ListTile to display Friends.
   //final userListWidget = <Widget>[];
 
@@ -198,7 +195,6 @@ class _FriendViewState extends State<FriendView> {
 
   @override
   void dispose() {
-    pendingFriendRequestReceiverListener.cancel();
     super.dispose();
   }
 }
