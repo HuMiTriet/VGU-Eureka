@@ -42,7 +42,7 @@ class _FriendViewState extends State<FriendView> {
 
   //Listener & Stream related
   late Stream<QuerySnapshot> _userFriendStream;
-  late int pendingFriendRequestCount;
+  int? pendingFriendRequestCount = 0;
 
   @override
   void initState() {
@@ -94,7 +94,7 @@ class _FriendViewState extends State<FriendView> {
               return StreamBuilder<QuerySnapshot>(
                 stream: _userFriendStream,
                 builder: (context, snapshot) {
-                  pendingFriendRequestCount = (snapshot.data?.docs.length)!;
+                  pendingFriendRequestCount = (snapshot.data?.docs.length);
                   if (snapshot.hasError) {
                     return const Text('Something went wrong');
                   }
