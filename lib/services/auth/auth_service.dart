@@ -33,9 +33,14 @@ class AuthService implements AuthProvider {
       );
 
   Stream<AuthUser?> get stream {
-    return FirebaseAuth.instance
-        .userChanges()
-        .map((user) => AuthUser.fromFirebase(user));
+    return FirebaseAuth.instance.userChanges().map((user) => AuthUser(
+          uid: user!.uid,
+          isEmailVerified: user.emailVerified,
+          email: user.email,
+          displayName: user.displayName,
+          phoneNumber: user.phoneNumber,
+          photoURL: user.photoURL,
+        ));
   }
 
   @override
@@ -59,4 +64,8 @@ class AuthService implements AuthProvider {
 
   @override
   Future<void> initialize() => provider.initialize();
+
+  @override
+  Future<bool> validateEnteredPassword(String password) async =>
+      provider.validateEnteredPassword(password);
 }

@@ -1,8 +1,9 @@
+import 'package:etoet/services/auth/auth_user.dart';
 import 'package:etoet/views/profile/Widgets/edit_image_page.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-EditImageDialog(BuildContext context) {
+EditImageDialog(BuildContext context, AuthUser user) {
   // Create SimpleDialog
   var dialog = SimpleDialog(
     title: const Text('Upload Image'),
@@ -12,8 +13,9 @@ EditImageDialog(BuildContext context) {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) =>
-                      EditImagePage(imageSource: ImageSource.camera)),
+                builder: (context) =>
+                    EditImagePage(imageSource: ImageSource.camera, user: user),
+              ),
             );
             // Navigator.pop(context);
           },
@@ -23,8 +25,9 @@ EditImageDialog(BuildContext context) {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) =>
-                    EditImagePage(imageSource: ImageSource.gallery)),
+              builder: (context) =>
+                  EditImagePage(imageSource: ImageSource.gallery, user: user),
+            ),
           );
           // Navigator.pop(context);
         },

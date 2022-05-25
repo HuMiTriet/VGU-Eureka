@@ -18,7 +18,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=2.16.2 <3.0.0'
+  sdk: '>=2.17.0 <3.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -45,10 +45,16 @@ dependencies:
   google_sign_in: ^5.3.1
   firebase_database_web: ^0.2.0+13
   firebase_database: ^9.0.14
+  routing_client_dart: ^0.3.1
+  settings_ui: ^2.0.2
+  flutter_login_facebook: ^1.4.1
+  pinput: ^2.2.9
   permission_handler: ^9.2.0
-  firebase_storage:
-    ^10.2.16
+  firebase_storage: ^10.2.16
+  flutter_pw_validator: ^1.4.2
   provider: ^6.0.2
+  modal_bottom_sheet:
+    ^2.0.1
     #dev dependencies will not be included in the final build
 dev_dependencies:
   flutter_test:
@@ -78,6 +84,9 @@ flutter:
     - assets/images/Anya.png
     - assets/images/Loid.png
     - assets/images/Yor.png
+    - assets/images/
+    - assets/images/Doraemon.png
+    # To add assets to your application, add an assets section, like this:
     - assets/images/google_logo.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

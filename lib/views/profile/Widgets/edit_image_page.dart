@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:etoet/services/auth/auth_user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -6,9 +7,11 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:developer';
 
 class EditImagePage extends StatefulWidget {
-  EditImagePage({Key? key, required this.imageSource}) : super(key: key);
+  EditImagePage({Key? key, required this.imageSource, required this.user})
+      : super(key: key);
 
   final imageSource;
+  final AuthUser user;
 
   @override
   _EditImagePageState createState() => _EditImagePageState();
@@ -40,8 +43,7 @@ class _EditImagePageState extends State<EditImagePage> {
                   width: 330,
                   child: GestureDetector(
                       onTap: () async {
-                        log('out side upload image');
-                        uploadImage();
+                        pickImage();
                       },
                       child: image != null
                           ? Image.file(
@@ -68,21 +70,25 @@ class _EditImagePageState extends State<EditImagePage> {
                     height: 50,
                     child: ElevatedButton(
                       onPressed: () async {
+                        if (image == null) return;
+
                         final _firebaseStorage = FirebaseStorage.instance;
                         try {
                           var snapshot = await _firebaseStorage
                               .ref()
-                              .child('images/16610')
+                              .child('images/${widget.user.uid}}')
                               .putFile(image!);
+                          log(widget.user.uid);
                           var downloadUrl = await snapshot.ref.getDownloadURL();
                           setState(() {
                             imageUrl = downloadUrl;
                           });
                         } on FirebaseException catch (e) {}
                         log('image url: ' + imageUrl);
-                        FirebaseAuth.instance.currentUser?.updatePhotoURL(
-                            imageUrl ??
-                                'https://static.wikia.nocookie.net/gintama/images/1/1a/Childkagura.png/revision/latest/scale-to-width-down/704?cb=20150206061302');
+                        Navigator.pop(context);
+
+                        FirebaseAuth.instance.currentUser
+                            ?.updatePhotoURL(imageUrl);
                       },
                       child: const Text(
                         'Update',
@@ -95,14 +101,14 @@ class _EditImagePageState extends State<EditImagePage> {
     );
   }
 
-  Future<File?> uploadImage() async {
+  Future<File?> pickImage() async {
     final _picker = ImagePicker();
     PickedFile image;
 
     XFile? _image = await _picker.pickImage(source: widget.imageSource);
 
     setState(() {
-      this.image = File(_image?.path ?? '');
+      this.image = File(_image!.path);
     });
   }
 }

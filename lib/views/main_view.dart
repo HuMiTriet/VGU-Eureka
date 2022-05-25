@@ -1,19 +1,21 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:etoet/constants/routes.dart';
-import 'package:etoet/services/map/map_factory.dart';
+import 'package:etoet/services/auth/user_info.dart' as etoet;
+import 'package:etoet/services/database/firestore.dart';
+import 'package:etoet/services/map/map_factory.dart' as etoet;
+import 'package:etoet/views/friend/friend_view.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:provider/provider.dart';
 
 import '../services/auth/auth_user.dart';
 
 class MainView extends StatefulWidget {
-  final AuthUser user;
-
   @override
   const MainView({
     Key? key,
-    required this.user,
   }) : super(key: key);
 
   @override
@@ -21,153 +23,128 @@ class MainView extends StatefulWidget {
 }
 
 class _MainViewState extends State<MainView> {
-  late Map map;
+  late etoet.Map map;
+  late AuthUser? authUser;
+  // late StreamSubscription<QuerySnapshot<Map<String, dynamic>>> pendingFriendRequestReceiverListener;
+  // late StreamSubscription<QuerySnapshot<Map<String, dynamic>>> pendingFriendRequestSenderListener;
 
-  Timer? timer;
-
-  Future<bool> hasLocationPermission() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    // Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
-      return Future.error('Location services are disabled.');
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
-        return Future.error('Location permissions are denied');
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-
-    return true;
-  }
 
   @override
   void initState() {
-    map = Map('GoogleMap', widget.user);
-    map.setContext(context);
     super.initState();
-    hasLocationPermission();
+    map = etoet.Map('GoogleMap');
+    map.context = context;
 
-    // run after build
-    WidgetsBinding.instance?.addPostFrameCallback((_) async {
-      setState(() {
-        map.initializeMap();
-        var screenWidth = MediaQuery.of(context).size.width *
-            MediaQuery.of(context).devicePixelRatio;
-        var screenHeight = MediaQuery.of(context).size.height *
-            MediaQuery.of(context).devicePixelRatio;
-        map.updateScreenSize(screenWidth, screenHeight);
-      });
-    });
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) {
+       // pendingFriendRequestSenderListener = Firestore.pendingFriendRequestSenderListener(authUser!.uid, context);
+      // pendingFriendRequestReceiverListener = Firestore.pendingFriendRequestReceiverListener(authUser!.uid, context);
+        });
   }
 
   @override
   Widget build(BuildContext context) {
-    timer = Timer.periodic(const Duration(seconds: 1), (t) {
-      setState(() {
-        map.updateCurrentMapAddress();
-      });
-      timer?.cancel();
-    });
+    authUser = context.watch<AuthUser?>();
+    // pendingFriendRequestReceiverListener = Firestore.pendingFriendRequestReceiverListener(authUser!.uid);
+    // pendingFriendRequestSenderListener = Firestore.pendingFriendRequestSenderListener(authUser!.uid);
+    
 
-    return Scaffold(
-      body: Stack(
-        children: <Widget>[
-          map,
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0.0, 30.0, 10.0, 0.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: <Widget>[
-                ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pushNamed(profileRoute);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.orange,
-                      shape: const CircleBorder(),
-                      fixedSize: const Size(50, 50),
+    return FutureBuilder(
+        future: Firestore.getFriendInfoList(authUser!.uid),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            var friendInfoList = snapshot.data as Set<etoet.UserInfo>;
+            authUser!.friendInfoList.clear();
+            for (var friendInfo in friendInfoList) {
+              authUser?.friendInfoList.add(friendInfo);
+            }
+            return Scaffold(
+              body: Stack(
+                children: <Widget>[
+                  map,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(200.0, 30.0, 10.0, 0.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: <Widget>[
+                        ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).pushNamed(profileRoute);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.orange,
+                              shape: const CircleBorder(),
+                              fixedSize: const Size(50, 50),
+                            ),
+                            child: const Icon(
+                              Icons.account_box_rounded,
+                              size: 24.0,
+                            )),
+                        ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).pushNamed(
+                                settingsRoute,
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.orange,
+                              shape: const CircleBorder(),
+                              fixedSize: const Size(50, 50),
+                            ),
+                            child: const Icon(
+                              Icons.settings,
+                              size: 24.0,
+                            )),
+                      ],
                     ),
-                    child: const Icon(
-                      Icons.account_box_rounded,
-                      size: 24.0,
-                    )),
-                ElevatedButton(
+                  ),
+                ],
+              ),
+              floatingActionButtonLocation:
+                  FloatingActionButtonLocation.centerFloat,
+              floatingActionButton: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  FloatingActionButton(
+                      heroTag: 'goToFriendsFromMain',
+                      onPressed: () {
+                        showBarModalBottomSheet(
+                          //expand: true,
+                          context: context,
+                          backgroundColor: Colors.transparent,
+                          builder: (context) => const FriendView(),
+                        );
+                      },
+                      child: const Icon(Icons.group)),
+                  FloatingActionButton(
+                      heroTag: 'goToSOSFromMain',
+                      onPressed: () {},
+                      child: const Icon(Icons.add_alert)),
+                  FloatingActionButton(
+                    heroTag: 'getCurrentLocationFromMain',
                     onPressed: () {
-                      Navigator.of(context).pushNamed(
-                        settingsRoute,
-                      );
+                      map.moveToCurrentLocation();
                     },
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.orange,
-                      shape: const CircleBorder(),
-                      fixedSize: const Size(50, 50),
-                    ),
-                    child: const Icon(
-                      Icons.settings,
-                      size: 24.0,
-                    )),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10.0, 40.0, 10.0, 0.0),
-            child: Text(map.address,
-                style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    backgroundColor: Color.fromARGB(104, 220, 155, 69))),
-          ),
-        ],
-      ),
-      floatingActionButton: Wrap(
-        spacing: 105,
-        alignment: WrapAlignment.center,
-        children: <Widget>[
-          FloatingActionButton(
-              heroTag: 'goToFriendsFromMain',
-              onPressed: () {},
-              child: const Icon(Icons.group)),
-          FloatingActionButton(
-              heroTag: 'goToSOSFromMain',
-              onPressed: () {},
-              child: const Icon(Icons.add_alert)),
-          FloatingActionButton(
-            heroTag: 'getCurrentLocationFromMain',
-            onPressed: () {
-              map.moveToCurrentLocation();
-            },
-            child: const Icon(Icons.location_on),
-          ),
-        ],
-      ),
-    );
+                    child: const Icon(Icons.location_on),
+                  ),
+                ],
+              ),
+            );
+          } else {
+            return const Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+        });
   }
 
   @override
   void dispose() {
-    timer?.cancel();
+    // pendingFriendRequestReceiverListener.cancel();
+    // pendingFriendRequestSenderListener.cancel();
     super.dispose();
   }
-
 }

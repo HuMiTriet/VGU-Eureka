@@ -4,7 +4,9 @@ import 'package:etoet/services/auth/auth_user.dart';
 import 'package:etoet/views/auth/login_view.dart';
 import 'package:etoet/views/auth/recover_account_view.dart';
 import 'package:etoet/views/auth/register_view.dart';
-import 'package:etoet/views/auth/verified_email_view.dart';
+import 'package:etoet/views/friend/add_friend_view.dart';
+import 'package:etoet/views/friend/friend_view.dart';
+import 'package:etoet/views/friend/pending_friend_view.dart';
 import 'package:etoet/views/profile/profile_page.dart';
 import 'package:etoet/views/settings_view.dart';
 import 'package:etoet/views/sign_post.dart';
@@ -23,7 +25,8 @@ void main() {
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.orange)
+              .copyWith(secondary: Colors.orangeAccent),
         ),
         home: const SignPost(),
 
@@ -31,10 +34,12 @@ void main() {
         routes: {
           loginRoute: (context) => const LoginView(),
           registerRoute: (context) => const RegisterView(),
-          verifyEmailRoute: (context) => const VerifyEmailView(),
           recoverAccountRoute: (context) => const RecoverAccountView(),
           settingsRoute: (context) => const SettingsView(),
-          profileRoute: (context) => ProfilePage(),
+          profileRoute: (context) => const ProfilePage(),
+          friendRoute: (context) => const FriendView(),
+          addFriendRoute: (context) => const AddFriendView(),
+          pendingFriendRoute: (context) => const PendingFriendView(),
         },
       ),
     ),
