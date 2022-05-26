@@ -21,8 +21,30 @@ class Firestore {
         'displayName': user.displayName,
         'photoUrl': user.photoURL ??
             'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977',
+        'phoneNumber': user.phoneNumber,
       },
     );
+  }
+
+  static Future<void> updateUserInfo(AuthUser authUser) async {
+    final userDocument = await firestoreReference
+        .collection('users')
+        .where('uid', isEqualTo: authUser.uid)
+        .get(const GetOptions(source: Source.serverAndCache));
+    final userData = userDocument.docs.first.data();
+    final userInfo = etoet.UserInfo(
+      uid: userData['uid'],
+      email: userData['email'],
+      displayName: userData['displayName'],
+      photoURL: userData['photoUrl'],
+      phoneNumber: userData['phoneNumber'],
+    );
+    await firestoreReference.collection('users').doc(authUser.uid).update({
+      'email': userInfo.email,
+      'displayName': userInfo.displayName,
+      'photoUrl': userInfo.photoURL,
+      'phoneNumber': userInfo.phoneNumber,
+    });
   }
 
   static Future<etoet.UserInfo> getUserInfo(String uid) async {
@@ -53,8 +75,8 @@ class Firestore {
   }
 
   //Function name is abit misleading, only used for finding friends using email
-  static Future<Set<etoet.UserInfo>> getUserInfoFromEmail(String emailQuery, String userUID) async {
-
+  static Future<Set<etoet.UserInfo>> getUserInfoFromEmail(
+      String emailQuery, String userUID) async {
     //
     emailQuery = emailQuery.toLowerCase();
 
@@ -180,58 +202,56 @@ class Firestore {
     return friendInfoList;
   }
 
-  static StreamSubscription<QuerySnapshot<Map<String, dynamic>>> pendingFriendRequestReceiverListener(String uid, BuildContext context)
-  {
-
-    var subscriber =  firestoreReference
-        .collection("users").doc(uid).collection('friends')
+  static StreamSubscription<QuerySnapshot<Map<String, dynamic>>>
+      pendingFriendRequestReceiverListener(String uid, BuildContext context) {
+    var subscriber = firestoreReference
+        .collection("users")
+        .doc(uid)
+        .collection('friends')
         .where("isSender", isEqualTo: false)
         .where("requestConfirmed", isEqualTo: false)
         .snapshots()
         .listen((querySnapshot) {
-      for(var i = 0; i < querySnapshot.docChanges.length; ++i)
-      {
+      for (var i = 0; i < querySnapshot.docChanges.length; ++i) {
         var changes = querySnapshot.docChanges.elementAt(i).doc.data()!;
         print(changes['friendUID']);
         showDialog(
             context: context,
-            builder: (context){
+            builder: (context) {
               return AlertDialog(
-                title: Text('Received a friend request from:' +changes['friendUID']),
+                title: Text(
+                    'Received a friend request from:' + changes['friendUID']),
               );
-            }
-        );
+            });
       }
     });
 
     return subscriber;
   }
 
-  static StreamSubscription<QuerySnapshot<Map<String, dynamic>>> pendingFriendRequestSenderListener(String uid, BuildContext context)
-  {
-    var subscriber =  firestoreReference
-        .collection("users").doc(uid).collection('friends')
+  static StreamSubscription<QuerySnapshot<Map<String, dynamic>>>
+      pendingFriendRequestSenderListener(String uid, BuildContext context) {
+    var subscriber = firestoreReference
+        .collection("users")
+        .doc(uid)
+        .collection('friends')
         .where("isSender", isEqualTo: true)
         .where("requestConfirmed", isEqualTo: false)
         .snapshots()
         .listen((querySnapshot) {
-      for(var i = 0; i < querySnapshot.docChanges.length; ++i)
-      {
+      for (var i = 0; i < querySnapshot.docChanges.length; ++i) {
         var changes = querySnapshot.docChanges.elementAt(i).doc.data()!;
         print(changes['friendUID']);
         showDialog(
             context: context,
-            builder: (context){
-           return AlertDialog(
-             title: Text('Friend request sent to' +changes['friendUID']),
-           );
-        }
-        );
+            builder: (context) {
+              return AlertDialog(
+                title: Text('Friend request sent to' + changes['friendUID']),
+              );
+            });
       }
     });
 
     return subscriber;
   }
-
-
 }
