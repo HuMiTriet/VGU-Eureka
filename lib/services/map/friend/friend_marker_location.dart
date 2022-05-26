@@ -9,19 +9,24 @@ import '../marker/marker.dart';
 
 /// This class is used to create a marker for a friend
 class FriendMarker {
-  static Routing routing = Routing.getInstance();
-
+  Routing routing = Routing.getInstance();
+  late etoet.UserInfo friendInfo;
+  late Future<BitmapDescriptor> friendIcon =
+      GoogleMapMarker.getIconFromUrl(friendInfo.photoURL!);
+  late Set<Polyline> polylines;
+  late BuildContext context;
+  FriendMarker({
+    required this.friendInfo,
+    required this.context,
+    required this.polylines,
+  });
   Future<Marker> createFriendMarker({
     required LatLng friendLatLng,
-    required BuildContext context,
-    required Set<Polyline> polylineList,
-    required etoet.UserInfo friendInfo,
   }) async {
-    late var icon = GoogleMapMarker.getIconFromUrl(friendInfo.photoURL!);
     return Marker(
       markerId: MarkerId(friendInfo.uid),
       position: friendLatLng,
-      icon: await icon,
+      icon: await friendIcon,
       infoWindow: InfoWindow(
         title: friendInfo.displayName,
         snippet: 'Tap to see friend\'s location',
@@ -78,14 +83,15 @@ class FriendMarker {
                               const TextStyle(fontWeight: ui.FontWeight.bold),
                         ),
                         onPressed: () async {
-                          polylineList.clear();
-                          polylineList.add(Polyline(
+                          polylines.clear();
+                          polylines.add(Polyline(
                               polylineId: const PolylineId('polyline'),
                               visible: true,
                               points:
                                   await routing.getPointsFromUser(friendLatLng),
                               width: 5,
                               color: Colors.blue));
+                          Navigator.pop(context);
                         },
                       ),
                     ),

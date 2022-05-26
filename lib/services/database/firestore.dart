@@ -78,6 +78,9 @@ class Firestore {
         // .where('uid', )
         .get();
 
+    var alrFriend = await firestoreReference.collection('users').doc(userUID).collection('friends')
+    .where('requestConfirmed', isEqualTo: true).get();
+
     var searchedUserInfoList = <etoet.UserInfo>{};
 
     for (var i = 0; i < res.docs.length; ++i) {
@@ -92,7 +95,24 @@ class Firestore {
         continue;
       }
 
-      searchedUserInfoList.add(userInfo);
+      if(alrFriend.docs.length == 0)
+        {
+          searchedUserInfoList.add(userInfo);
+          continue;
+        }
+      
+      for(var j = 0; j < alrFriend.docs.length; ++j)
+        {
+          var alrFriendData = alrFriend.docs.elementAt(j).data();
+          if(userInfo.uid == alrFriendData['friendUID'])
+            {
+              break;
+            }
+          else if (j == (alrFriend.docs.length-1) )
+            {
+              searchedUserInfoList.add(userInfo);
+            }
+        }
     }
 
     //devtools.log('$res', name: 'Firestore: getUserInfoFromDisplayName');
@@ -246,5 +266,16 @@ class Firestore {
     return subscriber;
   }
 
+  static Stream<QuerySnapshot> getPendingFriendStream(String userUID)
+  {
+    Stream<QuerySnapshot> _pendingFriendStream = Firestore.firestoreReference
+        .collection('users')
+        .doc(userUID)
+        .collection('friends')
+        .where('isSender', isEqualTo: false)
+        .where('requestConfirmed', isEqualTo: false)
+        .snapshots();
+    return _pendingFriendStream;
+  }
 
 }

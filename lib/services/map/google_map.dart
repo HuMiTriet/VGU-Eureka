@@ -2,17 +2,19 @@ import 'dart:async';
 import 'dart:developer' as devtools show log;
 
 import 'package:etoet/services/auth/auth_user.dart';
-import 'package:etoet/services/auth/user_info.dart';
+import 'package:etoet/services/auth/location.dart';
 import 'package:etoet/services/database/database.dart';
 import 'package:etoet/services/database/firestore.dart';
 import 'package:etoet/services/map/friend/friend_marker_location.dart';
-import 'package:etoet/services/map/map_factory.dart';
+import 'package:etoet/services/map/map_factory.dart' as etoet;
 import 'package:etoet/services/map/marker/marker.dart';
 import 'package:etoet/services/map/osrm/routing.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+
 import 'geocoding.dart';
 
 /// This is the implementation of the [Map] interface using [GoogleMap].
@@ -21,23 +23,19 @@ import 'geocoding.dart';
 /// - moveToCurrentLocation() - moves the map to the current location
 /// - updateCurrentMapAddress() - update the current addressList that the map shows
 /// - initializeMap() - initializes the map(move the map to current location, update addressList)
-class GoogleMapImpl extends StatefulWidget implements Map {
+class GoogleMapImpl extends StatefulWidget implements etoet.Map {
   late LatLng _location = const LatLng(0, 0);
-  late GoogleMapController? _mapController;
+  late GoogleMapController _mapController;
   late StreamSubscription _locationSubscription;
   late StreamSubscription _databaseLocationSubscription;
-  late final Set<Marker> _markersList = {};
-  late Set<Marker> friendMarkers = {};
-  final Set<Polyline> _polylinesList = {};
+  late Set<StreamSubscription> _friendsLocationSubscriptions;
+  final List<Marker> _markers = [];
+  final Set<Polyline> _polylines = {};
   Routing routing = Routing.getInstance();
   late num deviceWidth = MediaQuery.of(context).size.width *
       MediaQuery.of(context).devicePixelRatio;
   late num deviceHeight = MediaQuery.of(context).size.height *
       MediaQuery.of(context).devicePixelRatio;
-  final Geocoding geocoding = Geocoding();
-  late UserInfo userInfo;
-  late BitmapDescriptor userIcon;
-  FriendMarker friendMarkerCreator = FriendMarker();
 
   GoogleMapImpl({Key? key}) : super(key: key);
 
@@ -45,42 +43,28 @@ class GoogleMapImpl extends StatefulWidget implements Map {
   String address = 'Unknown';
 
   @override
-  late AuthUser? authUser;
-
-  @override
   late BuildContext context;
 
   @override
-  void updateCurrentMapAddress() async {
-    address = geocoding.getGeocoding(await _mapController!.getLatLng(
-        ScreenCoordinate(
-            x: (deviceWidth / 2).round(), y: (deviceHeight / 2).round())));
-  }
+  late AuthUser? authUser;
 
   @override
   void moveToCurrentLocation() {
     _moveMap(_location);
   }
 
-  // update markers of all friends every one second
-  void updateFriendMarker() async {
-    for (var friendInfo in authUser!.friendInfoList) {
-      var location = authUser!.mapFriendUidLocation[friendInfo.uid];
-      location = location!;
-      var latLng = LatLng(location.latitude, location.longitude);
-      var friendMarker = await friendMarkerCreator.createFriendMarker(
-          friendInfo: friendInfo,
-          friendLatLng: latLng,
-          context: context,
-          polylineList: _polylinesList);
-      _markersList.add(friendMarker);
-      devtools.log('add friend marker displayName: ${friendInfo.displayName}',
-          name: 'GoogleMap: updateFriendMarker');
-    }
-    devtools.log('update markers', name: 'GoogleMap: updateFriendMarker');
+  /// Update the current address that the map shows
+  void updateCurrentMapAddress() async {
+    address = await Geocoding.getGeocoding(await _mapController.getLatLng(
+        ScreenCoordinate(
+            x: (deviceWidth / 2).round(), y: (deviceHeight / 2).round())));
   }
 
-  Future<bool> hasLocationPermission() async {
+  void updateMapAddress(LatLng location) async {
+    address = await Geocoding.getGeocoding(location);
+  }
+
+  Future<bool> _hasLocationPermission() async {
     bool serviceEnabled;
     LocationPermission permission;
 
@@ -116,7 +100,7 @@ class GoogleMapImpl extends StatefulWidget implements Map {
   }
 
   Future<LatLng> _getCurrentLocation() async {
-    if (await hasLocationPermission()) {
+    if (await _hasLocationPermission()) {
       var locationDataGeolocator = await Geolocator.getCurrentPosition();
       _location = LatLng(
           locationDataGeolocator.latitude, locationDataGeolocator.longitude);
@@ -130,36 +114,21 @@ class GoogleMapImpl extends StatefulWidget implements Map {
   /// Listener to user location
   ///
   /// When the user's location changes, the marker for user is moved to the new location.
-  /// The user's location is also update to the database
-  void _updateLiveLocation(Function(Position) updateLocation) {
+  /// The user's location is updated to the database
+  StreamSubscription _getLocationStream(
+      Function(Position) updateLocation, int range) {
     // listener to update user's location and marker
-    _locationSubscription = Geolocator.getPositionStream(
-        locationSettings: const LocationSettings(
+    return Geolocator.getPositionStream(
+        locationSettings: LocationSettings(
       accuracy: LocationAccuracy.high,
-      distanceFilter: 5,
+      distanceFilter: range,
     )).listen((position) {
-      devtools.log('listener location: $position',
-          name: 'GoogleMap: _updateLiveLocation');
       updateLocation(position);
-    });
-
-    // listener to update location to database
-    _databaseLocationSubscription = Geolocator.getPositionStream(
-        locationSettings: const LocationSettings(
-      accuracy: LocationAccuracy.best,
-      distanceFilter: 10,
-    )).listen((position) {
-      authUser!.location.latitude = position.latitude;
-      authUser!.location.longitude = position.longitude;
-      Realtime.updateUserLocation(authUser!);
-      devtools.log(
-          'update user location to database lat: ${position.latitude} lng: ${position.longitude}',
-          name: 'GoogleMap: _updateLiveLocation');
     });
   }
 
   void _moveMap(LatLng location) {
-    _mapController?.animateCamera(CameraUpdate.newCameraPosition(
+    _mapController.animateCamera(CameraUpdate.newCameraPosition(
       CameraPosition(
         target: location,
         zoom: 15.0,
@@ -174,67 +143,115 @@ class GoogleMapImpl extends StatefulWidget implements Map {
 
 class _GoogleMapImplState extends State<GoogleMapImpl> {
   Timer? timer;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    timer?.cancel();
-    widget._locationSubscription.cancel();
-    widget._databaseLocationSubscription.cancel();
-    widget._mapController?.dispose();
-    super.dispose();
-  }
+  late Future<LatLng> location = widget._getCurrentLocation();
+  late BitmapDescriptor userIcon;
 
   void _initializeMap() async {
     devtools.log('_initializeMap', name: 'GoogleMap: _initializeMap');
 
-    Realtime.getFriendsLocation(widget.authUser!);
-    Realtime.syncFriendsLocation(widget.authUser!);
+    widget._friendsLocationSubscriptions =
+        Realtime.syncFriendsLocation(widget.authUser!);
+
+    // get location, update geocoding
     var currentLocation = await widget._getCurrentLocation();
     Routing.location = currentLocation;
-    widget.address = widget.geocoding.getGeocoding(currentLocation);
-    widget.userInfo = await Firestore.getUserInfo(widget.authUser!.uid);
-    widget.userIcon =
-        await GoogleMapMarker.getIconFromUrl(widget.authUser!.photoURL!);
-    devtools.log('userIcon: ${widget.userIcon}',
-        name: 'GoogleMap: _initializeMap');
-    widget._markersList.add(Marker(
-        markerId: MarkerId(widget.authUser!.uid),
-        position: currentLocation,
-        icon: widget.userIcon));
+    widget.address = await Geocoding.getGeocoding(currentLocation);
 
-    // listen to user's location and update location to database
-    widget._updateLiveLocation((position) async {
+    // get user icon, draw marker
+    var icon = await GoogleMapMarker.getIconFromUrl(widget.authUser!.photoURL ??
+        'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab297');
+    userIcon = icon;
+    widget._locationSubscription = widget._getLocationStream((position) {
       var location = LatLng(position.latitude, position.longitude);
       widget._location = location;
-      Routing.location = widget._location;
-      widget._markersList.add(
-        Marker(
-            markerId: MarkerId(widget.authUser!.uid),
-            position: widget._location,
-            icon: widget.userIcon),
-      );
+      Routing.location = location;
+      widget._markers.removeWhere(
+          (element) => element.markerId == MarkerId(widget.authUser!.uid));
+      widget._markers.add(Marker(
+          markerId: MarkerId(widget.authUser!.uid),
+          position: location,
+          icon: icon));
+      devtools.log('location: $location, user marker: ${widget._markers.first}',
+          name: 'GoogleMap: _getLocationStream');
+    }, 5);
+
+    // listen to user's location and update location to database
+    widget._databaseLocationSubscription =
+        widget._getLocationStream((position) {
+      widget.authUser?.location.latitude = position.latitude;
+      widget.authUser?.location.longitude = position.longitude;
+      Realtime.updateUserLocation(widget.authUser!);
+      devtools.log(
+          'update user location to database lat: ${position.latitude} lng: ${position.longitude}',
+          name: 'GoogleMap: _getLocationStream');
+    }, 10);
+
+    devtools.log('Finish _initializeMap', name: 'GoogleMap: _initializeMap');
+  }
+
+  /// Sync friend marker on map
+  void syncFriendMarker() {
+    for (var subcription in widget._friendsLocationSubscriptions) {
+      subcription.onData((data) {
+        data = data as DatabaseEvent;
+        var lat =
+            data.snapshot.child('location').child('latitude').value as double;
+        var lng =
+            data.snapshot.child('location').child('longitude').value as double;
+        var friendLocation = Location(latitude: lat, longitude: lng);
+        var friendId = data.snapshot.key;
+        widget.authUser!.mapFriendUidLocation[friendId!] = friendLocation;
+        updateFriendMarker();
+        setState(() {});
+        devtools.log('sync friend marker', name: 'GoogleMap: syncFriendMarker');
+      });
+    }
+  }
+
+  /// Update markers of all friends
+  void updateFriendMarker() async {
+    var friendInfoList = widget.authUser?.friendInfoList ?? {};
+    for (var friendInfo in friendInfoList) {
+      var friendMarkerCreator = FriendMarker(
+          context: context,
+          friendInfo: friendInfo,
+          polylines: widget._polylines);
+      var location = widget.authUser?.mapFriendUidLocation[friendInfo.uid];
+      var latLng = LatLng(location!.latitude, location.longitude);
+      var friendMarker =
+          await friendMarkerCreator.createFriendMarker(friendLatLng: latLng);
+      widget._markers
+          .removeWhere((marker) => marker.markerId == MarkerId(friendInfo.uid));
+      widget._markers.add(friendMarker);
+      devtools.log(
+          'marker list: ${widget._markers.length}, displayName: ${friendInfo.displayName}, location: $latLng',
+          name: 'GoogleMap: updateFriendMarker');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeMap();
+      syncFriendMarker();
     });
+  }
+
+  @override
+  void dispose() {
+    widget._mapController.dispose();
+    widget._locationSubscription.cancel();
+    widget._databaseLocationSubscription.cancel();
+    for (var subscription in widget._friendsLocationSubscriptions) {
+      subscription.cancel();
+    }
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     widget.authUser = context.watch<AuthUser?>();
-
-    var location = widget._getCurrentLocation();
-    timer = Timer.periodic(const Duration(seconds: 1), (t) async {
-      if (mounted) {
-        setState(() {
-          widget.updateFriendMarker();
-          widget.updateCurrentMapAddress();
-        });
-        timer?.cancel();
-      }
-    });
     return FutureBuilder(
       future: location,
       builder: (context, snapshot) {
@@ -254,14 +271,18 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
                   devtools.log(
                       'Google map state build _mapController: ${widget._mapController}',
                       name: 'GoogleMapImplState');
-                  _initializeMap();
                 },
-                markers: widget._markersList,
-                polylines: widget._polylinesList,
+                markers: widget._markers.toSet(),
+                polylines: widget._polylines,
                 myLocationEnabled: true,
                 zoomControlsEnabled: false,
                 myLocationButtonEnabled: false,
                 mapToolbarEnabled: false,
+                onCameraMoveStarted: () {
+                  setState(() {
+                    widget.updateCurrentMapAddress();
+                  });
+                },
               ),
               Positioned(
                 top: 40,
