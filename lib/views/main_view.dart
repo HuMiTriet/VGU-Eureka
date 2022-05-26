@@ -28,18 +28,11 @@ class _MainViewState extends State<MainView> {
   // late StreamSubscription<QuerySnapshot<Map<String, dynamic>>> pendingFriendRequestReceiverListener;
   // late StreamSubscription<QuerySnapshot<Map<String, dynamic>>> pendingFriendRequestSenderListener;
 
-
   @override
   void initState() {
     super.initState();
     map = etoet.Map('GoogleMap');
     map.context = context;
-
-    WidgetsBinding.instance
-        .addPostFrameCallback((_) {
-       // pendingFriendRequestSenderListener = Firestore.pendingFriendRequestSenderListener(authUser!.uid, context);
-      // pendingFriendRequestReceiverListener = Firestore.pendingFriendRequestReceiverListener(authUser!.uid, context);
-        });
   }
 
   @override
@@ -47,7 +40,6 @@ class _MainViewState extends State<MainView> {
     authUser = context.watch<AuthUser?>();
     // pendingFriendRequestReceiverListener = Firestore.pendingFriendRequestReceiverListener(authUser!.uid);
     // pendingFriendRequestSenderListener = Firestore.pendingFriendRequestSenderListener(authUser!.uid);
-    
 
     return FutureBuilder(
         future: Firestore.getFriendInfoList(authUser!.uid),

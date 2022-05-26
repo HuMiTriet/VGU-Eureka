@@ -5,6 +5,9 @@ import 'package:etoet/views/auth/login_view.dart';
 import 'package:etoet/views/auth/verified_email_view.dart';
 import 'package:etoet/views/main_view.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../services/auth/auth_user.dart';
 
 ///this class direct the app to the correct view based on the authentication
 ///status of the current user
@@ -18,7 +21,8 @@ class SignPost extends StatelessWidget {
       builder: (context, snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.done:
-            final user = AuthService.firebase().currentUser;
+            // get user from provider instead of firebase
+            final user = context.watch<AuthUser?>();
 
             devtools.log(user.toString());
 

@@ -1,7 +1,7 @@
+import 'dart:async';
 import 'dart:developer' as devtools show log;
 
 import 'package:etoet/services/auth/auth_user.dart';
-import 'package:etoet/services/auth/location.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 class Realtime {
@@ -26,38 +26,24 @@ class Realtime {
         name: 'Database: updateUserLocation'));
   }
 
-  static void getFriendsLocation(AuthUser authUser) async {
+  static Set<StreamSubscription> syncFriendsLocation(AuthUser authUser) {
+    var streamSubscriptionSet = <StreamSubscription>{};
     for (var friendInfo in authUser.friendInfoList) {
-      var location = await databaseReference
+      var subscription = databaseReference
           .child('users')
           .child(friendInfo.uid)
-          .child('location')
-          .get();
-      var lat = location.child('latitude').value as double;
-      var lng = location.child('longitude').value as double;
-      authUser.mapFriendUidLocation[friendInfo.uid] =
-          Location(latitude: lat, longitude: lng);
-      devtools.log('Initial fetch friend location $lat, $lng',
-          name: 'Database: fetchFriendsLocation');
-    }
-  }
-
-  static void syncFriendsLocation(AuthUser authUser) {
-    for (var friendInfo in authUser.friendInfoList) {
-      databaseReference
-          .child('users')
-          .child(friendInfo.uid)
-          .child('location')
           .onValue
           .listen((location) {
-        var lat = location.snapshot.child('latitude').value as double;
-        var lng = location.snapshot.child('longitude').value as double;
-        authUser.mapFriendUidLocation[friendInfo.uid] =
-            Location(latitude: lat, longitude: lng);
+        var lat = location.snapshot.child('location').child('latitude').value
+            as double;
+        var lng = location.snapshot.child('location').child('longitude').value
+            as double;
         devtools.log(
             'location updated from database: ID: ${friendInfo.uid} lat: $lat, lng: $lng',
             name: 'Database: syncFriendsLocation');
       });
+      streamSubscriptionSet.add(subscription);
     }
+    return streamSubscriptionSet;
   }
 }
