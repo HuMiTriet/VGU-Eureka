@@ -149,8 +149,20 @@ class MainViewState extends State<MainView> {
           showDialog(
               context: context,
               builder: (context) {
-                return const AlertDialog(
-                  title: Text('EMERGENCY'),
+                var content = event.notification!.body;
+                return AlertDialog(
+                  title: const Text('EMERGENCY'),
+                  content: Text(content ?? 'null'),
+                  actions: [
+                    ElevatedButton(
+                      onPressed: () {},
+                      child: const Text('Accpet'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {},
+                      child: const Text('Reject'),
+                    )
+                  ],
                 );
               });
         });
