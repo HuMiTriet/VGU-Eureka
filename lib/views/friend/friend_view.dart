@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:etoet/services/database/firestore.dart';
 import 'package:etoet/views/friend/pending_friend_view.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:provider/provider.dart';
 
 import '../../services/auth/auth_user.dart';
@@ -20,16 +20,11 @@ class FriendView extends StatefulWidget {
 }
 
 class _FriendViewState extends State<FriendView> {
-  Set<etoet.UserInfo> userListOnSearch = {};
-
   late AuthUser user;
+  Set<etoet.UserInfo> userListOnSearch = {};
 
   //Used to implements some of the search bar's function
   final _searchBarController = TextEditingController();
-
-  //Listener & Stream related
-  late Stream<QuerySnapshot> _pendingFriendStream;
-  int? pendingFriendRequestCount = 0;
 
   @override
   void initState() {
@@ -62,26 +57,15 @@ class _FriendViewState extends State<FriendView> {
     return filteredList;
   }
 
-  //Use for filtering list when searching
-  // List<String> getListContainsIgnoreCase(
-  //     {required List<String> list, required String value}) {
-  //   var result = <String>[];
-  //   for (var i = 0; i < list.length; ++i) {
-  //     if (list.elementAt(i).toLowerCase().contains(value.toLowerCase())) {
-  //       result.add(list.elementAt(i));
-  //     }
-  //   }
-  //   return result;
-  // }
-
   //Variables for easier config:
 
   final double friendViewHeight = 0.9; // Should be between 0.7 - 1.0
+  final Color backgroundColor = const Color.fromARGB(200, 255, 210, 177);
   final Color topListViewColor = const Color.fromARGB(200, 255, 210,
       177); // The background color of search and add friend part.
-  final Color spacingColor = Colors.orange;
   final Color bottomListViewColor = const Color.fromARGB(
       200, 255, 210, 177); // The background color of friend list.
+  final Color spacingColor = Colors.orange;
   static const IconData addFriendIcon = Icons.add;
   static const IconData pendingFriendRequestIcon = Icons.group_add;
 
@@ -93,14 +77,12 @@ class _FriendViewState extends State<FriendView> {
   @override
   Widget build(BuildContext context) {
     user = context.watch<AuthUser>();
-    _pendingFriendStream = Firestore.firestoreReference
-        .collection('users')
-        .doc(user.uid)
-        .collection('friends')
-        .where('isSender', isEqualTo: false)
-        .where('requestConfirmed', isEqualTo: false)
-        .snapshots();
-    // pendingFriendRequestReceiverListener = Firestore.pendingFriendRequestReceiverListener(user.uid, context);
+
+    //Listener & Stream related
+    late Stream<QuerySnapshot> _pendingFriendStream;
+    int? pendingFriendRequestCount = 0;
+
+    _pendingFriendStream = Firestore.getPendingFriendStream(user.uid);
 
     return StreamBuilder<QuerySnapshot>(
         stream: _pendingFriendStream,
@@ -117,7 +99,7 @@ class _FriendViewState extends State<FriendView> {
               heightFactor: friendViewHeight,
               child: SafeArea(
                   child: Container(
-                color: bottomListViewColor,
+                color: backgroundColor,
                 child: Column(
                   children: [
                     // Search, Add Friend and Pending Friend Request.
@@ -131,7 +113,7 @@ class _FriendViewState extends State<FriendView> {
                           TextField(
                             controller: _searchBarController,
                             decoration: InputDecoration(
-                              hintText: 'Search by Display Name',
+                              hintText: 'Search by Display Name or Email',
                               contentPadding: const EdgeInsets.all(20),
                               suffixIcon: IconButton(
                                 onPressed: () {
@@ -163,9 +145,10 @@ class _FriendViewState extends State<FriendView> {
                                 child: Icon(addFriendIcon),
                               ),
                             ),
-                            title: Text('Add Friend'),
+                            title: const Text('Add Friend'),
                             shape: RoundedRectangleBorder(
-                                side: BorderSide(color: Colors.black, width: 1),
+                                side: const BorderSide(
+                                    color: Colors.black, width: 1),
                                 borderRadius: BorderRadius.circular(15)),
                             onTap: () {
                               showBarModalBottomSheet(
@@ -235,8 +218,6 @@ class _FriendViewState extends State<FriendView> {
                       color: bottomListViewColor,
                       child: ListView.builder(
                         shrinkWrap: true,
-                        // children: userListWidget,
-                        // itemCount: user.friendInfoList.length,
                         itemCount: userListOnSearch.isNotEmpty
                             ? userListOnSearch.length
                             : user.friendInfoList.length,
