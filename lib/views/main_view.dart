@@ -23,15 +23,6 @@ class MainView extends StatefulWidget {
 class MainViewState extends State<MainView> {
   late etoet.Map map;
   late AuthUser? authUser;
-  // late StreamSubscription<QuerySnapshot<Map<String, dynamic>>> pendingFriendRequestReceiverListener;
-  // late StreamSubscription<QuerySnapshot<Map<String, dynamic>>> pendingFriendRequestSenderListener;
-
-  @override
-  void initState() {
-    super.initState();
-    map = etoet.Map('GoogleMap');
-    map.context = context;
-  }
 
   @override
   Widget build(BuildContext context) {
