@@ -5,40 +5,42 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 /// [Geocoding] can be used to convert location to placemark/address.
 class Geocoding {
-  List<String> addressList = <String>['', '', '', '', '', '', '', ''];
-  String getGeocoding(LatLng location) {
+  Geocoding._();
+
+  /// Get placemark from location using geocoding package.
+  static Future<String> getGeocoding(LatLng location) async {
+    var addressList = <String>['', '', '', '', '', '', '', ''];
     try {
-      placemarkFromCoordinates(location.latitude, location.longitude)
-          .then((listPlacemark) {
-        var placemarkAddress = listPlacemark.elementAt(0);
-        var country = placemarkAddress.country;
-        var city = placemarkAddress.locality;
-        var street = placemarkAddress.thoroughfare;
-        var subLocality = placemarkAddress.subLocality;
-        var postalCode = placemarkAddress.postalCode;
-        var administrativeArea = placemarkAddress.administrativeArea;
-        var subAdministrativeArea = placemarkAddress.subAdministrativeArea;
-        var subThoroughfare = placemarkAddress.subThoroughfare;
-        addressList[0] = '$country';
-        addressList[1] = '$city';
-        addressList[2] = '$street';
-        addressList[3] = '$subLocality';
-        addressList[4] = '$postalCode';
-        addressList[5] = '$administrativeArea';
-        addressList[6] = '$subAdministrativeArea';
-        addressList[7] = '$subThoroughfare';
-        devtools.log('geocoding of location: $addressList',
-            name: 'Geocoding: getGeocoding');
-        return _getAddress();
-      });
+      var listPlacemark =
+          await placemarkFromCoordinates(location.latitude, location.longitude);
+      var placemarkAddress = listPlacemark.elementAt(0);
+      var country = placemarkAddress.country;
+      var city = placemarkAddress.locality;
+      var street = placemarkAddress.thoroughfare;
+      var subLocality = placemarkAddress.subLocality;
+      var postalCode = placemarkAddress.postalCode;
+      var administrativeArea = placemarkAddress.administrativeArea;
+      var subAdministrativeArea = placemarkAddress.subAdministrativeArea;
+      var subThoroughfare = placemarkAddress.subThoroughfare;
+      addressList[0] = '$country';
+      addressList[1] = '$city';
+      addressList[2] = '$street';
+      addressList[3] = '$subLocality';
+      addressList[4] = '$postalCode';
+      addressList[5] = '$administrativeArea';
+      addressList[6] = '$subAdministrativeArea';
+      addressList[7] = '$subThoroughfare';
+      devtools.log('geocoding of location: $addressList',
+          name: 'Geocoding: getGeocoding');
+      return _getAddress(addressList);
     } catch (e) {
       devtools.log('get Geocoding error: $e', name: 'Geocoding: getGeocoding');
+      return 'Unknown';
     }
-    return _getAddress();
   }
 
-  /// [_getAddress] is used to get the address from the addressList with priority from: city > administrativeArea > subAdministrativeArea > subThoroughfare > country.
-  String _getAddress() {
+  /// [_getAddress] is used to get the address from the [addressList with priority from: city > administrativeArea > subAdministrativeArea > subThoroughfare > country.
+  static String _getAddress(List<String> addressList) {
     var address = 'Unknown';
     // city
     if (addressList[1] != '') {
