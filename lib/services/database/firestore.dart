@@ -253,5 +253,16 @@ class Firestore {
     return subscriber;
   }
 
+  static Stream<QuerySnapshot> getPendingFriendStream(String userUID)
+  {
+    Stream<QuerySnapshot> _pendingFriendStream = Firestore.firestoreReference
+        .collection('users')
+        .doc(userUID)
+        .collection('friends')
+        .where('isSender', isEqualTo: false)
+        .where('requestConfirmed', isEqualTo: false)
+        .snapshots();
+    return _pendingFriendStream;
+  }
 
 }
