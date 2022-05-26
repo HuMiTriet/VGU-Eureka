@@ -1,16 +1,9 @@
-import 'dart:async';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:etoet/services/database/firestore.dart';
 import 'package:etoet/services/map/map_factory.dart' as etoet;
-import 'package:etoet/views/friend/friend_view.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:etoet/constants/routes.dart';
-import 'package:etoet/services/database/firestore.dart';
-import 'package:etoet/services/map/map_factory.dart';
 import 'package:etoet/services/notification/notification.dart';
+import 'package:etoet/views/friend/friend_view.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
@@ -27,36 +20,13 @@ class MainView extends StatefulWidget {
   MainViewState createState() => MainViewState();
 }
 
-class _MainViewState extends State<MainView> {
+class MainViewState extends State<MainView> {
   late etoet.Map map;
   late AuthUser? authUser;
-
-
-  @override
-  void initState() {
-    super.initState();
-    map = etoet.Map('GoogleMap');
-    map.context = context;
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      var token = await NotificationHandler.notificatioToken;
-      if (token == null) {
-        showDialog(
-            context: context,
-            builder: (context) {
-              return const AlertDialog(
-                  title: Text('Can not retreive device token'));
-            });
-      } else {
-        Firestore.setFcmTokenAndNotificationStatus(
-            uid: widget.user.uid, token: token);
-      }
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     authUser = context.watch<AuthUser?>();
-    
 
     return FutureBuilder(
         future: Firestore.getFriendInfoList(authUser!.uid),
@@ -153,5 +123,26 @@ class _MainViewState extends State<MainView> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    map = etoet.Map('GoogleMap');
+    map.context = context;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      var token = await NotificationHandler.notificatioToken;
+      if (token == null) {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return const AlertDialog(
+                  title: Text('Can not retreive device token'));
+            });
+      } else {
+        Firestore.setFcmTokenAndNotificationStatus(
+            uid: authUser!.uid, token: token);
+      }
+    });
   }
 }
