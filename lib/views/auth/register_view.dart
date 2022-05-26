@@ -1,10 +1,10 @@
-// ignore_for_file: prefer_const_constructors
 
 import 'dart:developer' as devtools show log;
 
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/auth_exceptions.dart';
 import 'package:etoet/services/auth/auth_service.dart';
+import 'package:etoet/views/auth/verified_email_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pw_validator/flutter_pw_validator.dart';
 
@@ -268,7 +268,16 @@ class _RegisterViewState extends State<RegisterView> {
                             setState(() {});
 
                             AuthService.firebase().sendEmailVerification();
-                            Navigator.of(context).pushNamed(verifyEmailRoute);
+
+                            /* Navigator.of(context).pushNamed(verifyEmailRoute); */
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => VerifyEmailView(
+                                  user: user,
+                                ),
+                              ),
+                            );
                           } on EmailAlreadyInUsedAuthException {
                             devtools.log('email already in use');
                             emailAlreadyInUse = true;

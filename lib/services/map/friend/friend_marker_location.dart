@@ -1,6 +1,6 @@
 import 'dart:ui' as ui;
 
-import 'package:etoet/services/auth/user_info.dart';
+import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:etoet/services/map/osrm/routing.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -10,22 +10,20 @@ import '../marker/marker.dart';
 /// This class is used to create a marker for a friend
 class FriendMarker {
   static Routing routing = Routing.getInstance();
-  late UserInfo info;
-  late Future<BitmapDescriptor> icon =
-      GoogleMapMarker.getIconFromUrl(info.photoURL ?? 'assets/images/Anya.png');
 
-  Future<Marker> createFriendMarker(
-      LatLng friendLatLng,
-      String uid,
-      UserInfo userInfo,
-      BuildContext context,
-      Set<Polyline> polylineList) async {
+  Future<Marker> createFriendMarker({
+    required LatLng friendLatLng,
+    required BuildContext context,
+    required Set<Polyline> polylineList,
+    required etoet.UserInfo friendInfo,
+  }) async {
+    late var icon = GoogleMapMarker.getIconFromUrl(friendInfo.photoURL!);
     return Marker(
-      markerId: MarkerId(uid),
+      markerId: MarkerId(friendInfo.uid),
       position: friendLatLng,
       icon: await icon,
       infoWindow: InfoWindow(
-        title: userInfo.displayName,
+        title: friendInfo.displayName,
         snippet: 'Tap to see friend\'s location',
       ),
       onTap: () {
@@ -49,7 +47,7 @@ class FriendMarker {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      uid,
+                      friendInfo.displayName ?? 'Etoet User',
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -75,7 +73,7 @@ class FriendMarker {
                           fixedSize: const Size(320, 50),
                         ),
                         child: Text(
-                          'Show direction to $uid',
+                          'Show direction to ${friendInfo.displayName}',
                           style:
                               const TextStyle(fontWeight: ui.FontWeight.bold),
                         ),

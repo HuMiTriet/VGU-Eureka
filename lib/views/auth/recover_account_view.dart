@@ -50,7 +50,7 @@ class _RecoverAccountViewState extends State<RecoverAccountView> {
             'Enter your registered email below to recieve password instruction',
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 20,
+              fontSize: 15,
               fontWeight: FontWeight.w300,
               color: Colors.grey,
             ),
