@@ -4,6 +4,7 @@ import 'package:etoet/services/database/firestore.dart';
 import 'package:etoet/services/map/map_factory.dart' as etoet;
 import 'package:etoet/services/notification/notification.dart';
 import 'package:etoet/views/friend/friend_view.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
@@ -99,7 +100,7 @@ class MainViewState extends State<MainView> {
                   FloatingActionButton(
                       heroTag: 'goToSOSFromMain',
                       onPressed: () {
-                    Firestore.setEmergencySignal(uid: authUser!.uid);
+                        Firestore.setEmergencySignal(uid: authUser!.uid);
                       },
                       child: const Icon(Icons.add_alert)),
                   FloatingActionButton(
@@ -144,6 +145,15 @@ class MainViewState extends State<MainView> {
       } else {
         Firestore.setFcmTokenAndNotificationStatus(
             uid: authUser!.uid, token: token);
+        FirebaseMessaging.onMessage.listen((event) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                return const AlertDialog(
+                  title: Text('EMERGENCY'),
+                );
+              });
+        });
       }
     });
   }
