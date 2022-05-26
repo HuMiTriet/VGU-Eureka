@@ -224,11 +224,11 @@ class Firestore {
   static StreamSubscription<QuerySnapshot<Map<String, dynamic>>>
       pendingFriendRequestReceiverListener(String uid, BuildContext context) {
     var subscriber = firestoreReference
-        .collection("users")
+        .collection('users')
         .doc(uid)
         .collection('friends')
-        .where("isSender", isEqualTo: false)
-        .where("requestConfirmed", isEqualTo: false)
+        .where('isSender', isEqualTo: false)
+        .where('requestConfirmed', isEqualTo: false)
         .snapshots()
         .listen((querySnapshot) {
       for (var i = 0; i < querySnapshot.docChanges.length; ++i) {
@@ -251,11 +251,11 @@ class Firestore {
   static StreamSubscription<QuerySnapshot<Map<String, dynamic>>>
       pendingFriendRequestSenderListener(String uid, BuildContext context) {
     var subscriber = firestoreReference
-        .collection("users")
+        .collection('users')
         .doc(uid)
         .collection('friends')
-        .where("isSender", isEqualTo: true)
-        .where("requestConfirmed", isEqualTo: false)
+        .where('isSender', isEqualTo: true)
+        .where('requestConfirmed', isEqualTo: false)
         .snapshots()
         .listen((querySnapshot) {
       for (var i = 0; i < querySnapshot.docChanges.length; ++i) {

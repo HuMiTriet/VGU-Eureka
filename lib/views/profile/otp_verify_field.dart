@@ -1,13 +1,19 @@
-import 'dart:html';
+import 'dart:developer' as devtools show log;
 
+import 'package:etoet/constants/routes.dart';
+import 'package:etoet/services/auth/auth_provider.dart';
+import 'package:etoet/services/auth/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../services/auth/auth_user.dart';
+import '../../services/database/firestore.dart';
 
 class OTPVerifyView extends StatefulWidget {
+  final AuthUser authUser;
+
   const OTPVerifyView({
     Key? key,
-    required AuthUser authUser,
+    required this.authUser,
   }) : super(key: key);
 
   @override
@@ -19,6 +25,8 @@ class _OTPVerifyViewState extends State<OTPVerifyView> {
   late TextEditingController _controller2;
   late TextEditingController _controller3;
   late TextEditingController _controller4;
+  late TextEditingController _controller5;
+  late TextEditingController _controller6;
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +81,11 @@ class _OTPVerifyViewState extends State<OTPVerifyView> {
                       _textFieldOTP(
                           first: false, last: false, controller: _controller3),
                       _textFieldOTP(
-                          first: false, last: true, controller: _controller4),
+                          first: false, last: false, controller: _controller4),
+                      _textFieldOTP(
+                          first: false, last: false, controller: _controller5),
+                      _textFieldOTP(
+                          first: false, last: true, controller: _controller6),
                     ],
                   ),
                   const SizedBox(
@@ -82,7 +94,11 @@ class _OTPVerifyViewState extends State<OTPVerifyView> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        final smsCode =
+                            '${_controller1.text}${_controller2.text}${_controller3.text}${_controller4.text}${_controller5.text}${_controller6.text}';
+                        await verifyPhoneNumber(smsCode);
+                      },
                       style: ButtonStyle(
                         foregroundColor:
                             MaterialStateProperty.all<Color>(Colors.white),
@@ -177,6 +193,40 @@ class _OTPVerifyViewState extends State<OTPVerifyView> {
     );
   }
 
+  Future<void> verifyPhoneNumber(String smsCode) async {
+    devtools.log('smsCode: $smsCode');
+    await AuthService.firebase().verifyPhoneNumber(
+        phoneNumber: '+84' + widget.authUser.phoneNumber!,
+        verificationCompleted: (credential) async {
+          await Firestore.updateUserInfo(
+            widget.authUser,
+          );
+          Navigator.of(context).pushNamed(profileRoute);
+        },
+        verificationFailed: (exception) {
+          if (exception.code == 'invalid-phone-number') {
+            devtools.log('The provided phone number is not valid.');
+          } else if (exception.code == 'invalid-verification-code') {
+            devtools.log('The verification code entered was invalid');
+          }
+        },
+        codeSent: (verificationId, resendToken) async {
+          devtools.log('codeSent: $verificationId, $resendToken');
+          var credential = PhoneAuthProvider.credential(
+              verificationId: verificationId, smsCode: smsCode);
+          var userCred = FirebaseAuth.instance.signInWithCredential(credential);
+          userCred.then((value) async {
+            await Firestore.updateUserInfo(
+              widget.authUser,
+            );
+            Navigator.of(context).pushNamed(profileRoute);
+          });
+        },
+        codeAutoRetrievalTimeout: (verificationId) {
+          devtools.log('codeAutoRetrievalTimeout: $verificationId');
+        });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -184,6 +234,8 @@ class _OTPVerifyViewState extends State<OTPVerifyView> {
     _controller2 = TextEditingController();
     _controller3 = TextEditingController();
     _controller4 = TextEditingController();
+    _controller5 = TextEditingController();
+    _controller6 = TextEditingController();
   }
 
   @override
@@ -192,6 +244,8 @@ class _OTPVerifyViewState extends State<OTPVerifyView> {
     _controller2.dispose();
     _controller3.dispose();
     _controller4.dispose();
+    _controller5.dispose();
+    _controller6.dispose();
     super.dispose();
   }
 }

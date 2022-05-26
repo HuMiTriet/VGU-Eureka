@@ -5,7 +5,11 @@ import 'package:etoet/services/auth/auth_exceptions.dart';
 import 'package:etoet/services/auth/auth_provider.dart';
 import 'package:etoet/services/auth/auth_user.dart';
 import 'package:firebase_auth/firebase_auth.dart'
-    show EmailAuthProvider, FirebaseAuth, FirebaseAuthException;
+    show
+        EmailAuthProvider,
+        FirebaseAuth,
+        FirebaseAuthException,
+        PhoneAuthCredential;
 import 'package:firebase_core/firebase_core.dart';
 
 class FirebaseAuthProvider implements AuthProvider {
@@ -184,5 +188,20 @@ class FirebaseAuthProvider implements AuthProvider {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+  }
+
+  @override
+  Future<void> verifyPhoneNumber(
+      {required String phoneNumber,
+      required void Function(PhoneAuthCredential) verificationCompleted,
+      required void Function(FirebaseAuthException) verificationFailed,
+      required void Function(String, int?) codeSent,
+      required void Function(String) codeAutoRetrievalTimeout}) async {
+    await FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: phoneNumber,
+        verificationCompleted: verificationCompleted,
+        verificationFailed: verificationFailed,
+        codeSent: codeSent,
+        codeAutoRetrievalTimeout: codeAutoRetrievalTimeout);
   }
 }

@@ -1,17 +1,20 @@
 // ignore_for_file: prefer_const_constructors
 import 'dart:developer' as devtools show log;
 
+import 'package:etoet/services/auth/auth_service.dart';
 import 'package:etoet/services/auth/auth_user.dart';
 import 'package:etoet/views/profile/otp_verify_field.dart';
 import 'package:etoet/views/profile/verification_view.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ChangePhoneNumberPage extends VerificationView {
+  final String title;
+  final AuthUser user;
+
   const ChangePhoneNumberPage({
     Key? key,
-    required String title,
-    required AuthUser user,
+    required this.title,
+    required this.user,
   }) : super(
           key: key,
           title: title,
@@ -24,6 +27,7 @@ class ChangePhoneNumberPage extends VerificationView {
 
 class _ChangePhoneNumberPageState extends State<ChangePhoneNumberPage> {
   late TextEditingController _phoneNumber;
+
   @override
   Widget build(BuildContext context) {
     // throw UnimplementedError();

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:etoet/services/database/firestore.dart';
