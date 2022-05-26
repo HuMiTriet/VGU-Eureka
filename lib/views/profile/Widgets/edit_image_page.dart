@@ -23,7 +23,7 @@ class _EditImagePageState extends State<EditImagePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('upload image')),
+      appBar: AppBar(title: const Text('upload image')),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -38,7 +38,7 @@ class _EditImagePageState extends State<EditImagePage> {
                 ),
               )),
           Padding(
-              padding: EdgeInsets.only(top: 20),
+              padding: const EdgeInsets.only(top: 20),
               child: SizedBox(
                   width: 330,
                   child: GestureDetector(
@@ -62,7 +62,7 @@ class _EditImagePageState extends State<EditImagePage> {
                               ),
                             )))),
           Padding(
-              padding: EdgeInsets.only(top: 40),
+              padding: const EdgeInsets.only(top: 40),
               child: Align(
                   alignment: Alignment.bottomCenter,
                   child: SizedBox(
@@ -72,9 +72,9 @@ class _EditImagePageState extends State<EditImagePage> {
                       onPressed: () async {
                         if (image == null) return;
 
-                        final _firebaseStorage = FirebaseStorage.instance;
+                        final firebaseStorage = FirebaseStorage.instance;
                         try {
-                          var snapshot = await _firebaseStorage
+                          var snapshot = await firebaseStorage
                               .ref()
                               .child('images/${widget.user.uid}}')
                               .putFile(image!);

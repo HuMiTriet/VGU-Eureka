@@ -20,6 +20,6 @@
 
 [Authentication](./documentation/Authentication_architecture.md)
 
-#Table of content 
+# Table of content 
 1. [Authentication](./documentation/Authentication_architecture.md)
 2. [Backend]()

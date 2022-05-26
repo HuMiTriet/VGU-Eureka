@@ -9,9 +9,8 @@ import '../auth/user_info.dart' as etoet;
 
 class Firestore {
   static final firestoreReference = FirebaseFirestore.instance;
-  Firestore._();
 
-  late AuthUser user;
+  Firestore._();
 
   static void addUserInfo(AuthUser user) {
     firestoreReference.collection('users').doc(user.uid).set(
@@ -19,8 +18,22 @@ class Firestore {
         'uid': user.uid,
         'email': user.email,
         'displayName': user.displayName,
-        'photoUrl': user.photoURL ??
-            'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977',
+        'photoUrl': user.photoURL,
+      },
+    );
+  }
+
+  static void setFcmTokenAndNotificationStatus(
+      {required String uid, required String token}) {
+    firestoreReference
+        .collection('users')
+        .doc(uid)
+        .collection('notification')
+        .doc('fcm_token')
+        .set(
+      {
+        'enable_notification': true,
+        'fcm_token': token,
       },
     );
   }
