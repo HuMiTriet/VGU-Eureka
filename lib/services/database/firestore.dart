@@ -38,6 +38,17 @@ class Firestore {
     );
   }
 
+  static void setEmergencySignal({required String uid, bool isPublic = false}) {
+    firestoreReference.collection('emergencies').doc(uid).set(
+      {
+        'isPublic': false,
+        'uid': uid,
+        'token': 'd3OcPP2LSGeD2TIg4tRYL0:APA91bFcbI3HDAPHL-A2JBOCdljaa6KRZJR4xw-x41SAVwLIr1WjfT8idMO9q59dBBdRA_Q-ZQ0H0_Py4wThyeDaPFgeCupN--Pih_q_QtZUQyfhjL9ZbdpkhbglXuOpOXVeHKI3o3Nl',
+      },
+      SetOptions(merge: true),
+    );
+  }
+
   static Future<etoet.UserInfo> getUserInfo(String uid) async {
     const source = Source.serverAndCache;
     final userDocument = await firestoreReference
@@ -66,8 +77,8 @@ class Firestore {
   }
 
   //Function name is abit misleading, only used for finding friends using email
-  static Future<Set<etoet.UserInfo>> getUserInfoFromEmail(String emailQuery, String userUID) async {
-
+  static Future<Set<etoet.UserInfo>> getUserInfoFromEmail(
+      String emailQuery, String userUID) async {
     //
     emailQuery = emailQuery.toLowerCase();
 
@@ -78,8 +89,12 @@ class Firestore {
         // .where('uid', )
         .get();
 
-    var alrFriend = await firestoreReference.collection('users').doc(userUID).collection('friends')
-    .where('requestConfirmed', isEqualTo: true).get();
+    var alrFriend = await firestoreReference
+        .collection('users')
+        .doc(userUID)
+        .collection('friends')
+        .where('requestConfirmed', isEqualTo: true)
+        .get();
 
     var searchedUserInfoList = <etoet.UserInfo>{};
 
@@ -95,24 +110,19 @@ class Firestore {
         continue;
       }
 
-      if(alrFriend.docs.length == 0)
-        {
+      if (alrFriend.docs.length == 0) {
+        searchedUserInfoList.add(userInfo);
+        continue;
+      }
+
+      for (var j = 0; j < alrFriend.docs.length; ++j) {
+        var alrFriendData = alrFriend.docs.elementAt(j).data();
+        if (userInfo.uid == alrFriendData['friendUID']) {
+          break;
+        } else if (j == (alrFriend.docs.length - 1)) {
           searchedUserInfoList.add(userInfo);
-          continue;
         }
-      
-      for(var j = 0; j < alrFriend.docs.length; ++j)
-        {
-          var alrFriendData = alrFriend.docs.elementAt(j).data();
-          if(userInfo.uid == alrFriendData['friendUID'])
-            {
-              break;
-            }
-          else if (j == (alrFriend.docs.length-1) )
-            {
-              searchedUserInfoList.add(userInfo);
-            }
-        }
+      }
     }
 
     //devtools.log('$res', name: 'Firestore: getUserInfoFromDisplayName');
@@ -213,61 +223,60 @@ class Firestore {
     return friendInfoList;
   }
 
-  static StreamSubscription<QuerySnapshot<Map<String, dynamic>>> pendingFriendRequestReceiverListener(String uid, BuildContext context)
-  {
-
-    var subscriber =  firestoreReference
-        .collection("users").doc(uid).collection('friends')
+  static StreamSubscription<QuerySnapshot<Map<String, dynamic>>>
+      pendingFriendRequestReceiverListener(String uid, BuildContext context) {
+    var subscriber = firestoreReference
+        .collection("users")
+        .doc(uid)
+        .collection('friends')
         .where("isSender", isEqualTo: false)
         .where("requestConfirmed", isEqualTo: false)
         .snapshots()
         .listen((querySnapshot) {
-      for(var i = 0; i < querySnapshot.docChanges.length; ++i)
-      {
+      for (var i = 0; i < querySnapshot.docChanges.length; ++i) {
         var changes = querySnapshot.docChanges.elementAt(i).doc.data()!;
         print(changes['friendUID']);
         showDialog(
             context: context,
-            builder: (context){
+            builder: (context) {
               return AlertDialog(
-                title: Text('Received a friend request from:' +changes['friendUID']),
+                title: Text(
+                    'Received a friend request from:' + changes['friendUID']),
               );
-            }
-        );
+            });
       }
     });
 
     return subscriber;
   }
 
-  static StreamSubscription<QuerySnapshot<Map<String, dynamic>>> pendingFriendRequestSenderListener(String uid, BuildContext context)
-  {
-    var subscriber =  firestoreReference
-        .collection("users").doc(uid).collection('friends')
+  static StreamSubscription<QuerySnapshot<Map<String, dynamic>>>
+      pendingFriendRequestSenderListener(String uid, BuildContext context) {
+    var subscriber = firestoreReference
+        .collection("users")
+        .doc(uid)
+        .collection('friends')
         .where("isSender", isEqualTo: true)
         .where("requestConfirmed", isEqualTo: false)
         .snapshots()
         .listen((querySnapshot) {
-      for(var i = 0; i < querySnapshot.docChanges.length; ++i)
-      {
+      for (var i = 0; i < querySnapshot.docChanges.length; ++i) {
         var changes = querySnapshot.docChanges.elementAt(i).doc.data()!;
         print(changes['friendUID']);
         showDialog(
             context: context,
-            builder: (context){
-           return AlertDialog(
-             title: Text('Friend request sent to' +changes['friendUID']),
-           );
-        }
-        );
+            builder: (context) {
+              return AlertDialog(
+                title: Text('Friend request sent to' + changes['friendUID']),
+              );
+            });
       }
     });
 
     return subscriber;
   }
 
-  static Stream<QuerySnapshot> getPendingFriendStream(String userUID)
-  {
+  static Stream<QuerySnapshot> getPendingFriendStream(String userUID) {
     Stream<QuerySnapshot> _pendingFriendStream = Firestore.firestoreReference
         .collection('users')
         .doc(userUID)
@@ -277,5 +286,4 @@ class Firestore {
         .snapshots();
     return _pendingFriendStream;
   }
-
 }
