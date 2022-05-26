@@ -158,6 +158,8 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
       var location = LatLng(position.latitude, position.longitude);
       widget._location = location;
       Routing.location = location;
+      widget._markers.removeWhere(
+          (element) => element.markerId == MarkerId(widget.authUser!.uid));
       widget._markers.add(Marker(
           markerId: MarkerId(widget.authUser!.uid),
           position: location,
@@ -253,7 +255,7 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
                 },
                 markers: widget._markers.toSet(),
                 polylines: widget._polylines,
-                // myLocationEnabled: true,
+                myLocationEnabled: true,
                 zoomControlsEnabled: false,
                 myLocationButtonEnabled: false,
                 mapToolbarEnabled: false,
