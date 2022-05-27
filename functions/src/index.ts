@@ -11,43 +11,55 @@ const fcm = admin.messaging();
 export const sendPrivateNotification = functions.region("asia-southeast1").
     firestore.document("/emergencies/{userId}")
     .onCreate(async (snapshot, context) => {
+      // getting the regerence pointing at the user friend collection
       const userFriendsRef = db.collection("users")
           .doc(context.params.userId).collection("friends");
-
+      // getting all of the user's friends collection (database query require
+      // async interaction with the database)
       try {
-        const userFriendsSnapshot = await userFriendsRef.get();
-        const tokensPromises: Promise<DocumentSnapshot>[] = [];
-        userFriendsSnapshot.forEach((doc) => {
-          const p = db.collection("users").doc(doc.data().friendUID).get();
-          tokensPromises.push(p);
+        // The usage of async here is because a user can potential have a lot
+        // of frriends
+        const userFriendCollectionSnapshot = await userFriendsRef.get();
+        // Store each of the user's friend promise into an array, for each
+        // of the friend where query the database again for their fcm token
+        const friendFcmTokenPromises: Promise<DocumentSnapshot>[] = [];
+        // query the user friend collection for the uid -> find the fcm token
+        userFriendCollectionSnapshot.forEach(async (oneFriend) => {
+          const oneFcmToken = db.collection("users")
+              .doc(oneFriend.data().friendUID)
+              .collection("notification")
+              .doc("fcm_token")
+              .get();
+          friendFcmTokenPromises.push(oneFcmToken);
         });
-
-        const tokensSnapshot = await Promise.all(tokensPromises);
-
-        const tokens: string[] = [];
-        tokensSnapshot.forEach((doc) => {
-          if (doc.exists) {
-            tokens.push(doc.data().token);
+        const tokenSnapshot = await Promise.all(friendFcmTokenPromises);
+        const token: string[] = [];
+        tokenSnapshot.forEach((oneFcmTokenSnapshot) => {
+          if (oneFcmTokenSnapshot.data()?.enable_notification) {
+            token.push(oneFcmTokenSnapshot.data()?.token);
           }
-
+        });
         const payload = {
           notification: {
             title: "Emergency Alert",
             body: "Someone is in danger",
-            icon: "https://goo.gl/Fz9nrQ"
-          }
+          },
         };
-
-        return fcm.sendToDevice(tokens, payload);
+        return fcm.sendToDevice(token, payload);
       } catch (error) {
-        console.error(error);
-        const error_payload = {
+        // get the sender token
+        const senderRef = db.collection("users")
+            .doc(context.params.userId)
+            .collection("notification")
+            .doc("fcm_token");
+        const senderTokenSnapshot = await senderRef.get();
+        const token = senderTokenSnapshot.data()?.fcm_token;
+        const errorPayload = {
           notification: {
-            title: "Error",
-            body: "Something went wrong",
-            icon: "https://goo.gl/Fz9nrQ"
+            title: "Sorry we couldn't proccess your request",
+            body: "Please try again after a short few miniute",
+          },
+        };
+        return fcm.sendToDevice(token, errorPayload);
       }
-    }
-      }
-
     });
