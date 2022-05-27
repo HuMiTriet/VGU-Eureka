@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:etoet/services/auth/auth_service.dart';
 import 'package:etoet/services/auth/auth_user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -103,8 +104,8 @@ class _EditImagePageState extends State<EditImagePage> {
 
                         if (imageUrl != null) {
                           log('image url: ' + imageUrl);
-                          FirebaseAuth.instance.currentUser
-                              ?.updatePhotoURL(imageUrl);
+                          AuthService.firebase().updatePhotoURL(imageUrl);
+
                           ScaffoldMessenger.of(context)
                               .showSnackBar(_updateSuccessSnackBar);
                         } else {
