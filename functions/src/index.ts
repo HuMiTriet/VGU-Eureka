@@ -36,7 +36,8 @@ export const sendPrivateNotification = functions.region("asia-southeast1").
         const token: string[] = [];
         tokenSnapshot.forEach((oneFcmTokenSnapshot) => {
           if (oneFcmTokenSnapshot.data()?.enable_notification) {
-            token.push(oneFcmTokenSnapshot.data()?.token);
+            token.push(oneFcmTokenSnapshot.data()?.fcm_token);
+            console.log(oneFcmTokenSnapshot.data()?.fcm_token);
           }
         });
         const payload = {
@@ -45,6 +46,7 @@ export const sendPrivateNotification = functions.region("asia-southeast1").
             body: "Someone is in danger",
           },
         };
+        console.log("SOS PRIVATE SENT SUCCESSFULLY");
         return fcm.sendToDevice(token, payload);
       } catch (error) {
         // get the sender token
@@ -60,6 +62,7 @@ export const sendPrivateNotification = functions.region("asia-southeast1").
             body: "Please try again after a short few miniute",
           },
         };
+        console.log("SOS PRIVATE ERROR");
         return fcm.sendToDevice(token, errorPayload);
       }
     });
