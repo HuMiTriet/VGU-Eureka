@@ -74,9 +74,13 @@ class _FriendViewState extends State<FriendView> {
   // final int topListViewFlex = 39;
   // final int bottomListViewFlex = 100;
 
+
+  late StreamSubscription<QuerySnapshot<Map<String, dynamic>>> acceptedListener;
   @override
   Widget build(BuildContext context) {
     user = context.watch<AuthUser>();
+    acceptedListener = Firestore.acceptedFriendRequestReceiverListener(user.uid, context);
+
 
     //Listener & Stream related
     late Stream<QuerySnapshot> _pendingFriendStream;
@@ -255,5 +259,6 @@ class _FriendViewState extends State<FriendView> {
   @override
   void dispose() {
     super.dispose();
+    acceptedListener.cancel();
   }
 }

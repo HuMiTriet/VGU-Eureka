@@ -1,8 +1,9 @@
 import 'dart:async';
+import 'dart:developer' as devtools show log;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+
 
 import '../auth/auth_user.dart';
 import '../auth/user_info.dart' as etoet;
@@ -204,9 +205,9 @@ class Firestore {
   {
 
     var subscriber =  firestoreReference
-        .collection("users").doc(uid).collection('friends')
-        .where("isSender", isEqualTo: false)
-        .where("requestConfirmed", isEqualTo: false)
+        .collection('users').doc(uid).collection('friends')
+        .where('isSender', isEqualTo: false)
+        .where('requestConfirmed', isEqualTo: false)
         .snapshots()
         .listen((querySnapshot) {
       for(var i = 0; i < querySnapshot.docChanges.length; ++i)
@@ -226,6 +227,42 @@ class Firestore {
 
     return subscriber;
   }
+
+  static StreamSubscription<QuerySnapshot<Map<String, dynamic>>> acceptedFriendRequestReceiverListener(String uid, BuildContext context)
+  {
+
+    var subscriber =  firestoreReference
+        .collection('users').doc(uid).collection('friends')
+        //.where('isSender', isEqualTo: false)
+        .snapshots(includeMetadataChanges: true)
+        .listen((querySnapshot) {
+          for(var change in querySnapshot.docChanges )
+            {
+              if(change.type == DocumentChangeType.added)
+                {
+                  final source = (querySnapshot.metadata.isFromCache) ? "local cache" : "server";
+                  var data = change.doc.data() as Map<String, dynamic>;
+                  print('Added! ' + data['friendUID'] + 'fetched from ' + source);
+                }
+              else if(change.type == DocumentChangeType.modified)
+              {
+                final source = (querySnapshot.metadata.isFromCache) ? "local cache" : "server";
+                var data = change.doc.data() as Map<String, dynamic>;
+                print('Modified! ' + data['friendUID'] + 'fetched from ' + source);
+              }
+              else if(change.type == DocumentChangeType.removed)
+              {
+                final source = (querySnapshot.metadata.isFromCache) ? "local cache" : "server";
+                var data = change.doc.data() as Map<String, dynamic>;
+                print('Removed! ' + data['friendUID'] + 'fetched from ' + source);
+              }
+            }
+
+        });
+
+    return subscriber;
+  }
+
 
   static StreamSubscription<QuerySnapshot<Map<String, dynamic>>> pendingFriendRequestSenderListener(String uid, BuildContext context)
   {
