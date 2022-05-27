@@ -12,6 +12,13 @@ class OTPVerifyView extends StatefulWidget {
 }
 
 class _OTPVerifyViewState extends State<OTPVerifyView> {
+  var OTP_controller_1 = TextEditingController();
+  var OTP_controller_2 = TextEditingController();
+  var OTP_controller_3 = TextEditingController();
+  var OTP_controller_4 = TextEditingController();
+  var OTP_controller_5 = TextEditingController();
+  var OTP_controller_6 = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,12 +65,30 @@ class _OTPVerifyViewState extends State<OTPVerifyView> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _textFieldOTP(first: true, last: false),
-                      _textFieldOTP(first: false, last: false),
-                      _textFieldOTP(first: false, last: false),
-                      _textFieldOTP(first: false, last: false),
-                      _textFieldOTP(first: false, last: false),
-                      _textFieldOTP(first: false, last: true),
+                      _textFieldOTP(
+                          first: true,
+                          last: false,
+                          controller: OTP_controller_1),
+                      _textFieldOTP(
+                          first: false,
+                          last: false,
+                          controller: OTP_controller_2),
+                      _textFieldOTP(
+                          first: false,
+                          last: false,
+                          controller: OTP_controller_3),
+                      _textFieldOTP(
+                          first: false,
+                          last: false,
+                          controller: OTP_controller_4),
+                      _textFieldOTP(
+                          first: false,
+                          last: false,
+                          controller: OTP_controller_5),
+                      _textFieldOTP(
+                          first: false,
+                          last: true,
+                          controller: OTP_controller_6),
                     ],
                   ),
                   SizedBox(
@@ -127,12 +152,16 @@ class _OTPVerifyViewState extends State<OTPVerifyView> {
     );
   }
 
-  Widget _textFieldOTP({required bool first, required bool last}) {
+  Widget _textFieldOTP(
+      {required bool first,
+      required bool last,
+      required TextEditingController controller}) {
     return Container(
       height: 65,
       child: AspectRatio(
         aspectRatio: 1.0,
         child: TextField(
+          controller: controller,
           autofocus: true,
           onChanged: (value) {
             if (value.length == 1 && last == false) {
