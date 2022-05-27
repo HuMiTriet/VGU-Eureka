@@ -55,7 +55,7 @@ class _OTPVerifyViewState extends State<OTPVerifyView> {
               height: 28,
             ),
             Container(
-              padding: EdgeInsets.all(28),
+              padding: EdgeInsets.all(5),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
@@ -157,7 +157,7 @@ class _OTPVerifyViewState extends State<OTPVerifyView> {
       required bool last,
       required TextEditingController controller}) {
     return Container(
-      height: 65,
+      height: 50,
       child: AspectRatio(
         aspectRatio: 1.0,
         child: TextField(
