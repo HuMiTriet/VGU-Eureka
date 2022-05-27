@@ -22,24 +22,12 @@ class Firestore {
     );
   }
 
-  static Future<void> updateUserInfo(AuthUser authUser) async {
-    final userDocument = await firestoreReference
-        .collection('users')
-        .where('uid', isEqualTo: authUser.uid)
-        .get(const GetOptions(source: Source.serverAndCache));
-    final userData = userDocument.docs.first.data();
-    final userInfo = etoet.UserInfo(
-      uid: userData['uid'],
-      email: userData['email'],
-      displayName: userData['displayName'],
-      photoURL: userData['photoUrl'],
-      phoneNumber: userData['phoneNumber'],
-    );
-    await firestoreReference.collection('users').doc(authUser.uid).update({
-      'email': userInfo.email,
-      'displayName': userInfo.displayName,
-      'photoUrl': userInfo.photoURL,
-      'phoneNumber': userInfo.phoneNumber,
+  static void updateUserInfo(AuthUser authUser) async {
+    firestoreReference.collection('users').doc(authUser.uid).update({
+      'email': authUser.email,
+      'displayName': authUser.displayName,
+      'photoUrl': authUser.photoURL,
+      'phoneNumber': authUser.phoneNumber,
     });
   }
 

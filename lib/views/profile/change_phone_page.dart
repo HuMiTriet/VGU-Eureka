@@ -93,7 +93,7 @@ class _ChangePhoneNumberPageState extends State<ChangePhoneNumberPage> {
                     showLoading = true;
                   });
                   await AuthService.firebase().verifyPhoneNumber(
-                      phoneNumber: '+84' + _phoneNumber.text,
+                      phoneNumber: '+84${_phoneNumber.text}',
                       verificationCompleted: (phoneAuthCredential) async {
                         setState(() {
                           showLoading = false;
@@ -230,7 +230,7 @@ class _ChangePhoneNumberPageState extends State<ChangePhoneNumberPage> {
                               isEmailVerified: widget.user.isEmailVerified,
                               uid: widget.user.uid,
                               email: widget.user.email,
-                              phoneNumber: _phoneNumber.text,
+                              phoneNumber: '+84${_phoneNumber.text}',
                               displayName: widget.user.displayName,
                               photoURL: widget.user.photoURL,
                             );
