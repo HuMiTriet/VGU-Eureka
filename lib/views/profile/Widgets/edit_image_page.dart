@@ -18,6 +18,14 @@ class EditImagePage extends StatefulWidget {
 }
 
 class _EditImagePageState extends State<EditImagePage> {
+  final _updateFailSnackBar = const SnackBar(
+    content: Text('Update Image Failed.'),
+  );
+
+  final _updateSuccessSnackBar = const SnackBar(
+    content: Text('Image Updated.'),
+  );
+
   File? image;
   var imageUrl;
   @override
@@ -73,22 +81,37 @@ class _EditImagePageState extends State<EditImagePage> {
                         if (image == null) return;
 
                         final _firebaseStorage = FirebaseStorage.instance;
+                        var snapshot;
                         try {
-                          var snapshot = await _firebaseStorage
+                          snapshot = await _firebaseStorage
                               .ref()
                               .child('images/${widget.user.uid}')
                               .putFile(image!);
                           log(widget.user.uid);
+                        } on FirebaseException catch (e) {
+                          log('${e.message}');
+                        }
+
+                        try {
                           var downloadUrl = await snapshot.ref.getDownloadURL();
                           setState(() {
                             imageUrl = downloadUrl;
                           });
-                        } on FirebaseException catch (e) {}
-                        log('image url: ' + imageUrl);
-                        Navigator.pop(context);
+                        } on FirebaseException catch (e) {
+                          log('${e.message}');
+                        }
 
-                        FirebaseAuth.instance.currentUser
-                            ?.updatePhotoURL(imageUrl);
+                        if (imageUrl != null) {
+                          log('image url: ' + imageUrl);
+                          FirebaseAuth.instance.currentUser
+                              ?.updatePhotoURL(imageUrl);
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(_updateSuccessSnackBar);
+                        } else {
+                          log('fail to update image');
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(_updateFailSnackBar);
+                        }
                       },
                       child: const Text(
                         'Update',
