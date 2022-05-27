@@ -185,4 +185,27 @@ class FirebaseAuthProvider implements AuthProvider {
       options: DefaultFirebaseOptions.currentPlatform,
     );
   }
+
+  @override
+  Future<void> updatePhotoURL(String url) async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      await user.updatePhotoURL(url);
+    } else {
+      // you can not send verification email if you are not logged in.
+      throw UserNotLoggedInAuthException();
+    }
+  }
+
+  @override
+  Future<void> updateDisplayName(String name) async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      await user.updateDisplayName(name);
+    } else {
+      throw UserNotLoggedInAuthException();
+    }
+  }
 }

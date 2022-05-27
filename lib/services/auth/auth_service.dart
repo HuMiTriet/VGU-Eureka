@@ -68,4 +68,11 @@ class AuthService implements AuthProvider {
   @override
   Future<bool> validateEnteredPassword(String password) async =>
       provider.validateEnteredPassword(password);
+
+  @override
+  Future<void> updatePhotoURL(String url) => provider.updatePhotoURL(url);
+
+  @override
+  Future<void> updateDisplayName(String name) =>
+      provider.updateDisplayName(name);
 }
