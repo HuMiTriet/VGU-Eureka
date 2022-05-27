@@ -76,7 +76,7 @@ class _EditImagePageState extends State<EditImagePage> {
                         try {
                           var snapshot = await _firebaseStorage
                               .ref()
-                              .child('images/${widget.user.uid}}')
+                              .child('images/${widget.user.uid}')
                               .putFile(image!);
                           log(widget.user.uid);
                           var downloadUrl = await snapshot.ref.getDownloadURL();
