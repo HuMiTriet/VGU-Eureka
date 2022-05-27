@@ -2,16 +2,14 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../auth/auth_user.dart';
 import '../auth/user_info.dart' as etoet;
 
 class Firestore {
   static final firestoreReference = FirebaseFirestore.instance;
-  Firestore._();
 
-  late AuthUser user;
+  Firestore._();
 
   static void addUserInfo(AuthUser user) {
     firestoreReference.collection('users').doc(user.uid).set(
@@ -19,9 +17,7 @@ class Firestore {
         'uid': user.uid,
         'email': user.email,
         'displayName': user.displayName,
-        'photoUrl': user.photoURL ??
-            'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977',
-        'phoneNumber': user.phoneNumber,
+        'photoUrl': user.photoURL,
       },
     );
   }
@@ -45,6 +41,31 @@ class Firestore {
       'photoUrl': userInfo.photoURL,
       'phoneNumber': userInfo.phoneNumber,
     });
+  }
+
+  static void setFcmTokenAndNotificationStatus(
+      {required String uid, required String token}) {
+    firestoreReference
+        .collection('users')
+        .doc(uid)
+        .collection('notification')
+        .doc('fcm_token')
+        .set(
+      {
+        'enable_notification': true,
+        'fcm_token': token,
+      },
+    );
+  }
+
+  static void setEmergencySignal({required String uid, bool isPublic = false}) {
+    firestoreReference.collection('emergencies').doc(uid).set(
+      {
+        'isPublic': false,
+        'uid': uid,
+      },
+      SetOptions(merge: true),
+    );
   }
 
   static Future<etoet.UserInfo> getUserInfo(String uid) async {
@@ -83,7 +104,7 @@ class Firestore {
     var res = await firestoreReference
         .collection('users')
         .where('email', isGreaterThanOrEqualTo: emailQuery)
-        .where('email', isLessThanOrEqualTo: emailQuery + '\uf8ff')
+        .where('email', isLessThanOrEqualTo: '$emailQuery\uf8ff')
         // .where('uid', )
         .get();
 
@@ -260,7 +281,6 @@ class Firestore {
         .listen((querySnapshot) {
       for (var i = 0; i < querySnapshot.docChanges.length; ++i) {
         var changes = querySnapshot.docChanges.elementAt(i).doc.data()!;
-        print(changes['friendUID']);
         showDialog(
             context: context,
             builder: (context) {
@@ -275,13 +295,13 @@ class Firestore {
   }
 
   static Stream<QuerySnapshot> getPendingFriendStream(String userUID) {
-    Stream<QuerySnapshot> _pendingFriendStream = Firestore.firestoreReference
+    Stream<QuerySnapshot> pendingFriendStream = Firestore.firestoreReference
         .collection('users')
         .doc(userUID)
         .collection('friends')
         .where('isSender', isEqualTo: false)
         .where('requestConfirmed', isEqualTo: false)
         .snapshots();
-    return _pendingFriendStream;
+    return pendingFriendStream;
   }
 }
