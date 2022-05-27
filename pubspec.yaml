@@ -55,6 +55,9 @@ dependencies:
   provider: ^6.0.2
   modal_bottom_sheet: ^2.0.1
   google_maps_flutter_web: ^0.3.3
+  firebase_messaging: ^11.4.0
+  flutter_local_notifications: ^9.5.3+1
+
     #dev dependencies will not be included in the final build
 dev_dependencies:
   flutter_test:
@@ -65,7 +68,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^1.0.0
+  flutter_lints: ^2.0.1
 
   # This dependencies is for writing unit test
   test: ^1.19.5
