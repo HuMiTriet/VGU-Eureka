@@ -38,10 +38,15 @@ class Firestore {
     );
   }
 
-  static void setEmergencySignal({required String uid, bool isPublic = false}) {
+  static void setEmergencySignal({
+    required String uid,
+    required String message,
+    bool isPublic = false,
+  }) {
     firestoreReference.collection('emergencies').doc(uid).set(
       {
-        'isPublic': false,
+        'isPublic': isPublic,
+        'message': message,
         'uid': uid,
       },
       SetOptions(merge: true),
