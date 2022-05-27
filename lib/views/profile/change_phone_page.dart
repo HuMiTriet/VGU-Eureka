@@ -174,7 +174,7 @@ class _ChangePhoneNumberPageState extends State<ChangePhoneNumberPage> {
               height: 28,
             ),
             Container(
-              padding: const EdgeInsets.all(28),
+              padding: const EdgeInsets.all(5),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
@@ -316,8 +316,9 @@ class _ChangePhoneNumberPageState extends State<ChangePhoneNumberPage> {
       {required bool first,
       required bool last,
       required TextEditingController controller}) {
-    return SizedBox(
-      height: 40,
+    // ignore: sized_box_for_whitespace
+    return Container(
+      height: 50,
       child: AspectRatio(
         aspectRatio: 1.0,
         child: TextField(
@@ -334,7 +335,7 @@ class _ChangePhoneNumberPageState extends State<ChangePhoneNumberPage> {
           showCursor: false,
           readOnly: false,
           textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           keyboardType: TextInputType.number,
           maxLength: 1,
           decoration: InputDecoration(
