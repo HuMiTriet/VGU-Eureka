@@ -1,7 +1,11 @@
+/* import 'dart:developer' as devtools show log;
+
+import 'package:etoet/constants/routes.dart';
+import 'package:etoet/services/auth/auth_service.dart';
 import 'package:etoet/services/auth/auth_user.dart';
+import 'package:etoet/services/database/firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
 class OTPVerifyView extends StatefulWidget {
   const OTPVerifyView({Key? key, required this.authUser}) : super(key: key);
@@ -12,38 +16,38 @@ class OTPVerifyView extends StatefulWidget {
 }
 
 class _OTPVerifyViewState extends State<OTPVerifyView> {
-  var OTP_controller_1 = TextEditingController();
-  var OTP_controller_2 = TextEditingController();
-  var OTP_controller_3 = TextEditingController();
-  var OTP_controller_4 = TextEditingController();
-  var OTP_controller_5 = TextEditingController();
-  var OTP_controller_6 = TextEditingController();
+  late TextEditingController OTP_controller_1;
+  late TextEditingController OTP_controller_2;
+  late TextEditingController OTP_controller_3;
+  late TextEditingController OTP_controller_4;
+  late TextEditingController OTP_controller_5;
+  late TextEditingController OTP_controller_6;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Verify Phone Number'),
+        title: const Text('Verify Phone Number'),
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(vertical: 24, horizontal: 32),
+        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 32),
         child: Column(
           children: [
-            SizedBox(
+            const SizedBox(
               height: 24,
             ),
-            Text(
+            const Text(
               'Verification',
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
-            Text(
-              "Enter your OTP code number",
+            const Text(
+              'Enter your OTP code number',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -51,11 +55,11 @@ class _OTPVerifyViewState extends State<OTPVerifyView> {
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(
+            const SizedBox(
               height: 28,
             ),
             Container(
-              padding: EdgeInsets.all(28),
+              padding: const EdgeInsets.all(28),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
@@ -91,7 +95,7 @@ class _OTPVerifyViewState extends State<OTPVerifyView> {
                           controller: OTP_controller_6),
                     ],
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 22,
                   ),
                   SizedBox(
@@ -110,7 +114,7 @@ class _OTPVerifyViewState extends State<OTPVerifyView> {
                           ),
                         ),
                       ),
-                      child: Padding(
+                      child: const Padding(
                         padding: EdgeInsets.all(14.0),
                         child: Text(
                           'Verify',
@@ -122,10 +126,10 @@ class _OTPVerifyViewState extends State<OTPVerifyView> {
                 ],
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 18,
             ),
-            Text(
+            const Text(
               "Didn't you receive any code?",
               style: TextStyle(
                 fontSize: 14,
@@ -134,11 +138,11 @@ class _OTPVerifyViewState extends State<OTPVerifyView> {
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(
+            const SizedBox(
               height: 18,
             ),
-            Text(
-              "Resend New Code",
+            const Text(
+              'Resend New Code',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -156,7 +160,7 @@ class _OTPVerifyViewState extends State<OTPVerifyView> {
       {required bool first,
       required bool last,
       required TextEditingController controller}) {
-    return Container(
+    return SizedBox(
       height: 65,
       child: AspectRatio(
         aspectRatio: 1.0,
@@ -167,27 +171,101 @@ class _OTPVerifyViewState extends State<OTPVerifyView> {
             if (value.length == 1 && last == false) {
               FocusScope.of(context).nextFocus();
             }
-            if (value.length == 0 && first == false) {
+            if (value.isEmpty && first == false) {
               FocusScope.of(context).previousFocus();
             }
           },
           showCursor: false,
           readOnly: false,
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           keyboardType: TextInputType.number,
           maxLength: 1,
           decoration: InputDecoration(
-            counter: Offstage(),
+            counter: const Offstage(),
             enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(width: 2, color: Colors.black12),
+                borderSide: const BorderSide(width: 2, color: Colors.black12),
                 borderRadius: BorderRadius.circular(12)),
             focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(width: 2, color: Colors.purple),
+                borderSide: const BorderSide(width: 2, color: Colors.purple),
                 borderRadius: BorderRadius.circular(12)),
           ),
         ),
       ),
     );
   }
+
+  Future<void> verifyPhoneNumber(String smsCode) async {
+    devtools.log('smsCode: $smsCode');
+    await AuthService.firebase().verifyPhoneNumber(
+        phoneNumber: widget.authUser.phoneNumber!,
+        verificationCompleted: (credential) async {
+          await Firestore.updateUserInfo(
+            widget.authUser,
+          );
+          Navigator.of(context).pushNamed(profileRoute);
+        },
+        verificationFailed: (exception) {
+          if (exception.code == 'invalid-phone-number') {
+            devtools.log('The provided phone number is not valid.');
+          } else if (exception.code == 'invalid-verification-code') {
+            devtools.log('The verification code entered was invalid');
+          }
+        },
+        codeSent: (verificationId, resendToken) async {
+          devtools.log('codeSent: $verificationId, $resendToken');
+          var credential = PhoneAuthProvider.credential(
+              verificationId: verificationId, smsCode: smsCode);
+          try {
+            var userCred = AuthService.firebase()
+                .signInWithCredential(credential: credential);
+            userCred.then((value) async {
+              await Firestore.updateUserInfo(
+                widget.authUser,
+              );
+              Navigator.of(context).pushNamed(profileRoute);
+            });
+          } on FirebaseAuthException catch (e) {
+            if (e.code == 'account-exists-with-different-credential') {
+              devtools.log('account-exists-with-different-credential');
+            } else if (e.code == 'invalid-verification-code') {
+              devtools.log('invalid-verification-code');
+            } else if (e.code == 'invalid-verification-id') {
+              devtools.log('invalid-verification-id');
+            } else if (e.code == 'missing-verification-code') {
+              devtools.log('missing-verification-code');
+            } else if (e.code == 'missing-verification-id') {
+              devtools.log('missing-verification-id');
+            } else if (e.code == 'network-request-failed') {
+              devtools.log('network-request-failed');
+            }
+          }
+        },
+        codeAutoRetrievalTimeout: (verificationId) {
+          devtools.log('codeAutoRetrievalTimeout: $verificationId');
+        });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    OTP_controller_1 = TextEditingController();
+    OTP_controller_2 = TextEditingController();
+    OTP_controller_3 = TextEditingController();
+    OTP_controller_4 = TextEditingController();
+    OTP_controller_5 = TextEditingController();
+    OTP_controller_6 = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    OTP_controller_1.dispose();
+    OTP_controller_2.dispose();
+    OTP_controller_3.dispose();
+    OTP_controller_4.dispose();
+    OTP_controller_5.dispose();
+    OTP_controller_6.dispose();
+    super.dispose();
+  }
 }
+ */

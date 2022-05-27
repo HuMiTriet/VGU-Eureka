@@ -83,4 +83,9 @@ class AuthService implements AuthProvider {
         codeSent: codeSent,
         codeAutoRetrievalTimeout: codeAutoRetrievalTimeout,
       );
+
+  @override
+  Future<UserCredential> linkWithCredential(
+          {required AuthCredential credential}) =>
+      provider.linkWithCredential(credential: credential);
 }

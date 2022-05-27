@@ -31,4 +31,7 @@ abstract class AuthProvider {
       required void Function(FirebaseAuthException) verificationFailed,
       required void Function(String, int?) codeSent,
       required void Function(String) codeAutoRetrievalTimeout});
+
+  Future<UserCredential> linkWithCredential(
+      {required AuthCredential credential});
 }

@@ -9,7 +9,9 @@ import 'package:firebase_auth/firebase_auth.dart'
         EmailAuthProvider,
         FirebaseAuth,
         FirebaseAuthException,
-        PhoneAuthCredential;
+        PhoneAuthCredential,
+        UserCredential;
+import 'package:firebase_auth_platform_interface/src/auth_credential.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 class FirebaseAuthProvider implements AuthProvider {
@@ -203,5 +205,17 @@ class FirebaseAuthProvider implements AuthProvider {
         verificationFailed: verificationFailed,
         codeSent: codeSent,
         codeAutoRetrievalTimeout: codeAutoRetrievalTimeout);
+  }
+
+  @override
+  Future<UserCredential> linkWithCredential(
+      {required AuthCredential credential}) {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      return user.linkWithCredential(credential);
+    } else {
+      //triggered when user not logged in
+      throw UserNotLoggedInAuthException();
+    }
   }
 }
