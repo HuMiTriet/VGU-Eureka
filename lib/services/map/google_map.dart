@@ -5,7 +5,6 @@ import 'package:etoet/services/auth/auth_user.dart';
 import 'package:etoet/services/auth/location.dart';
 import 'package:etoet/services/database/database.dart';
 import 'package:etoet/services/map/friend/friend_marker_location.dart';
-import 'package:etoet/services/map/geoflutterfire/geoflutterfire.dart';
 import 'package:etoet/services/map/map_factory.dart' as etoet;
 import 'package:etoet/services/map/marker/marker.dart';
 import 'package:etoet/services/map/osrm/routing.dart';
