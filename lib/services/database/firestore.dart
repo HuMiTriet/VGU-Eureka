@@ -144,6 +144,8 @@ class Firestore {
 
     var pendingFriendInfoList = <etoet.UserInfo>{};
     for (var i = 0; i < pendingFriendRequestData.docs.length; ++i) {
+      var source = pendingFriendRequestData.metadata.isFromCache ? "cache" : "server";
+      print('Pending fetched from ' + source);
       var data = pendingFriendRequestData.docs.elementAt(i).data();
 
       var pendingFriendInfo = await getUserInfo(data['friendUID']);
@@ -152,6 +154,30 @@ class Firestore {
 
     return pendingFriendInfoList;
   }
+
+  static Future<Set<etoet.UserInfo>> getAcceptedUserInfo(String userUID) async {
+    var pendingFriendRequestData = await firestoreReference
+        .collection('users')
+        .doc(userUID)
+        .collection('friends')
+        .where('requestConfirmed', isEqualTo: false)
+        .get();
+
+
+
+    var pendingFriendInfoList = <etoet.UserInfo>{};
+    for (var i = 0; i < pendingFriendRequestData.docs.length; ++i) {
+      var source = pendingFriendRequestData.metadata.isFromCache ? "cache" : "server";
+      print('Pending fetched from ' + source);
+      var data = pendingFriendRequestData.docs.elementAt(i).data();
+
+      var pendingFriendInfo = await getUserInfo(data['friendUID']);
+      pendingFriendInfoList.add(pendingFriendInfo);
+    }
+
+    return pendingFriendInfoList;
+  }
+
 
   static void deleteFriendRequest(String receiverUID, String senderUID) {
     firestoreReference

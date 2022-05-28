@@ -79,6 +79,7 @@ class _FriendViewState extends State<FriendView> {
   @override
   Widget build(BuildContext context) {
     user = context.watch<AuthUser>();
+    var futureFriendList = user.friendInfoList as Future<etoet.UserInfo>;
 
     //Listener & Stream related
     late Stream<QuerySnapshot> _acceptedFriendStream;
@@ -102,11 +103,15 @@ class _FriendViewState extends State<FriendView> {
               }
               if (change.type == DocumentChangeType.added) {
                   print('Request Confirmed!');
-                  // var newFriend = await Firestore.getUserInfo(data['friendUID']);
-                  // user.friendInfoList.add(newFriend);
 
-                  var newData = acceptedRequestSnapshot.data;
-                  print(newData!.size.toString());
+                  // setState(() async {
+                  //   var newFriend = await Firestore.getUserInfo(changedData['friendUID']);
+                  //   user.friendInfoList.add(newFriend);
+                  // });
+
+
+                  // var newData = acceptedRequestSnapshot.data;
+                  // print(newData!.size.toString());
               }
             }
           }
