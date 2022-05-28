@@ -1,10 +1,10 @@
-import 'dart:async';
-
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:etoet/services/database/firestore.dart';
 import 'package:etoet/services/map/map_factory.dart' as etoet;
+import 'package:etoet/services/notification/notification.dart';
 import 'package:etoet/views/friend/friend_view.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
@@ -18,27 +18,16 @@ class MainView extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _MainViewState createState() => _MainViewState();
+  MainViewState createState() => MainViewState();
 }
 
-class _MainViewState extends State<MainView> {
+class MainViewState extends State<MainView> {
   late etoet.Map map;
   late AuthUser? authUser;
-  // late StreamSubscription<QuerySnapshot<Map<String, dynamic>>> pendingFriendRequestReceiverListener;
-  // late StreamSubscription<QuerySnapshot<Map<String, dynamic>>> pendingFriendRequestSenderListener;
-
-  @override
-  void initState() {
-    super.initState();
-    map = etoet.Map('GoogleMap');
-    map.context = context;
-  }
 
   @override
   Widget build(BuildContext context) {
     authUser = context.watch<AuthUser?>();
-    // pendingFriendRequestReceiverListener = Firestore.pendingFriendRequestReceiverListener(authUser!.uid);
-    // pendingFriendRequestSenderListener = Firestore.pendingFriendRequestSenderListener(authUser!.uid);
 
     return FutureBuilder(
         future: Firestore.getFriendInfoList(authUser!.uid),
@@ -110,7 +99,9 @@ class _MainViewState extends State<MainView> {
                       child: const Icon(Icons.group)),
                   FloatingActionButton(
                       heroTag: 'goToSOSFromMain',
-                      onPressed: () {},
+                      onPressed: () {
+                        Firestore.setEmergencySignal(uid: authUser!.uid);
+                      },
                       child: const Icon(Icons.add_alert)),
                   FloatingActionButton(
                     heroTag: 'getCurrentLocationFromMain',
@@ -134,8 +125,48 @@ class _MainViewState extends State<MainView> {
 
   @override
   void dispose() {
-    // pendingFriendRequestReceiverListener.cancel();
-    // pendingFriendRequestSenderListener.cancel();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    map = etoet.Map('GoogleMap');
+    map.context = context;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      var token = await NotificationHandler.notificatioToken;
+      if (token == null) {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return const AlertDialog(
+                  title: Text('Can not retreive device token'));
+            });
+      } else {
+        Firestore.setFcmTokenAndNotificationStatus(
+            uid: authUser!.uid, token: token);
+        FirebaseMessaging.onMessage.listen((event) {
+          showDialog(
+              context: context,
+              builder: (context) {
+                var content = event.notification!.body;
+                return AlertDialog(
+                  title: const Text('EMERGENCY'),
+                  content: Text(content ?? 'null'),
+                  actions: [
+                    ElevatedButton(
+                      onPressed: () {},
+                      child: const Text('Accpet'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {},
+                      child: const Text('Reject'),
+                    )
+                  ],
+                );
+              });
+        });
+      }
+    });
   }
 }
