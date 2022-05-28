@@ -50,8 +50,12 @@ class _ChangePhoneNumberPageState extends State<ChangePhoneNumberPage> {
   @override
   Widget build(BuildContext context) {
     return showLoading
-        ? Center(
-            child: CircularProgressIndicator(),
+        ? Scaffold(
+            body: SafeArea(
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
           )
         : currentState == MobileVerificationState.SHOW_MOBILE_FORM_STATE
             ? getMobileFormWidget(context)
