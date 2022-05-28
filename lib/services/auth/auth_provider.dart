@@ -34,4 +34,7 @@ abstract class AuthProvider {
 
   Future<UserCredential> linkWithCredential(
       {required AuthCredential credential});
+  Future<void> updatePhotoURL(String url);
+
+  Future<void> updateDisplayName(String name);
 }

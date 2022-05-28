@@ -100,7 +100,10 @@ class MainViewState extends State<MainView> {
                   FloatingActionButton(
                       heroTag: 'goToSOSFromMain',
                       onPressed: () {
-                        Firestore.setEmergencySignal(uid: authUser!.uid);
+                        Firestore.setEmergencySignal(
+                          uid: authUser!.uid,
+                          message: 'HELP ME LOID MAN',
+                        );
                       },
                       child: const Icon(Icons.add_alert)),
                   FloatingActionButton(

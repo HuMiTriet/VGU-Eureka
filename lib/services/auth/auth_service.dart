@@ -88,4 +88,10 @@ class AuthService implements AuthProvider {
   Future<UserCredential> linkWithCredential(
           {required AuthCredential credential}) =>
       provider.linkWithCredential(credential: credential);
+  @override
+  Future<void> updatePhotoURL(String url) => provider.updatePhotoURL(url);
+
+  @override
+  Future<void> updateDisplayName(String name) =>
+      provider.updateDisplayName(name);
 }

@@ -4,7 +4,6 @@ import 'dart:developer' as devtools show log;
 import 'package:etoet/services/auth/auth_user.dart';
 import 'package:etoet/services/auth/location.dart';
 import 'package:etoet/services/database/database.dart';
-import 'package:etoet/services/database/firestore.dart';
 import 'package:etoet/services/map/friend/friend_marker_location.dart';
 import 'package:etoet/services/map/map_factory.dart' as etoet;
 import 'package:etoet/services/map/marker/marker.dart';
@@ -55,13 +54,13 @@ class GoogleMapImpl extends StatefulWidget implements etoet.Map {
 
   /// Update the current address that the map shows
   void updateCurrentMapAddress() async {
-    address = await Geocoding.getGeocoding(await _mapController.getLatLng(
+    address = await Geocoding.getAddress(await _mapController.getLatLng(
         ScreenCoordinate(
             x: (deviceWidth / 2).round(), y: (deviceHeight / 2).round())));
   }
 
   void updateMapAddress(LatLng location) async {
-    address = await Geocoding.getGeocoding(location);
+    address = await Geocoding.getAddress(location);
   }
 
   Future<bool> _hasLocationPermission() async {
@@ -155,7 +154,7 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
     // get location, update geocoding
     var currentLocation = await widget._getCurrentLocation();
     Routing.location = currentLocation;
-    widget.address = await Geocoding.getGeocoding(currentLocation);
+    widget.address = await Geocoding.getAddress(currentLocation);
 
     // get user icon, draw marker
     var icon = await GoogleMapMarker.getIconFromUrl(widget.authUser!.photoURL ??
@@ -201,31 +200,33 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
         var friendLocation = Location(latitude: lat, longitude: lng);
         var friendId = data.snapshot.key;
         widget.authUser!.mapFriendUidLocation[friendId!] = friendLocation;
-        updateFriendMarker();
-        setState(() {});
+        updateFriendMarker(friendId);
         devtools.log('sync friend marker', name: 'GoogleMap: syncFriendMarker');
       });
     }
   }
 
   /// Update markers of all friends
-  void updateFriendMarker() async {
+  void updateFriendMarker(String friendId) async {
     var friendInfoList = widget.authUser?.friendInfoList ?? {};
     for (var friendInfo in friendInfoList) {
-      var friendMarkerCreator = FriendMarker(
-          context: context,
-          friendInfo: friendInfo,
-          polylines: widget._polylines);
-      var location = widget.authUser?.mapFriendUidLocation[friendInfo.uid];
-      var latLng = LatLng(location!.latitude, location.longitude);
-      var friendMarker =
-          await friendMarkerCreator.createFriendMarker(friendLatLng: latLng);
-      widget._markers
-          .removeWhere((marker) => marker.markerId == MarkerId(friendInfo.uid));
-      widget._markers.add(friendMarker);
-      devtools.log(
-          'marker list: ${widget._markers.length}, displayName: ${friendInfo.displayName}, location: $latLng',
-          name: 'GoogleMap: updateFriendMarker');
+      if (friendId == friendInfo.uid) {
+        var friendMarkerCreator = FriendMarker(
+            context: context,
+            friendInfo: friendInfo,
+            polylines: widget._polylines);
+        var location = widget.authUser?.mapFriendUidLocation[friendInfo.uid];
+        var latLng = LatLng(location!.latitude, location.longitude);
+        var friendMarker =
+            await friendMarkerCreator.createFriendMarker(friendLatLng: latLng);
+        widget._markers.removeWhere(
+            (marker) => marker.markerId == MarkerId(friendInfo.uid));
+        widget._markers.add(friendMarker);
+        setState(() {});
+        devtools.log(
+            'marker list: ${widget._markers.length}, displayName: ${friendInfo.displayName}, location: $latLng',
+            name: 'GoogleMap: updateFriendMarker');
+      }
     }
   }
 

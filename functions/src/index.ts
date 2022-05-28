@@ -2,15 +2,20 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import {DocumentSnapshot} from "firebase-functions/v1/firestore";
 
-"use strict";
 admin.initializeApp();
 
 const db = admin.firestore();
 const fcm = admin.messaging();
 
+// Promise in typescipt/javascript is the same as Future in dart
 export const sendPrivateNotification = functions.region("asia-southeast1").
     firestore.document("/emergencies/{userId}")
     .onCreate(async (snapshot, context) => {
+      // immediately exit the function if it is public
+      if (snapshot.data().isPublic) {
+        return functions.logger
+            .log("Private SOS function: not a private signal, reject");
+      }
       // getting the regerence pointing at the user friend collection
       const userFriendsRef = db.collection("users")
           .doc(context.params.userId).collection("friends");
@@ -21,7 +26,7 @@ export const sendPrivateNotification = functions.region("asia-southeast1").
         // of frriends
         const userFriendCollectionSnapshot = await userFriendsRef.get();
         // Store each of the user's friend promise into an array, for each
-        // of the friend where query the database again for their fcm token
+        // of the friend we query the database again for their fcm token
         const friendFcmTokenPromises: Promise<DocumentSnapshot>[] = [];
         // query the user friend collection for the uid -> find the fcm token
         userFriendCollectionSnapshot.forEach(async (oneFriend) => {
@@ -43,10 +48,9 @@ export const sendPrivateNotification = functions.region("asia-southeast1").
         const payload = {
           notification: {
             title: "Emergency Alert",
-            body: "Someone is in danger",
+            body: String(snapshot.data()?.message),
           },
         };
-        console.log("SOS PRIVATE SENT SUCCESSFULLY");
         return fcm.sendToDevice(token, payload);
       } catch (error) {
         // get the sender token
@@ -59,10 +63,12 @@ export const sendPrivateNotification = functions.region("asia-southeast1").
         const errorPayload = {
           notification: {
             title: "Sorry we couldn't proccess your request",
-            body: "Please try again after a short few miniute",
+            body: "Please try again later",
           },
         };
-        console.log("SOS PRIVATE ERROR");
         return fcm.sendToDevice(token, errorPayload);
       }
     });
+
+// export const overwritePhotoUrlFromStorage = functions.region("asia-southeast1").
+//     storage.bucket

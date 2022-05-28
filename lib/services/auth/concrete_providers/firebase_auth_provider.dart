@@ -193,6 +193,7 @@ class FirebaseAuthProvider implements AuthProvider {
   }
 
   @override
+<<<<<<< HEAD
   Future<void> verifyPhoneNumber(
       {required String phoneNumber,
       required void Function(PhoneAuthCredential) verificationCompleted,
@@ -215,6 +216,26 @@ class FirebaseAuthProvider implements AuthProvider {
       return user.linkWithCredential(credential);
     } else {
       //triggered when user not logged in
+=======
+  Future<void> updatePhotoURL(String url) async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      await user.updatePhotoURL(url);
+    } else {
+      // you can not send verification email if you are not logged in.
+      throw UserNotLoggedInAuthException();
+    }
+  }
+
+  @override
+  Future<void> updateDisplayName(String name) async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      await user.updateDisplayName(name);
+    } else {
+>>>>>>> dev
       throw UserNotLoggedInAuthException();
     }
   }

@@ -46,10 +46,15 @@ class Firestore {
     );
   }
 
-  static void setEmergencySignal({required String uid, bool isPublic = false}) {
+  static void setEmergencySignal({
+    required String uid,
+    required String message,
+    bool isPublic = false,
+  }) {
     firestoreReference.collection('emergencies').doc(uid).set(
       {
-        'isPublic': false,
+        'isPublic': isPublic,
+        'message': message,
         'uid': uid,
       },
       SetOptions(merge: true),
@@ -117,7 +122,7 @@ class Firestore {
         continue;
       }
 
-      if (alrFriend.docs.length == 0) {
+      if (alrFriend.docs.isEmpty) {
         searchedUserInfoList.add(userInfo);
         continue;
       }
@@ -242,7 +247,6 @@ class Firestore {
         .listen((querySnapshot) {
       for (var i = 0; i < querySnapshot.docChanges.length; ++i) {
         var changes = querySnapshot.docChanges.elementAt(i).doc.data()!;
-        print(changes['friendUID']);
         showDialog(
             context: context,
             builder: (context) {
