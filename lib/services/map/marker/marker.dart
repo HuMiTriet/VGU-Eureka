@@ -8,6 +8,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 /// Convert to google map marker icon from different image source.
 class GoogleMapMarker {
+  GoogleMapMarker._();
+
   /// Get marker icon from URL
   static Future<BitmapDescriptor> getIconFromUrl(String url) async {
     return BitmapDescriptor.fromBytes(await getBytesFromUrlResize(url, 100));

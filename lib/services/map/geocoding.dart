@@ -1,3 +1,5 @@
+// ignore_for_file: omit_local_variable_types
+
 import 'dart:developer' as devtools show log;
 
 import 'package:geocoding/geocoding.dart';
@@ -5,62 +7,49 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 /// [Geocoding] can be used to convert location to placemark/address.
 class Geocoding {
-  List<String> addressList = <String>['', '', '', '', '', '', '', ''];
-  String getGeocoding(LatLng location) {
-    try {
-      placemarkFromCoordinates(location.latitude, location.longitude)
-          .then((listPlacemark) {
-        var placemarkAddress = listPlacemark.elementAt(0);
-        var country = placemarkAddress.country;
-        var city = placemarkAddress.locality;
-        var street = placemarkAddress.thoroughfare;
-        var subLocality = placemarkAddress.subLocality;
-        var postalCode = placemarkAddress.postalCode;
-        var administrativeArea = placemarkAddress.administrativeArea;
-        var subAdministrativeArea = placemarkAddress.subAdministrativeArea;
-        var subThoroughfare = placemarkAddress.subThoroughfare;
-        addressList[0] = '$country';
-        addressList[1] = '$city';
-        addressList[2] = '$street';
-        addressList[3] = '$subLocality';
-        addressList[4] = '$postalCode';
-        addressList[5] = '$administrativeArea';
-        addressList[6] = '$subAdministrativeArea';
-        addressList[7] = '$subThoroughfare';
-        devtools.log('geocoding of location: $addressList',
-            name: 'Geocoding: getGeocoding');
-        return _getAddress();
-      });
-    } catch (e) {
-      devtools.log('get Geocoding error: $e', name: 'Geocoding: getGeocoding');
-    }
-    return _getAddress();
+  Geocoding._();
+
+  /// Get address from location
+  static Future<String> getAddress(LatLng location) async {
+    var placemark = await _getPlacemark(location);
+    return _getAddressWithPriority(placemark);
   }
 
-  /// [_getAddress] is used to get the address from the addressList with priority from: city > administrativeArea > subAdministrativeArea > subThoroughfare > country.
-  String _getAddress() {
+  /// Is used to get the address from the [placemark] with priority from: city > administrativeArea > subAdministrativeArea > thoroughfare > subThoroughfare > subLocality > country.
+  static String _getAddressWithPriority(Placemark placemark) {
     var address = 'Unknown';
-    // city
-    if (addressList[1] != '') {
-      address = addressList[1];
 
-      // administrativeArea
-    } else if (addressList[5] != '') {
-      address = addressList[5];
+    return placemark.locality ??
+        placemark.administrativeArea ??
+        placemark.subAdministrativeArea ??
+        placemark.thoroughfare ??
+        placemark.subThoroughfare ??
+        placemark.subLocality ??
+        placemark.country ??
+        address;
+  }
 
-      // subAdministrativeArea
-    } else if (addressList[6] != '') {
-      address = addressList[6];
-
-      // subThoroughfare
-    } else if (addressList[7] != '') {
-      address = addressList[7];
-
-      // country
-    } else if (addressList[0] != '') {
-      address = addressList[0];
+  /// Get placemark from location using geocoding package.
+  static Future<Placemark> _getPlacemark(LatLng location) async {
+    try {
+      var listPlacemark =
+          await placemarkFromCoordinates(location.latitude, location.longitude);
+      var placemark = listPlacemark.elementAt(0);
+      var country = placemark.country;
+      var city = placemark.locality;
+      var street = placemark.thoroughfare;
+      var subLocality = placemark.subLocality;
+      var postalCode = placemark.postalCode;
+      var administrativeArea = placemark.administrativeArea;
+      var subAdministrativeArea = placemark.subAdministrativeArea;
+      var subThoroughfare = placemark.subThoroughfare;
+      devtools.log(
+          'Placemark: country: $country, city: $city, administrativeArea: $administrativeArea, subAdministrativeArea: $subAdministrativeArea, street: $street, subLocality: $subLocality, subThoroughfare: $subThoroughfare, postalCode: $postalCode,',
+          name: 'Geocoding: getGeocoding');
+      return placemark;
+    } catch (e) {
+      devtools.log('get Geocoding error: $e', name: 'Geocoding: getGeocoding');
+      return Placemark();
     }
-    devtools.log('get address: $address', name: 'Geocoding: _getAddress');
-    return address;
   }
 }
