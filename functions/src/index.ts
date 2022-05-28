@@ -80,7 +80,7 @@ export const notifyNewFriendRequestAcceptedSender = functions
       // dont run if it is the sendee
       if (!snapshot.data().isSender) {
         return functions.logger
-            .log("sender new friend function: not a private signal, reject");
+            .log("sender new friend function: not the sender, reject");
       }
       // getting the friend info
       const friendInfoRef = db.collection("users")
@@ -90,9 +90,13 @@ export const notifyNewFriendRequestAcceptedSender = functions
 
       // get all of the friend info
       const friendUserName = String(friendInfoSnapshot.data()?.displayName);
+      console.log(friendUserName);
       const friendEmail = String(friendInfoSnapshot.data()?.email);
+      console.log(friendEmail);
       const friendPhotoUrl = String(friendInfoSnapshot.data()?.photoUrl);
+      console.log(friendPhotoUrl );
       const friendUid = String(friendInfoSnapshot.data()?.uid);
+      console.log(friendUid);
 
       const payload = {
         notification: {
@@ -107,9 +111,15 @@ export const notifyNewFriendRequestAcceptedSender = functions
       };
 
       // getting the friend FCM token
-      const friendFcmTokenRef = friendInfoRef.collection("notification")
+      const friendFcmTokenRef = db.collection("users")
+          .doc(context.params.userUID)
+          .collection("notification")
           .doc("fcm_token");
+
       const friendFcmToken = await friendFcmTokenRef.get();
+
       const token: string = friendFcmToken.data()?.fcm_token;
+      console.log(token);
+
       return fcm.sendToDevice(token, payload);
     });
