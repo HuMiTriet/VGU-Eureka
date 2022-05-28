@@ -1,4 +1,5 @@
 import 'package:etoet/services/auth/auth_user.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 /// FirebaseAuthProvider - AuthProvider - AuthService- UI
 abstract class AuthProvider {
@@ -23,4 +24,17 @@ abstract class AuthProvider {
   Future<void> sendEmailVerification();
 
   Future<bool> validateEnteredPassword(String password);
+
+  Future<void> verifyPhoneNumber(
+      {required String phoneNumber,
+      required void Function(PhoneAuthCredential) verificationCompleted,
+      required void Function(FirebaseAuthException) verificationFailed,
+      required void Function(String, int?) codeSent,
+      required void Function(String) codeAutoRetrievalTimeout});
+
+  Future<UserCredential> linkWithCredential(
+      {required AuthCredential credential});
+  Future<void> updatePhotoURL(String url);
+
+  Future<void> updateDisplayName(String name);
 }

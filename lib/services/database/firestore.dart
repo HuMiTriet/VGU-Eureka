@@ -1,9 +1,8 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:etoet/services/map/geoflutterfire/geoflutterfire.dart';
+import 'package:flutter/material.dart';
 
 import '../auth/auth_user.dart';
 import '../auth/user_info.dart' as etoet;
@@ -22,6 +21,15 @@ class Firestore {
         'photoUrl': user.photoURL,
       },
     );
+  }
+
+  static void updateUserInfo(AuthUser authUser) async {
+    firestoreReference.collection('users').doc(authUser.uid).update({
+      'email': authUser.email,
+      'displayName': authUser.displayName,
+      'photoUrl': authUser.photoURL,
+      'phoneNumber': authUser.phoneNumber,
+    });
   }
 
   static void setFcmTokenAndNotificationStatus(
@@ -124,7 +132,7 @@ class Firestore {
         continue;
       }
 
-      if (alrFriend.docs.length == 0) {
+      if (alrFriend.docs.isEmpty) {
         searchedUserInfoList.add(userInfo);
         continue;
       }
@@ -249,7 +257,6 @@ class Firestore {
         .listen((querySnapshot) {
       for (var i = 0; i < querySnapshot.docChanges.length; ++i) {
         var changes = querySnapshot.docChanges.elementAt(i).doc.data()!;
-        print(changes['friendUID']);
         showDialog(
             context: context,
             builder: (context) {
