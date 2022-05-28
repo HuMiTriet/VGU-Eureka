@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:etoet/services/map/geoflutterfire/geoflutterfire.dart';
 
 import '../auth/auth_user.dart';
 import '../auth/user_info.dart' as etoet;
@@ -51,6 +52,15 @@ class Firestore {
       },
       SetOptions(merge: true),
     );
+  }
+
+  static void updateEmergencySignalLocation(
+      {required String uid, required double lat, required double lng}) async {
+    var geoFirePoint = GeoFlutterFire.getGeoFirePoint(lat, lng);
+    await firestoreReference
+        .collection('emergencies')
+        .doc(uid)
+        .update({'postion': geoFirePoint.data});
   }
 
   static Future<etoet.UserInfo> getUserInfo(String uid) async {

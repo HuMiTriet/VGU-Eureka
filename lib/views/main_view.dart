@@ -104,6 +104,10 @@ class MainViewState extends State<MainView> {
                           uid: authUser!.uid,
                           message: 'HELP ME LOID MAN',
                         );
+                        Firestore.updateEmergencySignalLocation(
+                            uid: authUser!.uid,
+                            lat: authUser!.location.latitude,
+                            lng: authUser!.location.longitude);
                       },
                       child: const Icon(Icons.add_alert)),
                   FloatingActionButton(
