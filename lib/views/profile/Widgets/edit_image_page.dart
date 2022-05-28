@@ -1,24 +1,24 @@
+import 'dart:developer';
 import 'dart:io';
+
 import 'package:etoet/services/auth/auth_service.dart';
 import 'package:etoet/services/auth/auth_user.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:developer';
 
 class EditImagePage extends StatefulWidget {
-  EditImagePage({Key? key, required this.imageSource, required this.user})
+  final ImageSource imageSource;
+
+  final AuthUser user;
+  const EditImagePage({Key? key, required this.imageSource, required this.user})
       : super(key: key);
 
-  final imageSource;
-  final AuthUser user;
-
   @override
-  _EditImagePageState createState() => _EditImagePageState();
+  EditImagePageState createState() => EditImagePageState();
 }
 
-class _EditImagePageState extends State<EditImagePage> {
+class EditImagePageState extends State<EditImagePage> {
   final _updateFailSnackBar = const SnackBar(
     content: Text('Update Image Failed.'),
   );
@@ -28,7 +28,7 @@ class _EditImagePageState extends State<EditImagePage> {
   );
 
   File? image;
-  var imageUrl;
+   var imageUrl;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,7 +40,7 @@ class _EditImagePageState extends State<EditImagePage> {
           const SizedBox(
               width: 330,
               child: Text(
-                "Upload a photo of yourself:",
+                'Upload a photo of yourself:',
                 style: TextStyle(
                   fontSize: 23,
                   fontWeight: FontWeight.bold,
@@ -82,17 +82,15 @@ class _EditImagePageState extends State<EditImagePage> {
                         if (image == null) return;
 
                         final firebaseStorage = FirebaseStorage.instance;
+
                         try {
+
                           var snapshot = await firebaseStorage
                               .ref()
                               .child('images/${widget.user.uid}')
                               .putFile(image!);
                           log(widget.user.uid);
-                        } on FirebaseException catch (e) {
-                          log('${e.message}');
-                        }
 
-                        try {
                           var downloadUrl = await snapshot.ref.getDownloadURL();
                           setState(() {
                             imageUrl = downloadUrl;
@@ -128,7 +126,7 @@ class _EditImagePageState extends State<EditImagePage> {
     final _picker = ImagePicker();
     PickedFile image;
 
-    XFile? _image = await _picker.pickImage(source: widget.imageSource);
+    var _image = await _picker.pickImage(source: widget.imageSource);
 
     setState(() {
       this.image = File(_image!.path);
