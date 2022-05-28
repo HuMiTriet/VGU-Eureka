@@ -74,8 +74,8 @@ class _FriendViewState extends State<FriendView> {
   // final int topListViewFlex = 39;
   // final int bottomListViewFlex = 100;
 
-
   late StreamSubscription<QuerySnapshot<Map<String, dynamic>>> acceptedListener;
+
   @override
   Widget build(BuildContext context) {
     user = context.watch<AuthUser>();
@@ -89,192 +89,210 @@ class _FriendViewState extends State<FriendView> {
     _pendingFriendStream = Firestore.getPendingFriendStream(user.uid);
 
     return StreamBuilder<QuerySnapshot>(
-        stream: _pendingFriendStream,
-        builder: (context, snapshot) {
-          pendingFriendRequestCount = (snapshot.data?.docs.length);
+      stream: _acceptedFriendStream,
+      builder: (context, acceptedRequestSnapshot) {
 
-          //Check this
-
-          for (var change in snapshot.data!.docChanges) {
-            var data = change.doc.data() as Map<String, dynamic>;
-            if(snapshot.data!.metadata.isFromCache)
-              {
+        if(acceptedRequestSnapshot.data != null)
+          {
+            for (var change in acceptedRequestSnapshot.data!.docChanges) {
+              var changedData = change.doc.data() as Map<String, dynamic>;
+              if (acceptedRequestSnapshot.data!.metadata.isFromCache) {
+                print('From Cache');
                 continue;
               }
-            if(change.type == DocumentChangeType.modified)
-            {
-              if(data['requestConfirmed'] == true)
-              {
-                print('Request Confirmed!');
-                var newFriend = Firestore.getUserInfo(data['friendUID']) as etoet.UserInfo;
-                user.friendInfoList.add(newFriend);
+              if (change.type == DocumentChangeType.added) {
+                  print('Request Confirmed!');
+                  // var newFriend = await Firestore.getUserInfo(data['friendUID']);
+                  // user.friendInfoList.add(newFriend);
+
+                  var newData = acceptedRequestSnapshot.data;
+                  print(newData!.size.toString());
               }
             }
-
           }
 
-          if (snapshot.hasError) {
-            return const Text('Something went wrong');
-          }
 
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            // return const Text('Loading');
-          }
-          return FractionallySizedBox(
-              heightFactor: friendViewHeight,
-              child: SafeArea(
-                  child: Container(
-                color: backgroundColor,
-                child: Column(
-                  children: [
-                    // Search, Add Friend and Pending Friend Request.
-                    Flexible(
-                        //flex: topListViewFlex,
-                        child: Container(
-                      color: topListViewColor,
-                      child: ListView(
-                        shrinkWrap: true,
-                        children: [
-                          TextField(
-                            controller: _searchBarController,
-                            decoration: InputDecoration(
-                              hintText: 'Search by Display Name or Email',
-                              contentPadding: const EdgeInsets.all(20),
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  _searchBarController.clear();
+        return StreamBuilder<QuerySnapshot>(
+            stream: _pendingFriendStream,
+            builder: (context, snapshot) {
+              pendingFriendRequestCount = (snapshot.data?.docs.length);
+
+              //Check this
+
+              if (snapshot.hasError) {
+                return const Text('Something went wrong');
+              }
+
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                // return const Text('Loading');
+              }
+              return FractionallySizedBox(
+                  heightFactor: friendViewHeight,
+                  child: SafeArea(
+                      child: Container(
+                    color: backgroundColor,
+                    child: Column(
+                      children: [
+                        // Search, Add Friend and Pending Friend Request.
+                        Flexible(
+                            //flex: topListViewFlex,
+                            child: Container(
+                          color: topListViewColor,
+                          child: ListView(
+                            shrinkWrap: true,
+                            children: [
+                              TextField(
+                                controller: _searchBarController,
+                                decoration: InputDecoration(
+                                  hintText: 'Search by Display Name or Email',
+                                  contentPadding: const EdgeInsets.all(20),
+                                  suffixIcon: IconButton(
+                                    onPressed: () {
+                                      _searchBarController.clear();
+                                      setState(() {
+                                        userListOnSearch = user.friendInfoList;
+                                      });
+                                    },
+                                    icon: const Icon(Icons.clear),
+                                  ),
+                                ),
+                                onChanged: (keyword) {
                                   setState(() {
-                                    userListOnSearch = user.friendInfoList;
+                                    userListOnSearch = getFilteredFriendList(
+                                        friendList: user.friendInfoList,
+                                        keyword: keyword);
                                   });
                                 },
-                                icon: const Icon(Icons.clear),
                               ),
-                            ),
-                            onChanged: (keyword) {
-                              setState(() {
-                                userListOnSearch = getFilteredFriendList(
-                                    friendList: user.friendInfoList,
-                                    keyword: keyword);
-                              });
-                            },
-                          ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          ListTile(
-                            leading: Material(
-                              borderRadius: BorderRadius.circular(20),
-                              elevation: 2,
-                              shadowColor: Colors.black,
-                              child: const CircleAvatar(
-                                child: Icon(addFriendIcon),
+                              const SizedBox(
+                                height: 5,
                               ),
-                            ),
-                            title: const Text('Add Friend'),
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(
-                                    color: Colors.black, width: 1),
-                                borderRadius: BorderRadius.circular(15)),
-                            onTap: () {
-                              showBarModalBottomSheet(
-                                context: context,
-                                backgroundColor: Colors.transparent,
-                                builder: (context) => const AddFriendView(),
+                              ListTile(
+                                leading: Material(
+                                  borderRadius: BorderRadius.circular(20),
+                                  elevation: 2,
+                                  shadowColor: Colors.black,
+                                  child: const CircleAvatar(
+                                    child: Icon(addFriendIcon),
+                                  ),
+                                ),
+                                title: const Text('Add Friend'),
+                                shape: RoundedRectangleBorder(
+                                    side: const BorderSide(
+                                        color: Colors.black, width: 1),
+                                    borderRadius: BorderRadius.circular(15)),
+                                onTap: () {
+                                  showBarModalBottomSheet(
+                                    context: context,
+                                    backgroundColor: Colors.transparent,
+                                    builder: (context) => const AddFriendView(),
+                                  );
+                                },
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              ListTile(
+                                leading: Material(
+                                  borderRadius: BorderRadius.circular(20),
+                                  elevation: 2,
+                                  shadowColor: Colors.black,
+                                  child: const CircleAvatar(
+                                    child: Icon(pendingFriendRequestIcon),
+                                  ),
+                                ),
+                                title: const Text('Pending Friend Request'),
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide(
+                                        color: Colors.black, width: 1),
+                                    borderRadius: BorderRadius.circular(15)),
+                                onTap: () {
+                                  showBarModalBottomSheet(
+                                    context: context,
+                                    backgroundColor: Colors.transparent,
+                                    builder: (context) =>
+                                        const PendingFriendView(),
+                                  );
+                                },
+                                trailing:
+                                    Text(pendingFriendRequestCount.toString()),
+                              ),
+                            ],
+                          ),
+                        )),
+
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Material(
+                          color: topListViewColor,
+                          elevation: 5,
+                          child: SizedBox(
+                              height: 40,
+                              child: Container(
+                                color: spacingColor,
+                                child: const Center(
+                                  child: Text(
+                                    'Your Friend List',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16),
+                                  ),
+                                ),
+                              )),
+                        ),
+
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        // Friend List
+                        Flexible(
+                            //flex: bottomListViewFlex,
+                            child: Container(
+                          color: bottomListViewColor,
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: userListOnSearch.isNotEmpty
+                                ? userListOnSearch.length
+                                : user.friendInfoList.length,
+                            itemBuilder: (context, index) {
+                              return ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                      userListOnSearch.isNotEmpty
+                                          ? userListOnSearch
+                                              .elementAt(index)
+                                              .photoURL!
+                                          : user.friendInfoList
+                                              .elementAt(index)
+                                              .photoURL!),
+                                ),
+                                title: Text(userListOnSearch.isNotEmpty
+                                    ? userListOnSearch
+                                        .elementAt(index)
+                                        .displayName!
+                                    : user.friendInfoList
+                                        .elementAt(index)
+                                        .displayName!),
+                                subtitle: Text(userListOnSearch.isNotEmpty
+                                    ? userListOnSearch.elementAt(index).email!
+                                    : user.friendInfoList
+                                        .elementAt(index)
+                                        .email!),
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide(
+                                        color: Colors.black, width: 1),
+                                    borderRadius: BorderRadius.circular(15)),
                               );
                             },
                           ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          ListTile(
-                            leading: Material(
-                              borderRadius: BorderRadius.circular(20),
-                              elevation: 2,
-                              shadowColor: Colors.black,
-                              child: const CircleAvatar(
-                                child: Icon(pendingFriendRequestIcon),
-                              ),
-                            ),
-                            title: const Text('Pending Friend Request'),
-                            shape: RoundedRectangleBorder(
-                                side: BorderSide(color: Colors.black, width: 1),
-                                borderRadius: BorderRadius.circular(15)),
-                            onTap: () {
-                              showBarModalBottomSheet(
-                                context: context,
-                                backgroundColor: Colors.transparent,
-                                builder: (context) => const PendingFriendView(),
-                              );
-                            },
-                            trailing:
-                                Text(pendingFriendRequestCount.toString()),
-                          ),
-                        ],
-                      ),
-                    )),
-
-                    const SizedBox(
-                      height: 5,
+                        )),
+                      ],
                     ),
-                    Material(
-                      color: topListViewColor,
-                      elevation: 5,
-                      child: SizedBox(
-                          height: 40,
-                          child: Container(
-                            color: spacingColor,
-                            child: const Center(
-                              child: Text(
-                                'Your Friend List',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 16),
-                              ),
-                            ),
-                          )),
-                    ),
-
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    // Friend List
-                    Flexible(
-                        //flex: bottomListViewFlex,
-                        child: Container(
-                      color: bottomListViewColor,
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: userListOnSearch.isNotEmpty
-                            ? userListOnSearch.length
-                            : user.friendInfoList.length,
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                            leading: CircleAvatar(
-                              backgroundImage: NetworkImage(userListOnSearch
-                                      .isNotEmpty
-                                  ? userListOnSearch.elementAt(index).photoURL!
-                                  : user.friendInfoList
-                                      .elementAt(index)
-                                      .photoURL!),
-                            ),
-                            title: Text(userListOnSearch.isNotEmpty
-                                ? userListOnSearch.elementAt(index).displayName!
-                                : user.friendInfoList
-                                    .elementAt(index)
-                                    .displayName!),
-                            subtitle: Text(userListOnSearch.isNotEmpty
-                                ? userListOnSearch.elementAt(index).email!
-                                : user.friendInfoList.elementAt(index).email!),
-                            shape: RoundedRectangleBorder(
-                                side: BorderSide(color: Colors.black, width: 1),
-                                borderRadius: BorderRadius.circular(15)),
-                          );
-                        },
-                      ),
-                    )),
-                  ],
-                ),
-              )));
-        });
+                  )));
+            });
+      },
+    );
   }
 
   @override
