@@ -12,17 +12,44 @@ class Firestore {
 
   Firestore._();
 
-  late AuthUser user;
-
   static void addUserInfo(AuthUser user) {
     firestoreReference.collection('users').doc(user.uid).set(
       {
         'uid': user.uid,
         'email': user.email,
         'displayName': user.displayName,
-        'photoUrl': user.photoURL ??
-            'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977',
+        'photoUrl': user.photoURL,
       },
+    );
+  }
+
+  static void setFcmTokenAndNotificationStatus(
+      {required String uid, required String token}) {
+    firestoreReference
+        .collection('users')
+        .doc(uid)
+        .collection('notification')
+        .doc('fcm_token')
+        .set(
+      {
+        'enable_notification': true,
+        'fcm_token': token,
+      },
+    );
+  }
+
+  static void setEmergencySignal({
+    required String uid,
+    required String message,
+    bool isPublic = false,
+  }) {
+    firestoreReference.collection('emergencies').doc(uid).set(
+      {
+        'isPublic': isPublic,
+        'message': message,
+        'uid': uid,
+      },
+      SetOptions(merge: true),
     );
   }
 
@@ -62,7 +89,7 @@ class Firestore {
     var res = await firestoreReference
         .collection('users')
         .where('email', isGreaterThanOrEqualTo: emailQuery)
-        .where('email', isLessThanOrEqualTo: emailQuery + '\uf8ff')
+        .where('email', isLessThanOrEqualTo: '$emailQuery\uf8ff')
         // .where('uid', )
         .get();
 
@@ -87,7 +114,7 @@ class Firestore {
         continue;
       }
 
-      if (alrFriend.docs.length == 0) {
+      if (alrFriend.docs.isEmpty) {
         searchedUserInfoList.add(userInfo);
         continue;
       }
@@ -238,7 +265,6 @@ class Firestore {
         .listen((querySnapshot) {
       for (var i = 0; i < querySnapshot.docChanges.length; ++i) {
         var changes = querySnapshot.docChanges.elementAt(i).doc.data()!;
-        print(changes['friendUID']);
         showDialog(
             context: context,
             builder: (context) {
@@ -254,63 +280,38 @@ class Firestore {
   }
 
   static StreamSubscription<QuerySnapshot<Map<String, dynamic>>>
-      friendRequestListener(String uid, BuildContext context) {
+      pendingFriendRequestSenderListener(String uid, BuildContext context) {
     var subscriber = firestoreReference
         .collection('users')
         .doc(uid)
         .collection('friends')
-        //.where('isSender', isEqualTo: false)
-        .snapshots(includeMetadataChanges: true)
+        .where('isSender', isEqualTo: true)
+        .where('requestConfirmed', isEqualTo: false)
+        .snapshots()
         .listen((querySnapshot) {
-      for (var change in querySnapshot.docChanges) {
-        //final source = (querySnapshot.metadata.isFromCache) ? "local cache" : "server";
-        var data = change.doc.data() as Map<String, dynamic>;
-        //Check if change is from server
-        if (querySnapshot.metadata.isFromCache == false)
-        {
-          if (change.type == DocumentChangeType.added)
-          {
-            if (data['isSender'] == false && data['requestConfirmed'] == false)
-            {
-              print('Received a friend request from UID:' + data['friendUID']);
-            }
-          }
-          else if (change.type == DocumentChangeType.modified) {
-            if (data['isSender'] == false && data['requestConfirmed'] == true)
-            {
-              print('You accepted a friend request from UID:' + data['friendUID']);
-            }
-            else if (data['isSender'] == true && data['requestConfirmed'] == true)
-            {
-              print('Your friend request was accepted by UID:' + data['friendUID']);
-            }
-          }
-        }
+      for (var i = 0; i < querySnapshot.docChanges.length; ++i) {
+        var changes = querySnapshot.docChanges.elementAt(i).doc.data()!;
+        showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Text('Friend request sent to' + changes['friendUID']),
+              );
+            });
       }
     });
 
     return subscriber;
   }
 
-  static Stream<QuerySnapshot> getAcceptedFriendRequestStream(String uid) {
-    var subscriber = firestoreReference
-        .collection("users")
-        .doc(uid)
-        .collection('friends')
-        .where("requestConfirmed", isEqualTo: true)
-        .snapshots();
-
-    return subscriber;
-  }
-
   static Stream<QuerySnapshot> getPendingFriendStream(String userUID) {
-    Stream<QuerySnapshot> _pendingFriendStream = Firestore.firestoreReference
+    Stream<QuerySnapshot> pendingFriendStream = Firestore.firestoreReference
         .collection('users')
         .doc(userUID)
         .collection('friends')
         .where('isSender', isEqualTo: false)
         .where('requestConfirmed', isEqualTo: false)
         .snapshots();
-    return _pendingFriendStream;
+    return pendingFriendStream;
   }
 }

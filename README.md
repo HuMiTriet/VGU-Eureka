@@ -9,7 +9,7 @@
 + Thai Hoang Tam (17387) - API specialist
 + Dinh Minh Hoang (17124) - CI/CD engineer
 + Huynh Cam Tu (16610) - Front end
-+ Truong Quang Huy (18602) - DevOps
++ Truong Quang Huy (18602) - DevOps 
 
 ## Project:
 [Project description](Project_Proposal.pdf)
@@ -20,6 +20,6 @@
 
 [Authentication](./documentation/Authentication_architecture.md)
 
-#Table of content 
+# Table of content 
 1. [Authentication](./documentation/Authentication_architecture.md)
 2. [Backend]()

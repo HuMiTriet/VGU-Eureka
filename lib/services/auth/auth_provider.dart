@@ -23,4 +23,8 @@ abstract class AuthProvider {
   Future<void> sendEmailVerification();
 
   Future<bool> validateEnteredPassword(String password);
+
+  Future<void> updatePhotoURL(String url);
+
+  Future<void> updateDisplayName(String name);
 }
