@@ -228,7 +228,7 @@ class Firestore {
   }
 
   static StreamSubscription<QuerySnapshot<Map<String, dynamic>>>
-      acceptedFriendRequestReceiverListener(String uid, BuildContext context) {
+      friendRequestListener(String uid, BuildContext context) {
     var subscriber = firestoreReference
         .collection('users')
         .doc(uid)
@@ -266,28 +266,13 @@ class Firestore {
     return subscriber;
   }
 
-  static StreamSubscription<QuerySnapshot<Map<String, dynamic>>>
-      pendingFriendRequestSenderListener(String uid, BuildContext context) {
+  static Stream<QuerySnapshot> getAcceptedFriendRequestStream(String uid) {
     var subscriber = firestoreReference
         .collection("users")
         .doc(uid)
         .collection('friends')
-        .where("isSender", isEqualTo: true)
-        .where("requestConfirmed", isEqualTo: false)
-        .snapshots()
-        .listen((querySnapshot) {
-      for (var i = 0; i < querySnapshot.docChanges.length; ++i) {
-        var changes = querySnapshot.docChanges.elementAt(i).doc.data()!;
-        print(changes['friendUID']);
-        showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: Text('Friend request sent to' + changes['friendUID']),
-              );
-            });
-      }
-    });
+        .where("requestConfirmed", isEqualTo: true)
+        .snapshots();
 
     return subscriber;
   }

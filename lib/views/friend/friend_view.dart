@@ -79,19 +79,40 @@ class _FriendViewState extends State<FriendView> {
   @override
   Widget build(BuildContext context) {
     user = context.watch<AuthUser>();
-    acceptedListener = Firestore.acceptedFriendRequestReceiverListener(user.uid, context);
-
 
     //Listener & Stream related
+    late Stream<QuerySnapshot> _acceptedFriendStream;
     late Stream<QuerySnapshot> _pendingFriendStream;
     int? pendingFriendRequestCount = 0;
 
+    _acceptedFriendStream = Firestore.getAcceptedFriendRequestStream(user.uid);
     _pendingFriendStream = Firestore.getPendingFriendStream(user.uid);
 
     return StreamBuilder<QuerySnapshot>(
         stream: _pendingFriendStream,
         builder: (context, snapshot) {
           pendingFriendRequestCount = (snapshot.data?.docs.length);
+
+          //Check this
+
+          for (var change in snapshot.data!.docChanges) {
+            var data = change.doc.data() as Map<String, dynamic>;
+            if(snapshot.data!.metadata.isFromCache)
+              {
+                continue;
+              }
+            if(change.type == DocumentChangeType.modified)
+            {
+              if(data['requestConfirmed'] == true)
+              {
+                print('Request Confirmed!');
+                var newFriend = Firestore.getUserInfo(data['friendUID']) as etoet.UserInfo;
+                user.friendInfoList.add(newFriend);
+              }
+            }
+
+          }
+
           if (snapshot.hasError) {
             return const Text('Something went wrong');
           }
