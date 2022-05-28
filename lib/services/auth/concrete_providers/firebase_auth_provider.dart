@@ -219,6 +219,7 @@ class FirebaseAuthProvider implements AuthProvider {
     }
   }
 
+  @override
   Future<void> updatePhotoURL(String url) async {
     final user = FirebaseAuth.instance.currentUser;
 
