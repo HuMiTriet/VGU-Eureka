@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:etoet/services/database/firestore.dart';
 import 'package:etoet/views/friend/pending_friend_view.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
@@ -29,6 +30,43 @@ class _FriendViewState extends State<FriendView> {
   @override
   void initState() {
     super.initState();
+      FirebaseMessaging.onMessage.listen((event) {
+        print('Listened Bitch!');
+        var notification = event.notification;
+        var data = event.data;
+
+        print(notification!.body.toString());
+        print(data.toString());
+
+        if (data['type'] == "newFriendSender")
+        {
+          print('Your friend request has been accepted by ' + data['displayName']);
+          var newFriend = etoet.UserInfo(
+            uid: data['uid'],
+            photoURL: data['photoURL'],
+            email: data['email'],
+            displayName: data['displayName'],
+            phoneNumber: data['phoneNumber'],
+          );
+          user.friendInfoList.add(newFriend);
+          setState((){});
+        }
+        else if (data['type'] == "newFriendReceiver")
+        {
+          print('You have accepted a friend request from ' + data['displayName']);
+          var newFriend = etoet.UserInfo(
+            uid: data['uid'],
+            photoURL: data['photoURL'],
+            email: data['email'],
+            displayName: data['displayName'],
+            phoneNumber: data['phoneNumber'],
+          );
+          user.friendInfoList.add(newFriend);
+          setState((){});
+        }
+
+      });
+
   }
 
   Set<etoet.UserInfo> getFilteredFriendList(
@@ -79,43 +117,14 @@ class _FriendViewState extends State<FriendView> {
   @override
   Widget build(BuildContext context) {
     user = context.watch<AuthUser>();
-    var futureFriendList = user.friendInfoList as Future<etoet.UserInfo>;
 
     //Listener & Stream related
     late Stream<QuerySnapshot> _acceptedFriendStream;
     late Stream<QuerySnapshot> _pendingFriendStream;
     int? pendingFriendRequestCount = 0;
 
-    _acceptedFriendStream = Firestore.getAcceptedFriendRequestStream(user.uid);
+    //_acceptedFriendStream = Firestore.getAcceptedFriendRequestStream(user.uid);
     _pendingFriendStream = Firestore.getPendingFriendStream(user.uid);
-
-    return StreamBuilder<QuerySnapshot>(
-      stream: _acceptedFriendStream,
-      builder: (context, acceptedRequestSnapshot) {
-
-        if(acceptedRequestSnapshot.data != null)
-          {
-            for (var change in acceptedRequestSnapshot.data!.docChanges) {
-              var changedData = change.doc.data() as Map<String, dynamic>;
-              if (acceptedRequestSnapshot.data!.metadata.isFromCache) {
-                print('From Cache');
-                continue;
-              }
-              if (change.type == DocumentChangeType.added) {
-                  print('Request Confirmed!');
-
-                  // setState(() async {
-                  //   var newFriend = await Firestore.getUserInfo(changedData['friendUID']);
-                  //   user.friendInfoList.add(newFriend);
-                  // });
-
-
-                  // var newData = acceptedRequestSnapshot.data;
-                  // print(newData!.size.toString());
-              }
-            }
-          }
-
 
         return StreamBuilder<QuerySnapshot>(
             stream: _pendingFriendStream,
@@ -296,13 +305,11 @@ class _FriendViewState extends State<FriendView> {
                     ),
                   )));
             });
-      },
-    );
-  }
+      }
 
   @override
   void dispose() {
     super.dispose();
-    acceptedListener.cancel();
+    //acceptedListener.cancel();
   }
 }
