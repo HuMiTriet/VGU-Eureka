@@ -49,6 +49,10 @@ export const sendPrivateNotification = functions.region("asia-southeast1").
           notification: {
             title: "Emergency Alert",
             body: String(snapshot.data()?.message),
+            type: "emegency",
+          },
+          data: {
+            type: "emegency",
           },
         };
         return fcm.sendToDevice(token, payload);
@@ -70,5 +74,54 @@ export const sendPrivateNotification = functions.region("asia-southeast1").
       }
     });
 
-// export const overwritePhotoUrlFromStorage = functions.region("asia-southeast1").
-//     storage.bucket
+
+// send a notification new a new friend reqest is accepted
+export const notifyNewFriendRequestAcceptedSender = functions
+    .region("asia-southeast1")
+    .firestore.document("/users/{userUID}/friends/{friendUID}")
+    .onCreate(async (snapshot, context) => {
+      //  dont run if it is the sendee
+      // if (!snapshot.data().isSender) {
+      //   return functions.logger
+      //       .log("sender new friend function: not the sender, reject");
+      // }
+      // getting the friend info
+      const friendInfoRef = db.collection("users")
+          .doc(context.params.friendUID);
+      console.log(context.params.friendUID);
+
+      const friendInfoSnapshot = await friendInfoRef.get();
+
+      // get all of the friend info
+      const friendUserName = String(friendInfoSnapshot.data()?.displayName);
+      const friendEmail = String(friendInfoSnapshot.data()?.email);
+      const friendPhotoUrl = String(friendInfoSnapshot.data()?.photoUrl);
+      const friendUid = String(friendInfoSnapshot.data()?.uid);
+
+      const payload = {
+        notification: {
+          title: friendUserName + " has accepted your invite",
+          body: "You can now ask them for help !",
+        },
+        data: {
+          type: "newFriendSender",
+          displayName: friendUserName,
+          email: friendEmail,
+          photoUrl: friendPhotoUrl,
+          uid: friendUid,
+        },
+      };
+
+      // getting the friend FCM token
+      const friendFcmTokenRef = db.collection("users")
+          .doc(context.params.userUID)
+          .collection("notification")
+          .doc("fcm_token");
+
+      const friendFcmToken = await friendFcmTokenRef.get();
+
+      const token: string = friendFcmToken.data()?.fcm_token;
+      console.log(token);
+
+      return fcm.sendToDevice(token, payload);
+    });

@@ -5,7 +5,13 @@ import 'package:etoet/services/auth/auth_exceptions.dart';
 import 'package:etoet/services/auth/auth_provider.dart';
 import 'package:etoet/services/auth/auth_user.dart';
 import 'package:firebase_auth/firebase_auth.dart'
-    show EmailAuthProvider, FirebaseAuth, FirebaseAuthException;
+    show
+        EmailAuthProvider,
+        FirebaseAuth,
+        FirebaseAuthException,
+        PhoneAuthCredential,
+        UserCredential;
+import 'package:firebase_auth_platform_interface/src/auth_credential.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 class FirebaseAuthProvider implements AuthProvider {
@@ -184,6 +190,33 @@ class FirebaseAuthProvider implements AuthProvider {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+  }
+
+  @override
+  Future<void> verifyPhoneNumber(
+      {required String phoneNumber,
+      required void Function(PhoneAuthCredential) verificationCompleted,
+      required void Function(FirebaseAuthException) verificationFailed,
+      required void Function(String, int?) codeSent,
+      required void Function(String) codeAutoRetrievalTimeout}) async {
+    await FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: phoneNumber,
+        verificationCompleted: verificationCompleted,
+        verificationFailed: verificationFailed,
+        codeSent: codeSent,
+        codeAutoRetrievalTimeout: codeAutoRetrievalTimeout);
+  }
+
+  @override
+  Future<UserCredential> linkWithCredential(
+      {required AuthCredential credential}) {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      return user.linkWithCredential(credential);
+    } else {
+      //triggered when user not logged in
+      throw UserNotLoggedInAuthException();
+    }
   }
 
   @override

@@ -23,6 +23,15 @@ class Firestore {
     );
   }
 
+  static void updateUserInfo(AuthUser authUser) async {
+    firestoreReference.collection('users').doc(authUser.uid).update({
+      'email': authUser.email,
+      'displayName': authUser.displayName,
+      'photoUrl': authUser.photoURL,
+      'phoneNumber': authUser.phoneNumber,
+    });
+  }
+
   static void setFcmTokenAndNotificationStatus(
       {required String uid, required String token}) {
     firestoreReference

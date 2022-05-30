@@ -70,6 +70,25 @@ class AuthService implements AuthProvider {
       provider.validateEnteredPassword(password);
 
   @override
+  Future<void> verifyPhoneNumber(
+          {required String phoneNumber,
+          required void Function(PhoneAuthCredential) verificationCompleted,
+          required void Function(FirebaseAuthException) verificationFailed,
+          required void Function(String, int?) codeSent,
+          required void Function(String) codeAutoRetrievalTimeout}) =>
+      provider.verifyPhoneNumber(
+        phoneNumber: phoneNumber,
+        verificationCompleted: verificationCompleted,
+        verificationFailed: verificationFailed,
+        codeSent: codeSent,
+        codeAutoRetrievalTimeout: codeAutoRetrievalTimeout,
+      );
+
+  @override
+  Future<UserCredential> linkWithCredential(
+          {required AuthCredential credential}) =>
+      provider.linkWithCredential(credential: credential);
+  @override
   Future<void> updatePhotoURL(String url) => provider.updatePhotoURL(url);
 
   @override
