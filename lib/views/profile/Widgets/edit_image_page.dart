@@ -1,29 +1,38 @@
+import 'dart:developer';
 import 'dart:io';
+
+import 'package:etoet/services/auth/auth_service.dart';
 import 'package:etoet/services/auth/auth_user.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:developer';
 
 class EditImagePage extends StatefulWidget {
-  EditImagePage({Key? key, required this.imageSource, required this.user})
+  final ImageSource imageSource;
+
+  final AuthUser user;
+  const EditImagePage({Key? key, required this.imageSource, required this.user})
       : super(key: key);
 
-  final imageSource;
-  final AuthUser user;
-
   @override
-  _EditImagePageState createState() => _EditImagePageState();
+  EditImagePageState createState() => EditImagePageState();
 }
 
-class _EditImagePageState extends State<EditImagePage> {
+class EditImagePageState extends State<EditImagePage> {
+  final _updateFailSnackBar = const SnackBar(
+    content: Text('Update Image Failed.'),
+  );
+
+  final _updateSuccessSnackBar = const SnackBar(
+    content: Text('Image Updated.'),
+  );
+
   File? image;
-  var imageUrl;
+   var imageUrl;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('upload image')),
+      appBar: AppBar(title: const Text('upload image')),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -31,14 +40,14 @@ class _EditImagePageState extends State<EditImagePage> {
           const SizedBox(
               width: 330,
               child: Text(
-                "Upload a photo of yourself:",
+                'Upload a photo of yourself:',
                 style: TextStyle(
                   fontSize: 23,
                   fontWeight: FontWeight.bold,
                 ),
               )),
           Padding(
-              padding: EdgeInsets.only(top: 20),
+              padding: const EdgeInsets.only(top: 20),
               child: SizedBox(
                   width: 330,
                   child: GestureDetector(
@@ -62,7 +71,7 @@ class _EditImagePageState extends State<EditImagePage> {
                               ),
                             )))),
           Padding(
-              padding: EdgeInsets.only(top: 40),
+              padding: const EdgeInsets.only(top: 40),
               child: Align(
                   alignment: Alignment.bottomCenter,
                   child: SizedBox(
@@ -72,23 +81,35 @@ class _EditImagePageState extends State<EditImagePage> {
                       onPressed: () async {
                         if (image == null) return;
 
-                        final _firebaseStorage = FirebaseStorage.instance;
+                        final firebaseStorage = FirebaseStorage.instance;
+
                         try {
-                          var snapshot = await _firebaseStorage
+
+                          var snapshot = await firebaseStorage
                               .ref()
-                              .child('images/${widget.user.uid}}')
+                              .child('images/${widget.user.uid}')
                               .putFile(image!);
                           log(widget.user.uid);
+
                           var downloadUrl = await snapshot.ref.getDownloadURL();
                           setState(() {
                             imageUrl = downloadUrl;
                           });
-                        } on FirebaseException catch (e) {}
-                        log('image url: ' + imageUrl);
-                        Navigator.pop(context);
+                        } on FirebaseException catch (e) {
+                          log('${e.message}');
+                        }
 
-                        FirebaseAuth.instance.currentUser
-                            ?.updatePhotoURL(imageUrl);
+                        if (imageUrl != null) {
+                          log('image url: ' + imageUrl);
+                          AuthService.firebase().updatePhotoURL(imageUrl);
+
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(_updateSuccessSnackBar);
+                        } else {
+                          log('fail to update image');
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(_updateFailSnackBar);
+                        }
                       },
                       child: const Text(
                         'Update',
@@ -105,7 +126,7 @@ class _EditImagePageState extends State<EditImagePage> {
     final _picker = ImagePicker();
     PickedFile image;
 
-    XFile? _image = await _picker.pickImage(source: widget.imageSource);
+    var _image = await _picker.pickImage(source: widget.imageSource);
 
     setState(() {
       this.image = File(_image!.path);

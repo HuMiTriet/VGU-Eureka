@@ -12,6 +12,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login_facebook/flutter_login_facebook.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:provider/provider.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({
@@ -186,7 +187,8 @@ class _LoginViewState extends State<LoginView> {
                               password: password,
                             );
 
-                            final user = AuthService.firebase().currentUser;
+                            final user =
+                                Provider.of<AuthUser?>(context, listen: false);
 
                             devtools.log(user.toString());
 

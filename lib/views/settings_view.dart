@@ -1,4 +1,8 @@
 import 'package:etoet/constants/routes.dart';
+import 'package:etoet/services/auth/auth_user.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:etoet/views/settingUI_lib/src/custom_section.dart';
 import 'package:etoet/views/settingUI_lib/src/settings_list.dart';
 import 'package:etoet/views/settingUI_lib/src/settings_section.dart';
@@ -24,6 +28,7 @@ class _SettingsViewState extends State<SettingsView> {
 
   @override
   Widget build(BuildContext context) {
+    var user = context.watch<AuthUser?>();
     return Scaffold(
       appBar: AppBar(title: const Text('Settings UI')),
       body: buildSettingsList(),
@@ -87,11 +92,24 @@ class _SettingsViewState extends State<SettingsView> {
               },
             ),
             SettingsTile(
-              title: 'Notification-received range',
+                // title: 'Notification-received range',
+                titleWidget: Row (
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text('Notification-received range'),
+                    Text('${_receivedRange.toStringAsFixed(1)} km'),
+
+                    // Expanded(child: Container()),
+                    // Icon(Icons.arrow_drop_down),
+                  ],
+                ),
+                leading: Icon(Icons.collections_bookmark)
+            ),
+            SettingsTile(
               titleWidget: Slider(
                 min: 5,
                 max: 20,
-                divisions: 5,
+                divisions: 3,
                 activeColor: Colors.blue,
                 inactiveColor: Colors.grey,
                 value: _receivedRange,
@@ -100,6 +118,7 @@ class _SettingsViewState extends State<SettingsView> {
                     _receivedRange = value;
                   });
                 },
+                label: '$_receivedRange km',
               ),
             )
           ],

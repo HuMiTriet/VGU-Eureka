@@ -20,7 +20,4 @@ abstract class Map extends Widget {
 
   /// Move the camera to current location of user.
   void moveToCurrentLocation();
-
-  /// Show the current address of the map view.
-  void updateCurrentMapAddress();
 }
