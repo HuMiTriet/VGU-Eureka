@@ -4,11 +4,8 @@ import 'package:etoet/services/database/firestore.dart';
 import 'package:etoet/services/map/map_factory.dart' as etoet;
 import 'package:etoet/services/notification/notification.dart';
 import 'package:etoet/views/friend/friend_view.dart';
-<<<<<<< HEAD
 import 'package:etoet/views/signal/SOS_view.dart';
-=======
 import 'package:firebase_messaging/firebase_messaging.dart';
->>>>>>> origin/dev
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
@@ -28,32 +25,10 @@ class MainView extends StatefulWidget {
 class MainViewState extends State<MainView> {
   late etoet.Map map;
   late AuthUser? authUser;
-<<<<<<< HEAD
-  // late StreamSubscription<QuerySnapshot<Map<String, dynamic>>> pendingFriendRequestReceiverListener;
-  // late StreamSubscription<QuerySnapshot<Map<String, dynamic>>> pendingFriendRequestSenderListener;
-
-  @override
-  void initState() {
-    super.initState();
-    map = etoet.Map('GoogleMap');
-    map.context = context;
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // pendingFriendRequestSenderListener = Firestore.pendingFriendRequestSenderListener(authUser!.uid, context);
-      // pendingFriendRequestReceiverListener = Firestore.pendingFriendRequestReceiverListener(authUser!.uid, context);
-    });
-  }
-=======
->>>>>>> origin/dev
 
   @override
   Widget build(BuildContext context) {
     authUser = context.watch<AuthUser?>();
-<<<<<<< HEAD
-    // pendingFriendRequestReceiverListener = Firestore.pendingFriendRequestReceiverListener(authUser!.uid);
-    // pendingFriendRequestSenderListener = Firestore.pendingFriendRequestSenderListener(authUser!.uid);
-=======
->>>>>>> origin/dev
 
     return FutureBuilder(
         future: Firestore.getFriendInfoList(authUser!.uid),
@@ -126,14 +101,7 @@ class MainViewState extends State<MainView> {
                   FloatingActionButton(
                       heroTag: 'goToSOSFromMain',
                       onPressed: () {
-<<<<<<< HEAD
                         Navigator.of(context).pushNamed(sosRoute);
-=======
-                        Firestore.setEmergencySignal(
-                          uid: authUser!.uid,
-                          message: 'HELP ME LOID MAN',
-                        );
->>>>>>> origin/dev
                       },
                       child: const Icon(Icons.add_alert)),
                   FloatingActionButton(
