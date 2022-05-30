@@ -12,21 +12,29 @@ class Geocoding {
   /// Get address from location
   static Future<String> getAddress(LatLng location) async {
     var placemark = await _getPlacemark(location);
-    return _getAddressWithPriority(placemark);
+    var address = _getAddressWithPriority(placemark);
+    return address;
   }
 
   /// Is used to get the address from the [placemark] with priority from: city > administrativeArea > subAdministrativeArea > thoroughfare > subThoroughfare > subLocality > country.
   static String _getAddressWithPriority(Placemark placemark) {
     var address = 'Unknown';
-
-    return placemark.locality ??
-        placemark.administrativeArea ??
-        placemark.subAdministrativeArea ??
-        placemark.thoroughfare ??
-        placemark.subThoroughfare ??
-        placemark.subLocality ??
-        placemark.country ??
-        address;
+    if (placemark.locality != '') {
+      address = placemark.locality!;
+    } else if (placemark.administrativeArea != '') {
+      address = placemark.administrativeArea!;
+    } else if (placemark.subAdministrativeArea != '') {
+      address = placemark.subAdministrativeArea!;
+    } else if (placemark.thoroughfare != '') {
+      address = placemark.thoroughfare!;
+    } else if (placemark.subThoroughfare != '') {
+      address = placemark.subThoroughfare!;
+    } else if (placemark.subLocality != '') {
+      address = placemark.subLocality!;
+    } else if (placemark.country != '') {
+      address = placemark.country!;
+    }
+    return address;
   }
 
   /// Get placemark from location using geocoding package.
