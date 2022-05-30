@@ -10,6 +10,7 @@ import 'package:etoet/views/friend/pending_friend_view.dart';
 import 'package:etoet/views/profile/profile_page.dart';
 import 'package:etoet/views/settings_view.dart';
 import 'package:etoet/views/sign_post.dart';
+import 'package:etoet/views/signal/SOS_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -40,6 +41,7 @@ void main() {
           friendRoute: (context) => const FriendView(),
           addFriendRoute: (context) => const AddFriendView(),
           pendingFriendRoute: (context) => const PendingFriendView(),
+          sosRoute: (context) => SOSView(),
         },
       ),
     ),
