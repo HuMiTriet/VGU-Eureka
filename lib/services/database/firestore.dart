@@ -296,4 +296,44 @@ class Firestore {
         .snapshots();
     return pendingFriendStream;
   }
+
+  static Stream<QuerySnapshot> getMessageStream(String chatRoomUID) {
+    Stream<QuerySnapshot> messageStream = Firestore.firestoreReference
+        .collection('chatrooms')
+        .doc(chatRoomUID)
+        .collection('messages')
+        .snapshots();
+    return messageStream;
+  }
+
+  static void createFriendChatroom(
+      String userUID1, String userUID2, String chatroomUID) {
+    final user1Ref = Firestore.firestoreReference
+        .collection('users')
+        .doc(userUID1)
+        .collection('friends')
+        .doc(userUID2);
+    final user2Ref = Firestore.firestoreReference
+        .collection('users')
+        .doc(userUID2)
+        .collection('friends')
+        .doc(userUID1);
+    //TODO:
+    // user1Ref.update({'chatroomUID': chatroomUID});
+    // user2Ref.update({'chatroomUID': chatroomUID});
+    // Firestore.firestoreReference
+    //     .collection('chatrooms')
+    //     .doc(chatroomUID)
+    //     .set({'user1UID': userUID1, 'user2UID': userUID2});
+  }
+
+  static void setMessage(String chatroomUID, String message, String senderUID) {
+    var ts = DateTime.now();
+    final data = {'message': message, 'senderUID': senderUID, 'ts': ts};
+    FirebaseFirestore.instance
+        .collection('chatrooms')
+        .doc(chatroomUID)
+        .collection('messages')
+        .add(data);
+  }
 }
