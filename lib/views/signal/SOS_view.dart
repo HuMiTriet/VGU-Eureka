@@ -1,9 +1,7 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-
 import 'package:flutter/material.dart';
 
 class SOSView extends StatefulWidget {
-  SOSView({Key? key}) : super(key: key);
+  const SOSView({Key? key}) : super(key: key);
 
   @override
   State<SOSView> createState() => _SOSViewState();
@@ -21,22 +19,22 @@ class _SOSViewState extends State<SOSView> {
             children: [
               Row(
                 children: [
-                  Text(
+                  const Text(
                     'EMERGENCY!',
                     style: TextStyle(
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
                         color: Colors.red),
                   ),
-                  Spacer(),
+                  const Spacer(),
                   IconButton(
                     onPressed: () {},
-                    icon: Icon(Icons.close),
+                    icon: const Icon(Icons.close),
                     color: Colors.white,
                   ),
                 ],
               ),
-              Text(
+              const Text(
                 'What kind of problem you need to help with?',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -45,7 +43,7 @@ class _SOSViewState extends State<SOSView> {
               Theme(
                 data: ThemeData(unselectedWidgetColor: Colors.white),
                 child: CheckBoxList(
-                  children: ['Lost and Found', 'Accident', 'Thieves', 'Other'],
+                  children: const ['Lost and Found', 'Accident', 'Thieves', 'Other'],
                 ),
               ),
               Padding(
@@ -57,7 +55,7 @@ class _SOSViewState extends State<SOSView> {
                 child: Center(child: buildTextDescriptionField()),
               ),
               RichText(
-                  text: TextSpan(
+                  text: const TextSpan(
                       style: TextStyle(
                           color: Colors.black, fontWeight: FontWeight.bold),
                       children: <TextSpan>[
@@ -76,7 +74,7 @@ class _SOSViewState extends State<SOSView> {
                         text:
                             ", your location will be public for all ETOET's users. This may put you in danger! Choose wisingly and intentinally"),
                   ])),
-              SizedBox(
+              const SizedBox(
                 height: 15,
               ),
               buildButtons()
@@ -93,7 +91,7 @@ class _SOSViewState extends State<SOSView> {
   Widget buildTextDescriptionField() => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
               'Describe your location (trees, building, traffic signs or anything to find you faster)',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
@@ -103,7 +101,7 @@ class _SOSViewState extends State<SOSView> {
             autofocus: true,
             maxLength: maxLength,
             maxLines: maxLines,
-            style: TextStyle(fontSize: 20),
+            style: const TextStyle(fontSize: 20),
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.white,
@@ -116,7 +114,7 @@ class _SOSViewState extends State<SOSView> {
   Widget buildSituationField() => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Detailed about your situation',
+          const Text('Detailed about your situation',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
               )),
@@ -125,7 +123,7 @@ class _SOSViewState extends State<SOSView> {
             autofocus: true,
             maxLength: maxLength,
             maxLines: maxLines,
-            style: TextStyle(fontSize: 20),
+            style: const TextStyle(fontSize: 20),
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.white,
@@ -135,20 +133,20 @@ class _SOSViewState extends State<SOSView> {
         ],
       );
 
-  InputBorder border() => OutlineInputBorder(
+  InputBorder border() => const OutlineInputBorder(
         borderRadius: BorderRadius.all(Radius.circular(2)),
         borderSide: BorderSide(color: Colors.black, width: 0.5),
       );
 
   Widget buildButtons() => Row(
-        children: [
+        children: const [
           Expanded(
             child: _Buttons(
               color: Colors.green,
               text: 'PRIVATE SIGNAL',
             ),
           ),
-          const SizedBox(
+          SizedBox(
             width: 10,
           ),
           Expanded(
@@ -196,7 +194,7 @@ class _Buttons extends StatelessWidget {
                   children: [
                     Text(
                       text,
-                      style: TextStyle(color: Colors.white, fontSize: 10),
+                      style: const TextStyle(color: Colors.white, fontSize: 10),
                     ),
                     const SizedBox(width: 15),
                   ],
@@ -211,35 +209,35 @@ class _Buttons extends StatelessWidget {
 }
 
 class CheckBoxList extends StatefulWidget {
-  CheckBoxList({required this.children}) {
-    this.values = List.generate(children.length, (index) => false);
+  CheckBoxList({super.key, required this.children}) {
+    values = List.generate(children.length, (index) => false);
   }
   final List<String> children;
   // final int count;
   late final List<bool> values;
   @override
-  _CheckBoxListState createState() => _CheckBoxListState();
+  CheckBoxListState createState() => CheckBoxListState();
 }
 
-class _CheckBoxListState extends State<CheckBoxList> {
+class CheckBoxListState extends State<CheckBoxList> {
   @override
   Widget build(BuildContext context) {
     var children = widget.children;
     var values = widget.values;
     return Column(
         children: children.map((element) {
-      int index = children.indexOf(element);
+      var index = children.indexOf(element);
       return CheckboxListTile(
         controlAffinity: ListTileControlAffinity.leading,
         activeColor: Colors.teal,
         title: Text(
           element,
-          style: TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.w400,
           ),
         ),
         value: values[index],
-        onChanged: (bool? value) {
+        onChanged: (value) {
           setState(() {
             values[index] = value!;
           });
