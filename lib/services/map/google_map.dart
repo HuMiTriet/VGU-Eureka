@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'dart:developer' as devtools show log;
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:etoet/services/auth/auth_user.dart';
 import 'package:etoet/services/auth/location.dart';
 import 'package:etoet/services/database/database.dart';
-import 'package:etoet/services/database/firestore.dart';
+import 'package:etoet/services/map/emergency/emergency_marker.dart';
 import 'package:etoet/services/map/emergency/sos_default_map.dart';
 import 'package:etoet/services/map/friend/friend_marker_location.dart';
 import 'package:etoet/services/map/geoflutterfire/geoflutterfire.dart';
@@ -18,6 +19,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
+import '../database/firestore.dart';
 import 'geocoding.dart';
 
 /// This is the implementation of the [Map] interface using [GoogleMap].
@@ -62,10 +64,6 @@ class GoogleMapImpl extends StatefulWidget implements etoet.Map {
     address = await Geocoding.getAddress(await _mapController.getLatLng(
         ScreenCoordinate(
             x: (deviceWidth / 2).round(), y: (deviceHeight / 2).round())));
-  }
-
-  void updateMapAddress(LatLng location) async {
-    address = await Geocoding.getAddress(location);
   }
 
   Future<bool> _hasLocationPermission() async {
@@ -146,7 +144,6 @@ class GoogleMapImpl extends StatefulWidget implements etoet.Map {
 }
 
 class _GoogleMapImplState extends State<GoogleMapImpl> {
-  Timer? timer;
   late Future<LatLng> location = widget._getCurrentLocation();
   late BitmapDescriptor userIcon;
   final mapEmergencyUidLocation = <String, LatLng>{};
@@ -241,27 +238,72 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
     }
   }
 
-  /// Update markers of all friends
+  /// Update markers of nearby emergency signal
   void updateEmergencyMarker(String emergencyId) async {
     var emergencyInfo = await Firestore.getUserInfo(emergencyId);
-    var friendMarkerCreator = FriendMarker(
+    var emergencyMarkerCreator = EmergencyMarker(
         context: context,
-        friendInfo: emergencyInfo,
-        polylines: widget._polylines);
-    var location = widget.authUser?.mapFriendUidLocation[emergencyInfo.uid];
+        emergencyInfo: emergencyInfo,
+        polylines: widget._polylines,
+        uid: emergencyId);
+    var location = mapEmergencyUidLocation[emergencyId];
     var latLng = LatLng(location!.latitude, location.longitude);
-    var friendMarker =
-        await friendMarkerCreator.createFriendMarker(friendLatLng: latLng);
-    widget._markers.removeWhere(
-        (marker) => marker.markerId == MarkerId(emergencyInfo.uid));
-    widget._markers.add(friendMarker);
-    widget._friendsMarkers.removeWhere(
-        (marker) => marker.markerId == MarkerId(emergencyInfo.uid));
-    widget._friendsMarkers.add(friendMarker);
+    var emergencyMarker = await emergencyMarkerCreator.createEmergencyMarker(
+        emergencyLatLng: latLng);
+    widget._markers
+        .removeWhere((marker) => marker.markerId == MarkerId(emergencyId));
+    widget._markers.add(emergencyMarker);
+
     setState(() {});
     devtools.log(
         'marker list: ${widget._markers.length}, displayName: ${emergencyInfo.displayName}, location: $latLng',
-        name: 'GoogleMap: updateFriendMarker');
+        name: 'GoogleMap: updateEmergencyMarker');
+  }
+
+  void toEmergencyState() {
+    // pause friend stream
+    for (var subscription in widget._friendsLocationSubscriptions) {
+      subscription.pause();
+    }
+
+    // remove friends markers
+    widget._markers.removeWhere(
+        (marker) => marker.markerId != MarkerId(widget.authUser!.uid));
+    widget._polylines.clear();
+
+    // subcription to listen to all public signal in radius
+    var emergencyRadius = 20.0;
+    var emergencySubcription = GeoFlutterFire.querySignalInRadius(
+        lat: widget._location.latitude,
+        lng: widget._location.longitude,
+        radius: emergencyRadius);
+
+    // add emergency marker if there are nearby signal
+    emergencySubcription.onData((data) {
+      for (var doc in data) {
+        doc = doc as DocumentSnapshot;
+        // only get public emergency signal
+        if (doc['isPublic'] == true) {
+          var geoPoint = doc['position']['geopoint'] as GeoPoint;
+          var emergencyLocation = LatLng(geoPoint.latitude, geoPoint.longitude);
+          var emergencyId = doc['uid'] as String;
+          mapEmergencyUidLocation[emergencyId] = emergencyLocation;
+          updateEmergencyMarker(emergencyId);
+        }
+      }
+    });
+    setState(() {});
+  }
+
+  void toDefaultState() {
+    for (var subscription in widget._friendsLocationSubscriptions) {
+      subscription.resume();
+    }
+    widget._markers.removeWhere(
+        (marker) => marker.markerId != MarkerId(widget.authUser!.uid));
+    setState(() {
+      widget._markers.addAll(widget._friendsMarkers);
+    });
   }
 
   @override
@@ -337,53 +379,26 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
               Positioned(
                 bottom: 80,
                 child: EmergencyDefaultMap(
-                  toEmergencyState: () {
-                    for (var subscription
-                        in widget._friendsLocationSubscriptions) {
-                      subscription.pause();
-                    }
-                    widget._markers.removeWhere((marker) =>
-                        marker.markerId != MarkerId(widget.authUser!.uid));
-                    widget._polylines.clear();
-                    var emergencyRadius = 100.0;
-                    var emergencySubcription =
-                        GeoFlutterFire.querySignalInRadius(
-                      GeoFlutterFire.getGeoFirePoint(widget._location.latitude,
-                          widget._location.longitude),
-                      emergencyRadius,
-                    );
-                    // emergencySubcription.onData((data) {
-                    //   data = data as DatabaseEvent;
-                    //   var lat = data.snapshot
-                    //       .child('position')
-                    //       .child('geopoint')
-                    //       .child('latitude')
-                    //       .value as double;
-                    //   var lng = data.snapshot
-                    //       .child('position')
-                    //       .child('geopoint')
-                    //       .child('longitude')
-                    //       .value as double;
-                    //   var emergencyLocation = LatLng(lat, lng);
-                    //   var emergencyId = data.snapshot.key;
-                    //   mapEmergencyUidLocation[emergencyId!] = emergencyLocation;
-                    //   updateEmergencyMarker(emergencyId);
-                    //   devtools.log('sync emergency marker',
-                    //       name: 'GoogleMap: updateEmergencyMarker');
-                    // });
-                    setState(() {});
-                  },
-                  toDefaultState: () {
-                    for (var subscription
-                        in widget._friendsLocationSubscriptions) {
-                      subscription.resume();
-                    }
-                    setState(() {
-                      widget._markers.addAll(widget._friendsMarkers);
-                    });
-                  },
+                  toEmergencyState: toEmergencyState,
+                  toDefaultState: toDefaultState,
                 ),
               ),
+
+              // mock emergency signal
+              // ElevatedButton(
+              //     onPressed: () async {
+              //       var latLng = await widget._mapController.getLatLng(
+              //           ScreenCoordinate(
+              //               x: (widget.deviceWidth / 2).round(),
+              //               y: (widget.deviceHeight / 2).round()));
+              //       Firestore.setEmergencySignal(
+              //           uid: latLng.toString(), message: 'I need help!');
+              //       GeoFlutterFire.updateEmergencySignalLocation(
+              //           uid: latLng.toString(),
+              //           lat: latLng.latitude,
+              //           lng: latLng.longitude);
+              //     },
+              //     child: const Text('Send emergency signal')),
             ],
           );
         } else {
