@@ -120,3 +120,5 @@ app.*.symbols
 .flutter-plugins
 .flutter-plugins
 windows/flutter/generated_plugins.cmake
+
+functions/node_modules/
