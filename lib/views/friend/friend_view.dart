@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:pinput/pinput.dart';
 import 'package:uuid/uuid.dart';
 
@@ -35,6 +36,42 @@ class _FriendViewState extends State<FriendView> {
   @override
   void initState() {
     super.initState();
+    FirebaseMessaging.onMessage.listen((event) {
+      print('Listened Bitch!');
+      var notification = event.notification;
+      var data = event.data;
+
+      print(notification!.body.toString());
+      print(data.toString());
+
+      if (data['type'] == "newFriendSender")
+      {
+        print('Your friend request has been accepted by ' + data['displayName']);
+        var newFriend = etoet.UserInfo(
+          uid: data['uid'],
+          photoURL: data['photoURL'],
+          email: data['email'],
+          displayName: data['displayName'],
+          phoneNumber: data['phoneNumber'],
+        );
+        user.friendInfoList.add(newFriend);
+        setState((){});
+      }
+      else if (data['type'] == "newFriendReceiver")
+      {
+        print('You have accepted a friend request from ' + data['displayName']);
+        var newFriend = etoet.UserInfo(
+          uid: data['uid'],
+          photoURL: data['photoURL'],
+          email: data['email'],
+          displayName: data['displayName'],
+          phoneNumber: data['phoneNumber'],
+        );
+        user.friendInfoList.add(newFriend);
+        setState((){});
+      }
+
+    });
   }
 
   Set<etoet.UserInfo> getFilteredFriendList(
