@@ -21,64 +21,19 @@ class ChatRoomView extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatRoomView> {
   late AuthUser user;
-  String? chatRoomId, messageId = "";
+  String chatroomUID = 'aaaaaaa';
   String? myName, myProfilePic, myUserName, myEmail;
   Stream? messageStream;
   TextEditingController messageTextEditingController = TextEditingController();
 
-  // getMyInfoFromSharedPreference() async {
-  //   myName = await SharedPreferenceHelper().getDisplayName();
-  //   myProfilePic = await SharedPreferenceHelper().getUserProfileUrl();
-  //   myUserName = await SharedPreferenceHelper().getUserName();
-  //   myEmail = await SharedPreferenceHelper().getUserEmail();
-  //
-  //   chatRoomId = getChatRoomIdByUsernames(widget.chatWithUsername, myUserName!);
-  // }
 
-  // getChatRoomIdByUsernames(String a, String b) {
-  //   if (a.substring(0, 1).codeUnitAt(0) > b.substring(0, 1).codeUnitAt(0)) {
-  //     return "$b\_$a";
-  //   } else {
-  //     return "$a\_$b";
-  //   }
-  // }
-
-  addMessage(bool sendClicked) {
-    sendClicked = true;
-    if (messageTextEditingController.text != "") {
-      String message = messageTextEditingController.text;
-      //Ts: TimeStamp
-      var lastMessageTs = DateTime.now();
-      Firestore.setMessage('35195569s468', message, user.uid);
-
-      // //messageId
-      // if (messageId == "") {
-      //   //TODO: Fix
-      //   messageId = randomAlphaNumeric(12);
-      // }
-
-      // DatabaseMethods()
-      //     .addMessage(chatRoomId!, messageId!, messageInfoMap)
-      //     .then((value) {
-      //   Map<String, dynamic> lastMessageInfoMap = {
-      //     "lastMessage": message,
-      //     "lastMessageSendTs": lastMessageTs,
-      //     "lastMessageSendBy": myUserName
-      //   };
-
-      // DatabaseMethods()
-      //     .updateLastMessageSend(chatRoomId!, lastMessageInfoMap);
-
-      if (sendClicked) {
-        //remove the text in the message input field
-        messageTextEditingController.text = "";
-
-        //make the message id blank to get regenerated on next message send
-        messageId = "";
-      }
-      // });
-    }
+  @override
+  void initState() {
+    super.initState();
+    // asyncMethod();
+    // messageStream = Firestore.getMessageStream('35195569s468');
   }
+
 
   Widget chatMessageTile(String message, bool sendByMe) {
     return Row(
@@ -126,77 +81,74 @@ class _ChatScreenState extends State<ChatRoomView> {
     );
   }
 
-  // getAndSetMessages() async {
-  //TODO: Fix2
-  //   messageStream = await DatabaseMethods().getChatRoomMessages(chatRoomId);
-  //   setState(() {});
-  // }
-
-  // doThisOnLaunch() async {
-  //TODO: Fix3
-  //   await getMyInfoFromSharedPreference();
-  //   getAndSetMessages();
-  // }
-
-  @override
-  void initState() {
-    super.initState();
-    messageStream = Firestore.getMessageStream('35195569s468');
-  }
-
   @override
   Widget build(BuildContext context) {
     user = context.watch<AuthUser>();
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.selectedUser.displayName!),
-      ),
-      body: Container(
-        child: Stack(
-          children: [
-            chatMessages(),
-            Container(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                color: Colors.black.withOpacity(0.8),
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Row(
+    return FutureBuilder(
+      future: Firestore.getChatroomUID(user.uid, widget.selectedUser.uid),
+      builder: (context, snapshot){
+        if(snapshot.connectionState == ConnectionState.done)
+          {
+            chatroomUID = snapshot.data as String;
+
+            return Scaffold(
+              appBar: AppBar(
+                title: Text(widget.selectedUser.displayName!),
+                bottom: PreferredSize(
+                    preferredSize: Size.zero,
+                    child: Text(chatroomUID)),
+              ),
+              body: Container(
+                child: Stack(
                   children: [
-                    Expanded(
-                        child: TextField(
-                      controller: messageTextEditingController,
-                      onChanged: (value) {
-                        // addMessage(false);
-                      },
-                      //border: InputBorder.none to get rid of underline things
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: "Type a message!",
-                        hintStyle: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            color: Colors.white.withOpacity(0.6)),
-                      ),
-                      style: TextStyle(color: Colors.white),
-                    )),
-                    GestureDetector(
-                      onTap: () {
-                        // addMessage(true);
-                        Firestore.setMessage('35195569s468',
-                            messageTextEditingController.text, user.uid);
-                        messageTextEditingController.clear();
-                      },
-                      child: Icon(
-                        Icons.send,
-                        color: Colors.white,
+                    chatMessages(),
+                    Container(
+                      alignment: Alignment.bottomCenter,
+                      child: Container(
+                        color: Colors.black.withOpacity(0.8),
+                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        child: Row(
+                          children: [
+                            Expanded(
+                                child: TextField(
+                                  controller: messageTextEditingController,
+                                  onChanged: (value) {
+                                  },
+                                  //border: InputBorder.none to get rid of underline things
+                                  decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    hintText: "Type a message!",
+                                    hintStyle: TextStyle(
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.white.withOpacity(0.6)),
+                                  ),
+                                  style: TextStyle(color: Colors.white),
+                                )),
+                            GestureDetector(
+                              onTap: () {
+                                Firestore.setMessage('35195569s468',
+                                    messageTextEditingController.text, user.uid);
+                                messageTextEditingController.clear();
+                              },
+                              child: Icon(
+                                Icons.send,
+                                color: Colors.white,
+                              ),
+                            )
+                          ],
+                        ),
                       ),
                     )
                   ],
                 ),
               ),
-            )
-          ],
-        ),
-      ),
+            );
+          }
+        else
+          {
+            return const CircularProgressIndicator();
+          }
+      }
     );
   }
 }

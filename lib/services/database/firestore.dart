@@ -345,6 +345,19 @@ class Firestore {
 
   }
 
+  static Future<String> getChatroomUID(String user1UID, String user2UID)
+  async {
+    var ref = await firestoreReference.
+    collection('users').
+    doc(user1UID).
+    collection('friends').
+    doc(user2UID).
+    get();
+
+    return ref.data()!['chatroomUID'];
+  }
+
+
   static void setMessage(String chatroomUID, String message, String senderUID) {
     var ts = DateTime.now();
     final data = {'message': message, 'senderUID': senderUID, 'ts': ts};
