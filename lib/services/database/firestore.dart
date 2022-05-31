@@ -360,7 +360,7 @@ class Firestore {
 
 
   static void setMessage(String chatroomUID, String message, String senderUID) {
-    var ts = DateTime.now();
+    var ts = Timestamp.now();
     final data = {'message': message, 'senderUID': senderUID, 'ts': ts};
     FirebaseFirestore.instance
         .collection('chatrooms')

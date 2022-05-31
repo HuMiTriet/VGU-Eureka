@@ -209,7 +209,7 @@ class _ChatScreenState extends State<ChatRoomView> {
                             GestureDetector(
                               onTap: () {
                                 Firestore.setMessage(
-                                    '35195569s468',
+                                    chatroomUID,
                                     messageTextEditingController.text,
                                     user.uid);
                                 messageTextEditingController.clear();
