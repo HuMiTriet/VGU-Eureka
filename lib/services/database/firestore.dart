@@ -254,11 +254,6 @@ class Firestore {
         .collection('friends')
         .doc(receiverUID)
         .update({'requestConfirmed': true});
-    firestoreReference.collection('friendship').doc(senderUID).set(
-      {
-        'receiverUID': receiverUID,
-      },
-    );
   }
 
   static Future<Set<etoet.UserInfo>> getFriendInfoList(String uid) async {
