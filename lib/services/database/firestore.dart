@@ -302,6 +302,7 @@ class Firestore {
         .collection('chatrooms')
         .doc(chatRoomUID)
         .collection('messages')
+        .orderBy('ts', descending: true)
         .snapshots();
     return messageStream;
   }

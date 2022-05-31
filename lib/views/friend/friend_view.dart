@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:pinput/pinput.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -53,7 +54,9 @@ class _FriendViewState extends State<FriendView> {
       if (email.contains(keyword)) {
         filteredList.add(friendList.elementAt(i));
         continue;
-      } else if (displayName.contains(keyword)) {
+      }
+      //Condition 2: DisplayName
+      else if (displayName.contains(keyword)) {
         filteredList.add(friendList.elementAt(i));
         continue;
       }
@@ -223,16 +226,19 @@ class _FriendViewState extends State<FriendView> {
                       color: bottomListViewColor,
                       child: ListView.builder(
                         shrinkWrap: true,
-                        itemCount: userListOnSearch.isNotEmpty
+                        itemCount: (_searchBarController.text.isNotEmpty)
                             ? userListOnSearch.length
                             : user.friendInfoList.length,
                         itemBuilder: (context, index) {
                           return ListTile(
-                            onTap: () {
-                              selectedUser =
-                                  user.friendInfoList.elementAt(index);
+                            onTap: () async {
+                              // selectedUser =
+                              //     user.friendInfoList.elementAt(index);
+                              selectedUser = (_searchBarController.text.isNotEmpty)?
+                                  userListOnSearch.elementAt(index)
+                                  : user.friendInfoList.elementAt(index);
                               var chatroomUID = const Uuid().v4().toString();
-                              Firestore.createFriendChatroom(
+                              await Firestore.createFriendChatroom(
                                   user.uid, selectedUser.uid, chatroomUID);
                               // Navigator.pushNamedAndRemoveUntil(
                               //     context, chat_friend_route, (route) => false,
@@ -252,12 +258,12 @@ class _FriendViewState extends State<FriendView> {
                                       .elementAt(index)
                                       .photoURL!),
                             ),
-                            title: Text(userListOnSearch.isNotEmpty
+                            title: Text((_searchBarController.text.isNotEmpty)
                                 ? userListOnSearch.elementAt(index).displayName!
                                 : user.friendInfoList
                                     .elementAt(index)
                                     .displayName!),
-                            subtitle: Text(userListOnSearch.isNotEmpty
+                            subtitle: Text((_searchBarController.text.isNotEmpty)
                                 ? userListOnSearch.elementAt(index).email!
                                 : user.friendInfoList.elementAt(index).email!),
                             shape: RoundedRectangleBorder(

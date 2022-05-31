@@ -13,6 +13,7 @@ class ChatRoomView extends StatefulWidget {
   // const ChatRoomView({Key? key}) : super(key: key);
 
   final etoet.UserInfo selectedUser;
+
   ChatRoomView(@required this.selectedUser);
 
   @override
@@ -21,33 +22,31 @@ class ChatRoomView extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatRoomView> {
   late AuthUser user;
-  String chatroomUID = 'aaaaaaa';
+  late String chatroomUID;
   String? myName, myProfilePic, myUserName, myEmail;
-  Stream? messageStream;
+  late Stream<QuerySnapshot> messageStream;
   TextEditingController messageTextEditingController = TextEditingController();
-
+  late int? messageLength;
 
   @override
   void initState() {
     super.initState();
     // asyncMethod();
-    // messageStream = Firestore.getMessageStream('35195569s468');
   }
 
-
-  Widget chatMessageTile(String message, bool sendByMe) {
+  Widget chatMessageTile(String message, String senderUID) {
     return Row(
       mainAxisAlignment:
-          sendByMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+      (senderUID == user.uid) ? MainAxisAlignment.end : MainAxisAlignment.start,
       children: [
         Container(
           margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(24),
-              bottomRight: sendByMe ? Radius.circular(0) : Radius.circular(24),
+              bottomRight: (senderUID == user.uid) ? Radius.circular(0) : Radius.circular(24),
               topRight: Radius.circular(24),
-              bottomLeft: sendByMe ? Radius.circular(24) : Radius.circular(0),
+              bottomLeft: (senderUID == user.uid) ? Radius.circular(24) : Radius.circular(0),
             ),
             color: Colors.blue,
           ),
@@ -61,59 +60,87 @@ class _ChatScreenState extends State<ChatRoomView> {
     );
   }
 
-  Widget chatMessages() {
-    return StreamBuilder(
-      stream: messageStream,
-      builder: (context, AsyncSnapshot snapshot) {
-        return Container();
-        // return snapshot.hasData
-        //     ? ListView.builder(
-        //         padding: EdgeInsets.only(bottom: 80, top: 16),
-        //         itemCount: snapshot.data.docs.length,
-        //         reverse: true,
-        //         itemBuilder: (context, index) {
-        //           DocumentSnapshot ds = snapshot.data.docs[index];
-        //           return chatMessageTile(
-        //               ds['message'], user.uid == ds['senderUid']);
-        //         })
-        //     : Center(child: CircularProgressIndicator());
-      },
-    );
-  }
+  // Widget chatMessages() {
+  //   return
+  // }
 
   @override
   Widget build(BuildContext context) {
     user = context.watch<AuthUser>();
     return FutureBuilder(
-      future: Firestore.getChatroomUID(user.uid, widget.selectedUser.uid),
-      builder: (context, snapshot){
-        if(snapshot.connectionState == ConnectionState.done)
-          {
-            chatroomUID = snapshot.data as String;
+        future: Firestore.getChatroomUID(user.uid, widget.selectedUser.uid),
+        builder: (context, futureSnapshot) {
+          if (futureSnapshot.connectionState == ConnectionState.done) {
+            chatroomUID = futureSnapshot.data as String;
+            messageStream = Firestore.getMessageStream(chatroomUID);
 
             return Scaffold(
               appBar: AppBar(
-                title: Text(widget.selectedUser.displayName!),
-                bottom: PreferredSize(
-                    preferredSize: Size.zero,
-                    child: Text(chatroomUID)),
+                title: Row(
+                  children: <Widget>[
+                    CircleAvatar(
+                      backgroundImage: NetworkImage(widget.selectedUser.photoURL!),
+                    ),
+
+                    const SizedBox
+                      (
+                      width: 20,
+                    ),
+
+                    Text(widget.selectedUser.displayName!),
+                  ],
+                ),
+                titleSpacing: 0,
               ),
               body: Container(
                 child: Stack(
                   children: [
-                    chatMessages(),
+                    StreamBuilder<QuerySnapshot>(
+                      stream: messageStream,
+                      builder: (context, snapshot) {
+                        //return Container();
+                        if(snapshot.connectionState == ConnectionState.waiting)
+                          {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                        if (snapshot.hasData == false || snapshot.data!.docs.isEmpty) {
+                          return Center(
+                            child: Text('No messages yet, chat to ${widget.selectedUser.displayName}!'),
+                          );
+                        }
+                            messageLength = snapshot.data?.docs.length;
+                            return ListView.builder(
+                                padding: const EdgeInsets.only(bottom: 80, top: 16),
+                                itemCount: snapshot.data!.docs.length,
+                                reverse: true,
+                                itemBuilder: (context, index) {
+                                  var messageInfo = snapshot.data!.docs.elementAt(index).data() as Map<String, dynamic>;
+                                  var message = messageInfo['message'];
+                                  var senderUID = messageInfo['senderUID'];
+                                  return chatMessageTile(message, senderUID);
+                                  // DocumentSnapshot ds = snapshot.data!.docs[index];
+                                  // return chatMessageTile(
+                                  //     ds['message'], user.uid == ds['senderUid']);
+                                }
+                            );
+
+                      },
+                    )
+                    ,
                     Container(
                       alignment: Alignment.bottomCenter,
                       child: Container(
                         color: Colors.black.withOpacity(0.8),
-                        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding:
+                        EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         child: Row(
                           children: [
                             Expanded(
                                 child: TextField(
                                   controller: messageTextEditingController,
-                                  onChanged: (value) {
-                                  },
+                                  onChanged: (value) {},
                                   //border: InputBorder.none to get rid of underline things
                                   decoration: InputDecoration(
                                     border: InputBorder.none,
@@ -126,8 +153,10 @@ class _ChatScreenState extends State<ChatRoomView> {
                                 )),
                             GestureDetector(
                               onTap: () {
-                                Firestore.setMessage('35195569s468',
-                                    messageTextEditingController.text, user.uid);
+                                Firestore.setMessage(
+                                    '35195569s468',
+                                    messageTextEditingController.text,
+                                    user.uid);
                                 messageTextEditingController.clear();
                               },
                               child: Icon(
@@ -143,12 +172,9 @@ class _ChatScreenState extends State<ChatRoomView> {
                 ),
               ),
             );
-          }
-        else
-          {
+          } else {
             return const CircularProgressIndicator();
           }
-      }
-    );
+        });
   }
 }
