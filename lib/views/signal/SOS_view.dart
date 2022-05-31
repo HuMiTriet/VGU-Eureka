@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 class SOSView extends StatefulWidget {
@@ -43,7 +45,12 @@ class _SOSViewState extends State<SOSView> {
               Theme(
                 data: ThemeData(unselectedWidgetColor: Colors.white),
                 child: CheckBoxList(
-                  children: const ['Lost and Found', 'Accident', 'Thieves', 'Other'],
+                  children: const [
+                    'Lost and Found',
+                    'Accident',
+                    'Thieves',
+                    'Other'
+                  ],
                 ),
               ),
               Padding(
@@ -139,20 +146,35 @@ class _SOSViewState extends State<SOSView> {
       );
 
   Widget buildButtons() => Row(
-        children: const [
+        children: [
           Expanded(
             child: _Buttons(
               color: Colors.green,
               text: 'PRIVATE SIGNAL',
+              onTap: () {
+                showDialog(
+                    context: context,
+                    builder: (context) => const AlertDialog(
+                          actions: [Text('Private signal')],
+                        ));
+              },
             ),
           ),
-          SizedBox(
+          const SizedBox(
             width: 10,
           ),
           Expanded(
             child: _Buttons(
               color: Colors.red,
               text: 'PUBLIC SIGNAL',
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => const AlertDialog(
+                    actions: [Text('Public signal')],
+                  ),
+                );
+              },
             ),
           ),
         ],
@@ -162,10 +184,12 @@ class _SOSViewState extends State<SOSView> {
 class _Buttons extends StatelessWidget {
   final Color color;
   final String text;
+  final void Function() onTap;
 
   const _Buttons({
     required this.color,
     required this.text,
+    required this.onTap,
   });
 
   @override
@@ -173,7 +197,7 @@ class _Buttons extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: GestureDetector(
-        onTap: () {},
+        onTap: onTap,
         child: Container(
           alignment: Alignment.center,
           constraints: const BoxConstraints.tightForFinite(
