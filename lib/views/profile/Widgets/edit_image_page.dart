@@ -7,6 +7,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../services/database/firestore.dart';
+
 class EditImagePage extends StatefulWidget {
   final ImageSource imageSource;
 
@@ -98,6 +100,11 @@ class EditImagePageState extends State<EditImagePage> {
                         } on FirebaseException catch (e) {
                           log('${e.message}');
                         }
+                        
+                        //Update image URL to firestore
+                        Firestore.firestoreReference.
+                        collection('users').
+                        doc(widget.user.uid).update({'photoUrl' : imageUrl});
 
                         if (imageUrl != null) {
                           log('image url: ' + imageUrl);
