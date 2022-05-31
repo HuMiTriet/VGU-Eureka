@@ -176,8 +176,7 @@ export const notifyNewFriendReceiver = functions.region("asia-southeast1")
 
         const payload = {
           notification: {
-            title: receiverFriendDisplayName +
-            " has accepted your friend request",
+            title: receiverFriendDisplayName + " is now your friend",
             body: "Send them a message to say hello",
           },
           data: {
@@ -207,3 +206,5 @@ export const notifyNewFriendReceiver = functions.region("asia-southeast1")
             .log("From new friend RECEIVER: not a new friend established");
       }
     });
+
+
