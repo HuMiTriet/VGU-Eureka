@@ -10,3 +10,4 @@ const friendRoute = '/friend/';
 const addFriendRoute = '/add-friend/';
 const pendingFriendRoute = '/pending-friend';
 const profileRoute = '/profile/';
+const sosRoute = '/SOS-signal/';

@@ -51,6 +51,9 @@ export const sendPrivateNotification = functions.region("asia-southeast1").
             body: String(snapshot.data()?.message),
             type: "emegency",
           },
+          data: {
+            type: "emegency",
+          },
         };
         return fcm.sendToDevice(token, payload);
       } catch (error) {
@@ -77,31 +80,30 @@ export const notifyNewFriendRequestAcceptedSender = functions
     .region("asia-southeast1")
     .firestore.document("/users/{userUID}/friends/{friendUID}")
     .onCreate(async (snapshot, context) => {
-      // dont run if it is the sendee
-      if (!snapshot.data().isSender) {
-        return functions.logger
-            .log("sender new friend function: not the sender, reject");
-      }
+      //  dont run if it is the sendee
+      // if (!snapshot.data().isSender) {
+      //   return functions.logger
+      //       .log("sender new friend function: not the sender, reject");
+      // }
       // getting the friend info
       const friendInfoRef = db.collection("users")
           .doc(context.params.friendUID);
+      console.log(context.params.friendUID);
 
       const friendInfoSnapshot = await friendInfoRef.get();
 
       // get all of the friend info
       const friendUserName = String(friendInfoSnapshot.data()?.displayName);
-      console.log(friendUserName);
       const friendEmail = String(friendInfoSnapshot.data()?.email);
-      console.log(friendEmail);
       const friendPhotoUrl = String(friendInfoSnapshot.data()?.photoUrl);
-      console.log(friendPhotoUrl );
       const friendUid = String(friendInfoSnapshot.data()?.uid);
-      console.log(friendUid);
 
       const payload = {
         notification: {
           title: friendUserName + " has accepted your invite",
           body: "You can now ask them for help !",
+        },
+        data: {
           type: "newFriendSender",
           displayName: friendUserName,
           email: friendEmail,
