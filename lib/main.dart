@@ -5,7 +5,6 @@ import 'package:etoet/views/auth/login_view.dart';
 import 'package:etoet/views/auth/recover_account_view.dart';
 import 'package:etoet/views/auth/register_view.dart';
 import 'package:etoet/views/friend/add_friend_view.dart';
-import 'package:etoet/views/friend/chat_room_view.dart';
 import 'package:etoet/views/friend/friend_view.dart';
 import 'package:etoet/views/friend/pending_friend_view.dart';
 import 'package:etoet/views/main_view.dart';
