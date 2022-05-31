@@ -6,6 +6,7 @@ import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/auth_exceptions.dart';
 import 'package:etoet/services/auth/auth_service.dart';
 import 'package:etoet/services/auth/auth_user.dart';
+import 'package:etoet/services/database/firestore.dart';
 import 'package:etoet/views/auth/error_dialog.dart';
 import 'package:etoet/views/main_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -386,6 +387,13 @@ class _LoginViewState extends State<LoginView> {
         email: user.email,
         phoneNumber: user.phoneNumber,
         displayName: user.displayName);
+    var userExists = Firestore.userExists(authUser.uid);
+    userExists.then((value) => {
+          if (value)
+            {Firestore.updateUserInfo(authUser)}
+          else
+            {Firestore.addUserInfo(authUser)}
+        });
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(
@@ -436,6 +444,13 @@ class _LoginViewState extends State<LoginView> {
             email: user.email,
             phoneNumber: user.phoneNumber,
             displayName: user.displayName);
+        var userExists = Firestore.userExists(authUser.uid);
+        userExists.then((value) => {
+              if (value)
+                {Firestore.updateUserInfo(authUser)}
+              else
+                {Firestore.addUserInfo(authUser)}
+            });
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(

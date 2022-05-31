@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as devtools show log;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -148,11 +149,13 @@ class Firestore {
       'requestConfirmed': false,
       'friendUID': receiverUID
     };
+
     var receiverData = {
       'isSender': false,
       'requestConfirmed': false,
       'friendUID': senderUID
     };
+
     firestoreReference
         .collection('users')
         .doc(senderUID)
@@ -179,6 +182,31 @@ class Firestore {
 
     var pendingFriendInfoList = <etoet.UserInfo>{};
     for (var i = 0; i < pendingFriendRequestData.docs.length; ++i) {
+      var source =
+          pendingFriendRequestData.metadata.isFromCache ? "cache" : "server";
+      print('Pending fetched from ' + source);
+      var data = pendingFriendRequestData.docs.elementAt(i).data();
+
+      var pendingFriendInfo = await getUserInfo(data['friendUID']);
+      pendingFriendInfoList.add(pendingFriendInfo);
+    }
+
+    return pendingFriendInfoList;
+  }
+
+  static Future<Set<etoet.UserInfo>> getAcceptedUserInfo(String userUID) async {
+    var pendingFriendRequestData = await firestoreReference
+        .collection('users')
+        .doc(userUID)
+        .collection('friends')
+        .where('requestConfirmed', isEqualTo: false)
+        .get();
+
+    var pendingFriendInfoList = <etoet.UserInfo>{};
+    for (var i = 0; i < pendingFriendRequestData.docs.length; ++i) {
+      var source =
+          pendingFriendRequestData.metadata.isFromCache ? "cache" : "server";
+      print('Pending fetched from ' + source);
       var data = pendingFriendRequestData.docs.elementAt(i).data();
 
       var pendingFriendInfo = await getUserInfo(data['friendUID']);
@@ -216,6 +244,11 @@ class Firestore {
         .collection('friends')
         .doc(receiverUID)
         .update({'requestConfirmed': true});
+    firestoreReference.collection('friendship').doc(senderUID).set(
+      {
+        'receiverUID': receiverUID,
+      },
+    );
   }
 
   static Future<Set<etoet.UserInfo>> getFriendInfoList(String uid) async {
