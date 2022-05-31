@@ -229,11 +229,9 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
             await friendMarkerCreator.createFriendMarker(friendLatLng: latLng);
         widget._markers.removeWhere(
             (marker) => marker.markerId == MarkerId(friendInfo.uid));
-        widget._markers.add(friendMarker);
-        widget._friendsMarkers.removeWhere(
-            (marker) => marker.markerId == MarkerId(friendInfo.uid));
-        widget._friendsMarkers.add(friendMarker);
-        setState(() {});
+        setState(() {
+          widget._markers.add(friendMarker);
+        });
         devtools.log(
             'marker list: ${widget._markers.length}, displayName: ${friendInfo.displayName}, location: $latLng',
             name: 'GoogleMap: updateFriendMarker');
