@@ -44,33 +44,18 @@ class _FriendViewState extends State<FriendView> {
       print(notification!.body.toString());
       print(data.toString());
 
-      if (data['type'] == "newFriendSender")
+      if (data['type'] == "newFriend")
       {
         print('Your friend request has been accepted by ' + data['displayName']);
         var newFriend = etoet.UserInfo(
           uid: data['uid'],
-          photoURL: data['photoURL'],
+          photoURL: data['photoUrl'],
           email: data['email'],
           displayName: data['displayName'],
-          phoneNumber: data['phoneNumber'],
         );
         user.friendInfoList.add(newFriend);
         setState((){});
       }
-      else if (data['type'] == "newFriendReceiver")
-      {
-        print('You have accepted a friend request from ' + data['displayName']);
-        var newFriend = etoet.UserInfo(
-          uid: data['uid'],
-          photoURL: data['photoURL'],
-          email: data['email'],
-          displayName: data['displayName'],
-          phoneNumber: data['phoneNumber'],
-        );
-        user.friendInfoList.add(newFriend);
-        setState((){});
-      }
-
     });
   }
 
@@ -160,15 +145,15 @@ class _FriendViewState extends State<FriendView> {
                                     decoration: InputDecoration(
                                       hintText: 'Search by Display Name or Email',
                                       contentPadding: const EdgeInsets.all(20),
-                                      suffixIcon: IconButton(
-                                        onPressed: () {
-                                          _searchBarController.clear();
-                                          setState(() {
-                                            userListOnSearch = user.friendInfoList;
-                                          });
-                                        },
-                                        icon: const Icon(Icons.clear),
-                                      ),
+                                      // suffixIcon: IconButton(
+                                      //   onPressed: () {
+                                      //     _searchBarController.clear();
+                                      //     setState(() {
+                                      //       userListOnSearch = user.friendInfoList;
+                                      //     });
+                                      //   },
+                                      //   icon: const Icon(Icons.clear),
+                                      // ),
                                     ),
                                     onChanged: (keyword) {
                                       setState(() {
