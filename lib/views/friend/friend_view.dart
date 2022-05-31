@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:uuid/uuid.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:etoet/constants/routes.dart';
@@ -230,7 +231,7 @@ class _FriendViewState extends State<FriendView> {
                             onTap: () {
                               selectedUser =
                                   user.friendInfoList.elementAt(index);
-                              String chatroomUID = randomAlphaNumeric(12);
+                              var chatroomUID = const Uuid().v4().toString();
                               Firestore.createFriendChatroom(
                                   user.uid, selectedUser.uid, chatroomUID);
                               // Navigator.pushNamedAndRemoveUntil(
