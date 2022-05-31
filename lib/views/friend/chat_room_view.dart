@@ -34,27 +34,57 @@ class _ChatScreenState extends State<ChatRoomView> {
     // asyncMethod();
   }
 
-  Widget chatMessageTile(String message, String senderUID) {
+  Widget avatarAndTime(String senderUID, Timestamp timestamp)
+  {
+    DateTime myDateTime = timestamp.toDate();
+    var timestampString = myDateTime.hour.toString() + ':' + myDateTime.minute.toString();
+    return Row
+      (
+      children: [
+        CircleAvatar(
+          backgroundImage:
+          NetworkImage((senderUID == user.uid)?
+          user.photoURL! : widget.selectedUser.photoURL!,
+          ),
+          radius: 15,
+        ),
+
+        const SizedBox(width: 1,),
+
+        Text(timestampString),
+
+      ],
+    );
+  }
+
+
+  Widget chatMessageTile(String message, String senderUID, Timestamp timestamp) {
     return Row(
       mainAxisAlignment:
       (senderUID == user.uid) ? MainAxisAlignment.end : MainAxisAlignment.start,
       children: [
-        Container(
-          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(24),
-              bottomRight: (senderUID == user.uid) ? Radius.circular(0) : Radius.circular(24),
-              topRight: Radius.circular(24),
-              bottomLeft: (senderUID == user.uid) ? Radius.circular(24) : Radius.circular(0),
+        Column(
+          children: [
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  bottomRight: (senderUID == user.uid) ? Radius.circular(0) : Radius.circular(24),
+                  topRight: Radius.circular(24),
+                  bottomLeft: (senderUID == user.uid) ? Radius.circular(24) : Radius.circular(0),
+                ),
+                color: Colors.blue,
+              ),
+              padding: EdgeInsets.all(16),
+              child: Text(
+                message,
+                style: TextStyle(color: Colors.white),
+              ),
             ),
-            color: Colors.blue,
-          ),
-          padding: EdgeInsets.all(16),
-          child: Text(
-            message,
-            style: TextStyle(color: Colors.white),
-          ),
+
+            avatarAndTime(senderUID, timestamp),
+          ]
         ),
       ],
     );
@@ -119,7 +149,8 @@ class _ChatScreenState extends State<ChatRoomView> {
                                   var messageInfo = snapshot.data!.docs.elementAt(index).data() as Map<String, dynamic>;
                                   var message = messageInfo['message'];
                                   var senderUID = messageInfo['senderUID'];
-                                  return chatMessageTile(message, senderUID);
+                                  Timestamp timestamp = messageInfo['ts'];
+                                  return chatMessageTile(message, senderUID, timestamp);
                                   // DocumentSnapshot ds = snapshot.data!.docs[index];
                                   // return chatMessageTile(
                                   //     ds['message'], user.uid == ds['senderUid']);
