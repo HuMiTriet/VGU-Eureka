@@ -1,6 +1,8 @@
-import 'dart:developer';
-
+import 'package:etoet/services/auth/auth_user.dart';
+import 'package:etoet/services/database/firestore.dart';
+import 'package:etoet/services/map/geoflutterfire/geoflutterfire.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SOSView extends StatefulWidget {
   const SOSView({Key? key}) : super(key: key);
@@ -10,8 +12,14 @@ class SOSView extends StatefulWidget {
 }
 
 class _SOSViewState extends State<SOSView> {
+  AuthUser? authUser;
+  late TextEditingController situationDetailTextController =
+      TextEditingController();
+  late TextEditingController locationDescriptionTextController =
+      TextEditingController();
   @override
   Widget build(BuildContext context) {
+    authUser = context.watch<AuthUser?>();
     return Scaffold(
       backgroundColor: const Color.fromRGBO(239, 172, 172, 2),
       body: SafeArea(
@@ -30,7 +38,9 @@ class _SOSViewState extends State<SOSView> {
                   ),
                   const Spacer(),
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
                     icon: const Icon(Icons.close),
                     color: Colors.white,
                   ),
@@ -104,6 +114,7 @@ class _SOSViewState extends State<SOSView> {
                 fontWeight: FontWeight.bold,
               )),
           TextField(
+            controller: locationDescriptionTextController,
             textInputAction: TextInputAction.newline,
             autofocus: true,
             maxLength: maxLength,
@@ -126,6 +137,7 @@ class _SOSViewState extends State<SOSView> {
                 fontWeight: FontWeight.bold,
               )),
           TextField(
+            controller: situationDetailTextController,
             textInputAction: TextInputAction.newline,
             autofocus: true,
             maxLength: maxLength,
@@ -152,11 +164,19 @@ class _SOSViewState extends State<SOSView> {
               color: Colors.green,
               text: 'PRIVATE SIGNAL',
               onTap: () {
-                showDialog(
-                    context: context,
-                    builder: (context) => const AlertDialog(
-                          actions: [Text('Private signal')],
-                        ));
+                var situationDetail = situationDetailTextController.text;
+                var locationDescription =
+                    locationDescriptionTextController.text;
+                Firestore.setEmergencySignal(
+                    uid: authUser!.uid,
+                    situationDetail: situationDetail,
+                    locationDescription: locationDescription,
+                    isPublic: false);
+                Firestore.updateEmergencySignalLocation(
+                    uid: authUser!.uid,
+                    lat: authUser!.location.latitude,
+                    lng: authUser!.location.longitude);
+                Navigator.pop(context);
               },
             ),
           ),
@@ -168,12 +188,18 @@ class _SOSViewState extends State<SOSView> {
               color: Colors.red,
               text: 'PUBLIC SIGNAL',
               onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => const AlertDialog(
-                    actions: [Text('Public signal')],
-                  ),
-                );
+                var situationDetail = locationDescriptionTextController.text;
+                var locationDescription = situationDetailTextController.text;
+                Firestore.setEmergencySignal(
+                    uid: authUser!.uid,
+                    situationDetail: situationDetail,
+                    locationDescription: locationDescription,
+                    isPublic: true);
+                GeoFlutterFire.updateEmergencySignalLocation(
+                    uid: authUser!.uid,
+                    lat: authUser!.location.latitude,
+                    lng: authUser!.location.longitude);
+                Navigator.pop(context);
               },
             ),
           ),

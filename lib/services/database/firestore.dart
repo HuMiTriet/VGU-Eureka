@@ -49,13 +49,17 @@ class Firestore {
 
   static void setEmergencySignal({
     required String uid,
-    required String message,
+    // required String type,
+    required String locationDescription,
+    required String situationDetail,
     bool isPublic = false,
   }) {
     firestoreReference.collection('emergencies').doc(uid).set(
       {
         'isPublic': isPublic,
-        'message': message,
+        // 'type': type,
+        'locationDescription': locationDescription,
+        'situationDetail': situationDetail,
         'uid': uid,
       },
       SetOptions(merge: true),
@@ -64,11 +68,7 @@ class Firestore {
 
   static void updateEmergencySignalLocation(
       {required String uid, required double lat, required double lng}) async {
-    var geoFirePoint = GeoFlutterFire.getGeoFirePoint(lat, lng);
-    await firestoreReference
-        .collection('emergencies')
-        .doc(uid)
-        .update({'postion': geoFirePoint.data});
+    GeoFlutterFire.updateEmergencySignalLocation(uid: uid, lat: lat, lng: lng);
   }
 
   static Future<etoet.UserInfo> getUserInfo(String uid) async {
