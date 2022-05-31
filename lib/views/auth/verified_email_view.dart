@@ -103,12 +103,12 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
                       onPressed: () async {
                         await AuthService.firebase().logOut();
                         Navigator.of(context).pushNamedAndRemoveUntil(
-                          registerRoute,
+                          loginRoute,
                           (route) => false,
                         );
                       },
                       child: const Center(
-                        child: Text('Return to Sign Up',
+                        child: Text('Return to Login',
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,

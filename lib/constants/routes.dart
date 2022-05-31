@@ -11,3 +11,4 @@ const addFriendRoute = '/add-friend/';
 const pendingFriendRoute = '/pending-friend';
 const profileRoute = '/profile/';
 const sosRoute = '/SOS-signal/';
+const chat_friend_route = '/chat_friend';

@@ -7,6 +7,9 @@ admin.initializeApp();
 const db = admin.firestore();
 const fcm = admin.messaging();
 
+// firebase emulators:start --import ./emulators_data --export-on-exit
+// ./emulators_data
+
 // Promise in typescipt/javascript is the same as Future in dart
 export const sendPrivateNotification = functions.region("asia-southeast1").
     firestore.document("/emergencies/{userId}")
@@ -49,7 +52,6 @@ export const sendPrivateNotification = functions.region("asia-southeast1").
           notification: {
             title: "Emergency Alert",
             body: String(snapshot.data()?.message),
-            type: "emegency",
           },
           data: {
             type: "emegency",
@@ -74,54 +76,135 @@ export const sendPrivateNotification = functions.region("asia-southeast1").
       }
     });
 
-
-// send a notification new a new friend reqest is accepted
-export const notifyNewFriendRequestAcceptedSender = functions
-    .region("asia-southeast1")
+// Send a notification Annoucing new friend for Sender of that friend reques
+export const notifyNewFriendSender = functions.region("asia-southeast1")
     .firestore.document("/users/{userUID}/friends/{friendUID}")
-    .onCreate(async (snapshot, context) => {
-      //  dont run if it is the sendee
-      // if (!snapshot.data().isSender) {
-      //   return functions.logger
-      //       .log("sender new friend function: not the sender, reject");
-      // }
-      // getting the friend info
-      const friendInfoRef = db.collection("users")
-          .doc(context.params.friendUID);
-      console.log(context.params.friendUID);
+    .onUpdate(async (change, context) => {
+      if (change.before.data().requestConfirmed === false &&
+          change.after.data().requestConfirmed === true) {
+        if (change.before.data().isSender === false) {
+          return functions.logger
+              .log("from new friend SENDER: not a sender message => reject");
+        }
+        console.log("SENDER'S UID: " + context.params.userUID);
+        const senderFriendRef = db
+            .collection("users")
+            .doc(context.params.friendUID);
 
-      const friendInfoSnapshot = await friendInfoRef.get();
+        const senderFriendSnapshot = await senderFriendRef.get();
 
-      // get all of the friend info
-      const friendUserName = String(friendInfoSnapshot.data()?.displayName);
-      const friendEmail = String(friendInfoSnapshot.data()?.email);
-      const friendPhotoUrl = String(friendInfoSnapshot.data()?.photoUrl);
-      const friendUid = String(friendInfoSnapshot.data()?.uid);
+        console.log("SENDER'S FRIEND INFO:");
 
-      const payload = {
-        notification: {
-          title: friendUserName + " has accepted your invite",
-          body: "You can now ask them for help !",
-        },
-        data: {
-          type: "newFriendSender",
-          displayName: friendUserName,
-          email: friendEmail,
-          photoUrl: friendPhotoUrl,
-          uid: friendUid,
-        },
-      };
+        const senderFriendDisplayName = String(senderFriendSnapshot
+            .data()?.displayName);
+        console.log(senderFriendDisplayName);
 
-      // getting the friend FCM token
-      const friendFcmTokenRef = db.collection("users")
-          .doc(context.params.userUID)
-          .collection("notification")
-          .doc("fcm_token");
+        const senderFriendEmail = String(senderFriendSnapshot.data()?.email);
+        console.log(senderFriendEmail);
 
-      const friendFcmToken = await friendFcmTokenRef.get();
+        const senderFriendPhotoUrl = String(senderFriendSnapshot
+            .data()?.photoUrl);
+        console.log(senderFriendPhotoUrl);
 
-      const token: string = friendFcmToken.data()?.fcm_token;
-      console.log(token);
+        const senderFriendUID = String(senderFriendSnapshot.data()?.uid);
+        console.log(senderFriendUID);
 
-      return fcm.sendToDevice(token, payload);
+        const payload = {
+          notification: {
+            title: senderFriendDisplayName +
+            " has accepted your friend request",
+            body: "Send them a message to say hello",
+          },
+          data: {
+            type: "newFriend",
+            displayName: senderFriendDisplayName,
+            email: senderFriendEmail,
+            photoUrl: senderFriendPhotoUrl,
+            uid: senderFriendUID,
+          },
+        };
+
+        const senderTokenRef = db
+            .collection("users")
+            .doc(context.params.userUID)
+            .collection("notification")
+            .doc("fcm_token");
+
+        const senderTokenDoc = await senderTokenRef.get();
+        const senderToken = senderTokenDoc.data()?.fcm_token;
+
+        console.log("SENDER'S TOKEN: " + senderToken);
+
+        return fcm.sendToDevice(senderToken, payload);
+      } else {
+        return functions.logger
+            .log("From new friend SENDER: not a new friend established");
+      }
     });
+
+// Send a notification Annoucing new friend for Sender of that friend reques
+export const notifyNewFriendReceiver = functions.region("asia-southeast1")
+    .firestore.document("/users/{userUID}/friends/{friendUID}")
+    .onUpdate(async (change, context) => {
+      if (change.before.data().requestConfirmed === false &&
+          change.after.data().requestConfirmed === true) {
+        if (change.before.data().isSender === true) {
+          return functions.logger
+              .log("from new friend RECEIVER: not receiver message => reject");
+        }
+        console.log("RECEIVER'S UID: " + context.params.userUID);
+        const receiverFriendRef = db
+            .collection("users")
+            .doc(context.params.friendUID);
+
+        const receiverFriendSnapshot = await receiverFriendRef.get();
+
+        console.log("RECEIVER'S FRIEND INFO");
+        const receiverFriendDisplayName = String(receiverFriendSnapshot
+            .data()?.displayName);
+        console.log(receiverFriendDisplayName);
+
+        const receiverFriendEmail = String(receiverFriendSnapshot
+            .data()?.email);
+        console.log(receiverFriendEmail);
+
+        const receiverFriendPhotoUrl = String(receiverFriendSnapshot
+            .data()?.photoUrl);
+        console.log(receiverFriendPhotoUrl);
+
+        const receiverFriendUID = String(receiverFriendSnapshot.data()?.uid);
+
+        const payload = {
+          notification: {
+            title: receiverFriendDisplayName + " is now your friend",
+            body: "Send them a message to say hello",
+          },
+          data: {
+            type: "newFriend",
+            displayName: receiverFriendDisplayName,
+            email: receiverFriendEmail,
+            photoUrl: receiverFriendPhotoUrl,
+            uid: receiverFriendUID,
+          },
+        };
+
+        const receiverTokenRef = db
+            .collection("users")
+            .doc(context.params.userUID)
+            .collection("notification")
+            .doc("fcm_token");
+
+
+        const receiverTokenDoc = await receiverTokenRef.get();
+        const receiverToken = receiverTokenDoc.data()?.fcm_token;
+
+        console.log("RECEIVER'S TOKEN: " + receiverToken);
+
+        return fcm.sendToDevice(receiverToken, payload);
+      } else {
+        return functions.logger
+            .log("From new friend RECEIVER: not a new friend established");
+      }
+    });
+
+

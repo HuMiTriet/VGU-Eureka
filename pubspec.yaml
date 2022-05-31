@@ -57,6 +57,8 @@ dependencies:
   firebase_messaging: ^11.4.0
   flutter_local_notifications: ^9.5.3+1
   geoflutterfire: ^3.0.2
+  random_string: ^2.3.1
+  uuid: 3.0.6
 
     #dev dependencies will not be included in the final build
 dev_dependencies:

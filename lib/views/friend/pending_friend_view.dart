@@ -35,7 +35,6 @@ class _PendingFriendViewState extends State<PendingFriendView> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     user = context.watch<AuthUser>();
     return FutureBuilder(
         future: Firestore.getPendingRequestUserInfo(user.uid),
