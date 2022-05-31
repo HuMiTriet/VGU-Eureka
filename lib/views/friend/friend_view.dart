@@ -1,13 +1,18 @@
 import 'dart:async';
+import 'package:pinput/pinput.dart';
+import 'package:uuid/uuid.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:etoet/services/database/firestore.dart';
+import 'package:etoet/views/friend/chat_room_view.dart';
 import 'package:etoet/views/friend/pending_friend_view.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
+import 'package:random_string/random_string.dart';
 
 import '../../services/auth/auth_user.dart';
 import 'add_friend_view.dart';
@@ -22,6 +27,7 @@ class FriendView extends StatefulWidget {
 
 class _FriendViewState extends State<FriendView> {
   late AuthUser user;
+  static late etoet.UserInfo selectedUser;
   Set<etoet.UserInfo> userListOnSearch = {};
 
   //Used to implements some of the search bar's function
@@ -86,7 +92,9 @@ class _FriendViewState extends State<FriendView> {
       if (email.contains(keyword)) {
         filteredList.add(friendList.elementAt(i));
         continue;
-      } else if (displayName.contains(keyword)) {
+      }
+      //Condition 2: DisplayName
+      else if (displayName.contains(keyword)) {
         filteredList.add(friendList.elementAt(i));
         continue;
       }
