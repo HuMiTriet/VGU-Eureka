@@ -20,8 +20,7 @@ class VerifyEmailView extends StatefulWidget {
 class _VerifyEmailViewState extends State<VerifyEmailView> {
   @override
   Widget build(BuildContext context) {
-    // ignore: omit_local_variable_types
-    Future<bool> userExists = Firestore.userExists(widget.user.uid);
+    var userExists = Firestore.userExists(widget.user.uid);
     userExists.then((value) => {
           if (value)
             {
