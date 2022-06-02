@@ -14,7 +14,8 @@ class Firestore {
   Firestore._();
 
   static void addUserInfo(AuthUser user) {
-    firestoreReference.collection('users').doc(user.uid).set(
+    var userRef = firestoreReference.collection('users').doc(user.uid);
+    userRef.set(
       {
         'uid': user.uid,
         'email': user.email,
@@ -22,15 +23,33 @@ class Firestore {
         'photoUrl': user.photoURL,
       },
     );
+
+    /// attributes that are related to the fact that the user is helping someone else
+    var userHelperRef = userRef.collection('helper').doc('helper');
+
+    userHelperRef.set(
+      {
+        'helpRange': user.helpRange,
+        'isHelping': false,
+      },
+    );
   }
 
   static void updateUserInfo(AuthUser authUser) async {
-    firestoreReference.collection('users').doc(authUser.uid).update({
+    var userRef = firestoreReference.collection('users').doc(authUser.uid);
+    userRef.update({
       'email': authUser.email,
       'displayName': authUser.displayName,
       'photoUrl': authUser.photoURL,
       'phoneNumber': authUser.phoneNumber,
     });
+    var userHelperRef = userRef.collection('helper').doc('helper');
+
+    userHelperRef.set(
+      {
+        'helpRange': authUser.helpRange,
+      },
+    );
   }
 
   static void setFcmTokenAndNotificationStatus(
@@ -359,41 +378,27 @@ class Firestore {
     var data1 = await user1Ref.get();
     var data2 = await user2Ref.get();
 
-
-    if(data1.data()!['chatroomUID'] == null || data2.data()!['chatroomUID'] == null)
-    {
-      user1Ref.set(
-          {
-            'chatroomUID': chatroomUID
-          },
-          SetOptions(merge: true)
-      );
-      user2Ref.set(
-          {
-            'chatroomUID': chatroomUID
-          },
-          SetOptions(merge: true)
-      );
+    if (data1.data()!['chatroomUID'] == null ||
+        data2.data()!['chatroomUID'] == null) {
+      user1Ref.set({'chatroomUID': chatroomUID}, SetOptions(merge: true));
+      user2Ref.set({'chatroomUID': chatroomUID}, SetOptions(merge: true));
       Firestore.firestoreReference
           .collection('chatrooms')
           .doc(chatroomUID)
           .set({'user1UID': userUID1, 'user2UID': userUID2});
     }
-
   }
 
-  static Future<String> getChatroomUID(String user1UID, String user2UID)
-  async {
-    var ref = await firestoreReference.
-    collection('users').
-    doc(user1UID).
-    collection('friends').
-    doc(user2UID).
-    get();
+  static Future<String> getChatroomUID(String user1UID, String user2UID) async {
+    var ref = await firestoreReference
+        .collection('users')
+        .doc(user1UID)
+        .collection('friends')
+        .doc(user2UID)
+        .get();
 
     return ref.data()!['chatroomUID'];
   }
-
 
   static void setMessage(String chatroomUID, String message, String senderUID) {
     var ts = Timestamp.now();
