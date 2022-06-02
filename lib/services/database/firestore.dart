@@ -50,7 +50,6 @@ class Firestore {
 
   static void setEmergencySignal({
     required String uid,
-    // required String type,
     required String locationDescription,
     required String situationDetail,
     bool isPublic = false,
@@ -58,7 +57,6 @@ class Firestore {
     firestoreReference.collection('emergencies').doc(uid).set(
       {
         'isPublic': isPublic,
-        // 'type': type,
         'locationDescription': locationDescription,
         'situationDetail': situationDetail,
         'uid': uid,

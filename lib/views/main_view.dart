@@ -147,15 +147,15 @@ class MainViewState extends State<MainView> {
         Firestore.setFcmTokenAndNotificationStatus(
             uid: authUser!.uid, token: token);
         FirebaseMessaging.onMessage.listen((event) {
-          print('LISTEN FROM MAIN VIEW');
           var dataType = event.data['type'];
           if (dataType == 'emegency'){
           showDialog(
               context: context,
               builder: (context) {
                 var content = event.notification!.body;
+                var title = event.notification!.title;
                 return AlertDialog(
-                  title: const Text('EMERGENCY'),
+                  title: Text(title ?? 'Emergency alert'),
                   content: Text(content ?? 'null'),
                   actions: [
                     ElevatedButton(
