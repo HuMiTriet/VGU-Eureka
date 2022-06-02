@@ -226,6 +226,9 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
             await friendMarkerCreator.createFriendMarker(friendLatLng: latLng);
         widget._markers.removeWhere(
             (marker) => marker.markerId == MarkerId(friendInfo.uid));
+        widget._friendsMarkers.removeWhere(
+            (marker) => marker.markerId == MarkerId(friendInfo.uid));
+        widget._friendsMarkers.add(friendMarker);
         setState(() {
           widget._markers.add(friendMarker);
         });

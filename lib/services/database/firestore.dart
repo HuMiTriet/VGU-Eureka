@@ -45,7 +45,7 @@ class Firestore {
     });
     var userHelperRef = userRef.collection('helper').doc('helper');
 
-    userHelperRef.set(
+    userHelperRef.update(
       {
         'helpRange': authUser.helpRange,
       },
