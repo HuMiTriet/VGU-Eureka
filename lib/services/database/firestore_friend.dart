@@ -244,4 +244,11 @@ class FirestoreFriend extends Firestore {
         .snapshots();
     return pendingFriendStream;
   }
+
+  static Future<void> deleteFriend(String userUID, String friendUID)
+  async {
+    Firestore.firestoreReference.collection('users').doc(userUID).collection('friends').doc(friendUID).delete();
+    Firestore.firestoreReference.collection('users').doc(friendUID).collection('friends').doc(userUID).delete();
+  }
+
 }

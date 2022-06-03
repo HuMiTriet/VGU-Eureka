@@ -40,24 +40,27 @@ class _FriendViewState extends State<FriendView> {
   void initState() {
     super.initState();
     FirebaseMessaging.onMessage.listen((event) {
-      print('Listened Bitch!');
-      var notification = event.notification;
+      print('Listened from Friend View!');
+
       var data = event.data;
 
-      print(notification!.body.toString());
-      print(data.toString());
+      print("Friend View Data fetched From FirebaseMessaging: $data");
 
-      if (data['type'] == "newFriend") {
-        print(
-            'Your friend request has been accepted by ' + data['displayName']);
-        var newFriend = etoet.UserInfo(
-          uid: data['uid'],
-          photoURL: data['photoUrl'],
-          email: data['email'],
-          displayName: data['displayName'],
-        );
-        user.friendInfoList.add(newFriend);
-        setState(() {});
+      if (data['type'] == 'newFriend') {
+        if (data['uid'] == user.uid) {
+          print('Data of self received, skipping...');
+        } else {
+          print('Your friend request has been accepted by ' +
+              data['displayName']);
+          var newFriend = etoet.UserInfo(
+            uid: data['uid'],
+            photoURL: data['photoUrl'],
+            email: data['email'],
+            displayName: data['displayName'],
+          );
+          user.friendInfoList.add(newFriend);
+          setState(() {});
+        }
       }
     });
   }
@@ -287,7 +290,18 @@ class _FriendViewState extends State<FriendView> {
                                                 'Are you sure you want to unfriend ${selectedUser.displayName!}?'),
                                             actions: [
                                               TextButton(
-                                                onPressed: () {},
+                                                onPressed: () {
+                                                  FirestoreFriend.deleteFriend(
+                                                      user.uid,
+                                                      selectedUser.uid);
+
+                                                  // Not a good way to delete Friend from local friendList
+                                                  // Pleased noted to change to listener to database
+                                                  user.friendInfoList
+                                                      .remove(selectedUser);
+                                                  setState(() {});
+                                                  Navigator.pop(context);
+                                                },
                                                 style: ButtonStyle(
                                                     backgroundColor:
                                                         MaterialStateProperty
@@ -299,7 +313,9 @@ class _FriendViewState extends State<FriendView> {
                                                 ),
                                               ),
                                               TextButton(
-                                                onPressed: () {},
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
                                                 style: ButtonStyle(
                                                     backgroundColor:
                                                         MaterialStateProperty
