@@ -153,90 +153,88 @@ class _FriendViewState extends State<FriendView> {
                 child: Column(
                   children: [
                     // Search, Add Friend and Pending Friend Request.
-                    Flexible(
-                        //flex: topListViewFlex,
-                        child: Container(
+                    Container(
                       color: topListViewColor,
                       child: ListView(
-                        shrinkWrap: true,
-                        children: [
-                          TextField(
-                            controller: _searchBarController,
-                            decoration: InputDecoration(
-                              hintText: 'Search by Display Name or Email',
-                              contentPadding: const EdgeInsets.all(20),
-                              // suffixIcon: IconButton(
-                              //   onPressed: () {
-                              //     _searchBarController.clear();
-                              //     setState(() {
-                              //       userListOnSearch = user.friendInfoList;
-                              //     });
-                              //   },
-                              //   icon: const Icon(Icons.clear),
-                              // ),
-                            ),
-                            onChanged: (keyword) {
-                              setState(() {
-                                userListOnSearch = getFilteredFriendList(
-                                    friendList: user.friendInfoList,
-                                    keyword: keyword);
-                              });
-                            },
-                          ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          ListTile(
-                            leading: Material(
-                              borderRadius: BorderRadius.circular(20),
-                              elevation: 2,
-                              shadowColor: Colors.black,
-                              child: const CircleAvatar(
-                                child: Icon(addFriendIcon),
-                              ),
-                            ),
-                            title: const Text('Add Friend'),
-                            shape: RoundedRectangleBorder(
-                                side: const BorderSide(
-                                    color: Colors.black, width: 1),
-                                borderRadius: BorderRadius.circular(15)),
-                            onTap: () {
-                              showBarModalBottomSheet(
-                                context: context,
-                                backgroundColor: Colors.transparent,
-                                builder: (context) => const AddFriendView(),
-                              );
-                            },
-                          ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          ListTile(
-                            leading: Material(
-                              borderRadius: BorderRadius.circular(20),
-                              elevation: 2,
-                              shadowColor: Colors.black,
-                              child: const CircleAvatar(
-                                child: Icon(pendingFriendRequestIcon),
-                              ),
-                            ),
-                            title: const Text('Pending Friend Request'),
-                            shape: RoundedRectangleBorder(
-                                side: BorderSide(color: Colors.black, width: 1),
-                                borderRadius: BorderRadius.circular(15)),
-                            onTap: () {
-                              showBarModalBottomSheet(
-                                context: context,
-                                backgroundColor: Colors.transparent,
-                                builder: (context) => const PendingFriendView(),
-                              );
-                            },
-                            trailing:
-                                Text(pendingFriendRequestCount.toString()),
-                          ),
-                        ],
+                    shrinkWrap: true,
+                    children: [
+                      TextField(
+                        controller: _searchBarController,
+                        decoration: InputDecoration(
+                          hintText: 'Search by Display Name or Email',
+                          contentPadding: const EdgeInsets.all(20),
+                          // suffixIcon: IconButton(
+                          //   onPressed: () {
+                          //     _searchBarController.clear();
+                          //     setState(() {
+                          //       userListOnSearch = user.friendInfoList;
+                          //     });
+                          //   },
+                          //   icon: const Icon(Icons.clear),
+                          // ),
+                        ),
+                        onChanged: (keyword) {
+                          setState(() {
+                            userListOnSearch = getFilteredFriendList(
+                                friendList: user.friendInfoList,
+                                keyword: keyword);
+                          });
+                        },
                       ),
-                    )),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      ListTile(
+                        leading: Material(
+                          borderRadius: BorderRadius.circular(20),
+                          elevation: 2,
+                          shadowColor: Colors.black,
+                          child: const CircleAvatar(
+                            child: Icon(addFriendIcon),
+                          ),
+                        ),
+                        title: const Text('Add Friend'),
+                        shape: RoundedRectangleBorder(
+                            side: const BorderSide(
+                                color: Colors.black, width: 1),
+                            borderRadius: BorderRadius.circular(15)),
+                        onTap: () {
+                          showBarModalBottomSheet(
+                            context: context,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) => const AddFriendView(),
+                          );
+                        },
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      ListTile(
+                        leading: Material(
+                          borderRadius: BorderRadius.circular(20),
+                          elevation: 2,
+                          shadowColor: Colors.black,
+                          child: const CircleAvatar(
+                            child: Icon(pendingFriendRequestIcon),
+                          ),
+                        ),
+                        title: const Text('Pending Friend Request'),
+                        shape: RoundedRectangleBorder(
+                            side: BorderSide(color: Colors.black, width: 1),
+                            borderRadius: BorderRadius.circular(15)),
+                        onTap: () {
+                          showBarModalBottomSheet(
+                            context: context,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) => const PendingFriendView(),
+                          );
+                        },
+                        trailing:
+                            Text(pendingFriendRequestCount.toString()),
+                      ),
+                    ],
+                      ),
+                    ),
 
                     const SizedBox(
                       height: 5,
@@ -263,125 +261,127 @@ class _FriendViewState extends State<FriendView> {
                     ),
 
                     // Friend List
-                    Container(
-                      color: bottomListViewColor,
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: (_searchBarController.text.isNotEmpty)
-                            ? userListOnSearch.length
-                            : user.friendInfoList.length,
-                        itemBuilder: (context, index) {
-                          return Slidable(
-                            endActionPane: ActionPane(
-                              motion: ScrollMotion(),
-                              children: [
-                                SlidableAction(
-                                  flex: 1,
-                                  onPressed: (context) {
-                                    selectedUser = (_searchBarController
-                                            .text.isNotEmpty)
-                                        ? userListOnSearch.elementAt(index)
-                                        : user.friendInfoList.elementAt(index);
-                                    showDialog(
-                                        context: context,
-                                        builder: (context) {
-                                          return AlertDialog(
-                                            title: Text(
-                                                'Are you sure you want to unfriend ${selectedUser.displayName!}?'),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () {
-                                                  FirestoreFriend.deleteFriend(
-                                                      user.uid,
-                                                      selectedUser.uid);
+                    Expanded(
+                      child: Container(
+                        color: bottomListViewColor,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: (_searchBarController.text.isNotEmpty)
+                              ? userListOnSearch.length
+                              : user.friendInfoList.length,
+                          itemBuilder: (context, index) {
+                            return Slidable(
+                              endActionPane: ActionPane(
+                                motion: ScrollMotion(),
+                                children: [
+                                  SlidableAction(
+                                    flex: 1,
+                                    onPressed: (context) {
+                                      selectedUser = (_searchBarController
+                                              .text.isNotEmpty)
+                                          ? userListOnSearch.elementAt(index)
+                                          : user.friendInfoList.elementAt(index);
+                                      showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return AlertDialog(
+                                              title: Text(
+                                                  'Are you sure you want to unfriend ${selectedUser.displayName!}?'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () {
+                                                    FirestoreFriend.deleteFriend(
+                                                        user.uid,
+                                                        selectedUser.uid);
 
-                                                  // Not a good way to delete Friend from local friendList
-                                                  // Pleased noted to change to listener to database
-                                                  user.friendInfoList
-                                                      .remove(selectedUser);
-                                                  setState(() {});
-                                                  Navigator.pop(context);
-                                                },
-                                                style: ButtonStyle(
-                                                    backgroundColor:
-                                                        MaterialStateProperty
-                                                            .all(Colors.red)),
-                                                child: const Text(
-                                                  'Unfriend',
-                                                  style: TextStyle(
-                                                      color: Colors.white),
+                                                    // Not a good way to delete Friend from local friendList
+                                                    // Pleased noted to change to listener to database
+                                                    user.friendInfoList
+                                                        .remove(selectedUser);
+                                                    setState(() {});
+                                                    Navigator.pop(context);
+                                                  },
+                                                  style: ButtonStyle(
+                                                      backgroundColor:
+                                                          MaterialStateProperty
+                                                              .all(Colors.red)),
+                                                  child: const Text(
+                                                    'Unfriend',
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
                                                 ),
-                                              ),
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                style: ButtonStyle(
-                                                    backgroundColor:
-                                                        MaterialStateProperty
-                                                            .all(Colors
-                                                                .lightBlue)),
-                                                child: const Text(
-                                                  'Cancel',
-                                                  style: TextStyle(
-                                                      color: Colors.white),
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                  style: ButtonStyle(
+                                                      backgroundColor:
+                                                          MaterialStateProperty
+                                                              .all(Colors
+                                                                  .lightBlue)),
+                                                  child: const Text(
+                                                    'Cancel',
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
                                                 ),
-                                              ),
-                                            ],
-                                          );
-                                        });
-                                  },
-                                  backgroundColor: Colors.red,
-                                  foregroundColor: Colors.white,
-                                  icon: Icons.person_remove,
-                                  label: 'Unfriend',
+                                              ],
+                                            );
+                                          });
+                                    },
+                                    backgroundColor: Colors.red,
+                                    foregroundColor: Colors.white,
+                                    icon: Icons.person_remove,
+                                    label: 'Unfriend',
+                                  ),
+                                  SlidableAction(
+                                    flex: 1,
+                                    onPressed: (context) {
+                                      toFriendChatView(index);
+                                    },
+                                    backgroundColor: Colors.lightBlue,
+                                    foregroundColor: Colors.white,
+                                    icon: Icons.chat,
+                                    label: 'Chat',
+                                  )
+                                ],
+                              ),
+                              child: ListTile(
+                                onTap: () async {
+                                  toFriendChatView(index);
+                                },
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                      userListOnSearch.isNotEmpty
+                                          ? userListOnSearch
+                                              .elementAt(index)
+                                              .photoURL!
+                                          : user.friendInfoList
+                                              .elementAt(index)
+                                              .photoURL!),
                                 ),
-                                SlidableAction(
-                                  flex: 1,
-                                  onPressed: (context) {
-                                    toFriendChatView(index);
-                                  },
-                                  backgroundColor: Colors.lightBlue,
-                                  foregroundColor: Colors.white,
-                                  icon: Icons.chat,
-                                  label: 'Chat',
-                                )
-                              ],
-                            ),
-                            child: ListTile(
-                              onTap: () async {
-                                toFriendChatView(index);
-                              },
-                              leading: CircleAvatar(
-                                backgroundImage: NetworkImage(
-                                    userListOnSearch.isNotEmpty
-                                        ? userListOnSearch
-                                            .elementAt(index)
-                                            .photoURL!
+                                title: Text((_searchBarController.text.isNotEmpty)
+                                    ? userListOnSearch
+                                        .elementAt(index)
+                                        .displayName!
+                                    : user.friendInfoList
+                                        .elementAt(index)
+                                        .displayName!),
+                                subtitle: Text(
+                                    (_searchBarController.text.isNotEmpty)
+                                        ? userListOnSearch.elementAt(index).email!
                                         : user.friendInfoList
                                             .elementAt(index)
-                                            .photoURL!),
+                                            .email!),
+                                shape: RoundedRectangleBorder(
+                                    side:
+                                        BorderSide(color: Colors.black, width: 1),
+                                    borderRadius: BorderRadius.circular(15)),
                               ),
-                              title: Text((_searchBarController.text.isNotEmpty)
-                                  ? userListOnSearch
-                                      .elementAt(index)
-                                      .displayName!
-                                  : user.friendInfoList
-                                      .elementAt(index)
-                                      .displayName!),
-                              subtitle: Text(
-                                  (_searchBarController.text.isNotEmpty)
-                                      ? userListOnSearch.elementAt(index).email!
-                                      : user.friendInfoList
-                                          .elementAt(index)
-                                          .email!),
-                              shape: RoundedRectangleBorder(
-                                  side:
-                                      BorderSide(color: Colors.black, width: 1),
-                                  borderRadius: BorderRadius.circular(15)),
-                            ),
-                          );
-                        },
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ],
