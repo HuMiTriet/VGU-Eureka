@@ -1,5 +1,6 @@
 import 'package:etoet/services/auth/auth_user.dart';
 import 'package:etoet/services/database/firestore.dart';
+import 'package:etoet/services/database/firestore_friend.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
@@ -61,7 +62,7 @@ class _AddFriendViewState extends State<AddFriendView> {
                             onPressed: () async {
                               if (_searchBarController.text.isNotEmpty) {
                                 searchedUserInfoList =
-                                    await Firestore.getUserInfoFromEmail(
+                                    await FirestoreFriend.getUserInfoFromEmail(
                                         _searchBarController.text, user.uid);
                               } else {
                                 searchedUserInfoList.clear();
@@ -96,7 +97,7 @@ class _AddFriendViewState extends State<AddFriendView> {
                         ),
                         trailing: IconButton(
                           onPressed: () {
-                            Firestore.sendFriendRequest(user.uid,
+                            FirestoreFriend.sendFriendRequest(user.uid,
                                 searchedUserInfoList.elementAt(index).uid);
                             showDialog(
                               context: context,
