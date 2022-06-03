@@ -31,6 +31,16 @@ class FirestoreChat extends Firestore {
     var data1 = await user1Ref.get();
     var data2 = await user2Ref.get();
 
+    //Check if there is already a chatroom when two user unfriended
+    var oldChatroomUID = await oldFriendChatroom(userUID1, userUID2);
+    print(oldChatroomUID);
+    if(oldChatroomUID.isNotEmpty)
+    {
+      user1Ref.set({'chatroomUID': oldChatroomUID}, SetOptions(merge: true));
+      user2Ref.set({'chatroomUID': oldChatroomUID}, SetOptions(merge: true));
+      return ;
+    }
+
     if (data1.data()!['chatroomUID'] == null ||
         data2.data()!['chatroomUID'] == null) {
       user1Ref.set({'chatroomUID': chatroomUID}, SetOptions(merge: true));
@@ -38,9 +48,41 @@ class FirestoreChat extends Firestore {
       Firestore.firestoreReference
           .collection('chatrooms')
           .doc(chatroomUID)
-          .set({'user1UID': userUID1, 'user2UID': userUID2});
+          .set({'user1UID': userUID1, 'user2UID': userUID2, 'chatroomUID' : chatroomUID});
     }
   }
+
+  static Future<String> oldFriendChatroom(
+      String user1UID, String user2UID) async {
+    var data1 = await Firestore.firestoreReference
+        .collection('chatrooms')
+        .where('user1UID', isEqualTo: user1UID)
+        .where('user2UID', isEqualTo: user2UID)
+        .get();
+
+    //Another case, the users UID position got switched
+    //TODO: Maybe change the field in chatrooms to arrays, it makes more sense when checking
+    var data2 = await Firestore.firestoreReference
+        .collection('chatrooms')
+        .where('user1UID', isEqualTo: user2UID)
+        .where('user2UID', isEqualTo: user1UID)
+        .get();
+
+    if (data1.docs.isNotEmpty) {
+
+      String oldChatroomUID = data1.docs.elementAt(0).data()['chatroomUID'];
+      print('old chatroom detected! chatroom UID:' + oldChatroomUID);
+      return oldChatroomUID;
+    }
+    if (data2.docs.isNotEmpty){
+      String oldChatroomUID = data2.docs.elementAt(0).data()['chatroomUID'];
+      print('old chatroom detected! chatroom UID:' + oldChatroomUID);
+      return oldChatroomUID;
+    }
+
+    return '';
+  }
+
 
   static Future<String> getChatroomUID(String user1UID, String user2UID) async {
     var ref = await Firestore.firestoreReference
