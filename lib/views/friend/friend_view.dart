@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 import 'package:random_string/random_string.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 import '../../services/auth/auth_user.dart';
 import 'add_friend_view.dart';
@@ -85,6 +86,23 @@ class _FriendViewState extends State<FriendView> {
     }
 
     return filteredList;
+  }
+
+  Future<void> toFriendChatView(int index)
+  async {
+    selectedUser = (_searchBarController.text.isNotEmpty)?
+    userListOnSearch.elementAt(index)
+        : user.friendInfoList.elementAt(index);
+    var chatroomUID = const Uuid().v4().toString();
+    await Firestore.createFriendChatroom(
+        user.uid, selectedUser.uid, chatroomUID);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) =>
+              ChatRoomView(selectedUser)),
+    );
   }
 
   //Variables for easier config:
@@ -241,60 +259,105 @@ class _FriendViewState extends State<FriendView> {
                         const SizedBox(
                           height: 5,
                         ),
+
                         // Friend List
-                        Flexible(
-                          //flex: bottomListViewFlex,
-                            child: Container(
-                              color: bottomListViewColor,
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: (_searchBarController.text.isNotEmpty)
-                                    ? userListOnSearch.length
-                                    : user.friendInfoList.length,
-                                itemBuilder: (context, index) {
-                                  return ListTile(
-                                    onTap: () async {
-                                      // selectedUser =
-                                      //     user.friendInfoList.elementAt(index);
-                                      selectedUser = (_searchBarController.text.isNotEmpty)?
-                                      userListOnSearch.elementAt(index)
-                                          : user.friendInfoList.elementAt(index);
-                                      var chatroomUID = const Uuid().v4().toString();
-                                      await Firestore.createFriendChatroom(
-                                          user.uid, selectedUser.uid, chatroomUID);
-                                      // Navigator.pushNamedAndRemoveUntil(
-                                      //     context, chat_friend_route, (route) => false,
-                                      //     arguments: selectedUser);
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                ChatRoomView(selectedUser)),
-                                      );
-                                    },
-                                    leading: CircleAvatar(
-                                      backgroundImage: NetworkImage(userListOnSearch
-                                          .isNotEmpty
-                                          ? userListOnSearch.elementAt(index).photoURL!
-                                          : user.friendInfoList
-                                          .elementAt(index)
-                                          .photoURL!),
+                        Container(
+                          color: bottomListViewColor,
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: (_searchBarController.text.isNotEmpty)
+                                ? userListOnSearch.length
+                                : user.friendInfoList.length,
+                            itemBuilder: (context, index) {
+                              return Slidable(
+                                endActionPane: ActionPane(
+                                  motion: ScrollMotion(),
+                                  children: [
+                                    SlidableAction(
+                                      flex: 1,
+                                      onPressed: (context){
+                                        selectedUser = (_searchBarController.text.isNotEmpty)?
+                                        userListOnSearch.elementAt(index)
+                                            : user.friendInfoList.elementAt(index);
+                                        showDialog(
+                                            context: context,
+                                            builder: (context)
+                                            {
+                                              return AlertDialog(
+                                                title: Text('Are you sure you want to unfriend ${selectedUser.displayName!}?'),
+                                                actions: [
+                                                  TextButton(
+                                                      onPressed: ()
+                                                      {
+
+                                                      },
+                                                      style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.red)),
+                                                      child: const Text(
+                                                        'Unfriend',
+                                                        style: TextStyle(color: Colors.white),
+                                                      ),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: ()
+                                                    {
+
+                                                    },
+                                                    style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.lightBlue)),
+                                                    child: const Text(
+                                                      'Cancel',
+                                                      style: TextStyle(color: Colors.white),
+                                                    ),
+                                                  ),
+                                                ],
+                                              );
+                                            }
+                                        );
+                                      },
+                                      backgroundColor: Colors.red,
+                                      foregroundColor: Colors.white,
+                                      icon: Icons.person_remove,
+                                      label: 'Unfriend',
                                     ),
-                                    title: Text((_searchBarController.text.isNotEmpty)
-                                        ? userListOnSearch.elementAt(index).displayName!
+                                    SlidableAction(
+                                      flex: 1,
+                                      onPressed: (context){
+                                        toFriendChatView(index);
+                                      },
+                                      backgroundColor: Colors.lightBlue,
+                                      foregroundColor: Colors.white,
+                                      icon: Icons.chat,
+                                      label: 'Chat',
+                                    )
+                                  ],
+                                ),
+                                child: ListTile(
+                                  onTap: () async {
+                                    toFriendChatView(index);
+                                  },
+                                  leading: CircleAvatar(
+                                    backgroundImage: NetworkImage(userListOnSearch
+                                        .isNotEmpty
+                                        ? userListOnSearch.elementAt(index).photoURL!
                                         : user.friendInfoList
                                         .elementAt(index)
-                                        .displayName!),
-                                    subtitle: Text((_searchBarController.text.isNotEmpty)
-                                        ? userListOnSearch.elementAt(index).email!
-                                        : user.friendInfoList.elementAt(index).email!),
-                                    shape: RoundedRectangleBorder(
-                                        side: BorderSide(color: Colors.black, width: 1),
-                                        borderRadius: BorderRadius.circular(15)),
-                                  );
-                                },
-                              ),
-                            )),
+                                        .photoURL!),
+                                  ),
+                                  title: Text((_searchBarController.text.isNotEmpty)
+                                      ? userListOnSearch.elementAt(index).displayName!
+                                      : user.friendInfoList
+                                      .elementAt(index)
+                                      .displayName!),
+                                  subtitle: Text((_searchBarController.text.isNotEmpty)
+                                      ? userListOnSearch.elementAt(index).email!
+                                      : user.friendInfoList.elementAt(index).email!),
+                                  shape: RoundedRectangleBorder(
+                                      side: BorderSide(color: Colors.black, width: 1),
+                                      borderRadius: BorderRadius.circular(15)),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
                       ],
                     ),
                   )));
