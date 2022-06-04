@@ -55,6 +55,16 @@ class _FriendViewState extends State<FriendView> {
             email: data['email'],
             displayName: data['displayName'],
           );
+
+          // Very scruffed fix when you got accepted but you have no friend
+          //TODO: make for loop run at least once
+          if(user.friendInfoList.length == 0)
+            {
+              setState(() {
+                user.friendInfoList.add(newFriend);
+              });
+              print('Your are now friend with ' + data['displayName']);
+            }
           for (var i = 0; i < user.friendInfoList.length; ++i) {
             if (i == (user.friendInfoList.length - 1) &&
                 newFriend.uid != user.friendInfoList.elementAt(i).uid) {
@@ -318,8 +328,8 @@ class _FriendViewState extends State<FriendView> {
 
                                                     // Not a good way to delete Friend from local friendList
                                                     // Pleased noted to change to listener to database
-                                                    // user.friendInfoList
-                                                    //     .remove(selectedUser);
+                                                    user.friendInfoList
+                                                        .remove(selectedUser);
                                                     setState(() {});
                                                     Navigator.pop(context);
                                                   },
