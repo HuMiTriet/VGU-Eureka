@@ -18,10 +18,17 @@ export default async (
   // Friend is the person whom the user unfriended to (the victim so to speak)
   const friendTokenPromise = getFcmToken(context, friendUID);
 
-  const fcmTokens = await Promise.all([userTokenPromise, friendTokenPromise]);
+  const userTokenSnap = await userTokenPromise;
+  const userToken: string = userTokenSnap.data()?.fcm_token;
 
-  const userToken = fcmTokens[0].data()?.fcm_token;
-  const friendToken = fcmTokens[1].data()?.fcm_token;
+  const friendTokenSnap = await friendTokenPromise;
+  const friendToken: string = friendTokenSnap.data()?.fcm_token;
+
+  // const fcmTokens = await Promise
+  // .all([userTokenPromise, friendTokenPromise]);
+
+  // const userToken = fcmTokens[0].data()?.fcm_token;
+  // const friendToken = fcmTokens[1].data()?.fcm_token;
 
   const tokens: string[] = [userToken, friendToken];
 
@@ -32,6 +39,7 @@ export default async (
       friendUID: friendUID,
     },
   };
+  console.log(payload);
 
   fcm.sendToDevice(tokens, payload);
 };
