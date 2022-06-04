@@ -42,8 +42,7 @@ class NotificationHandler {
 
       await _notificationsPlugin.show(
         1,
-        // message.notification!.title,
-        'second notification',
+        message.notification!.title,
         message.notification!.body,
         notificationDetails,
       );
