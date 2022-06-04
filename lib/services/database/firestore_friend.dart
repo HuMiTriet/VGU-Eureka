@@ -26,7 +26,7 @@ class FirestoreFriend extends Firestore {
         .collection('users')
         .doc(userUID)
         .collection('friends')
-        .where('requestConfirmed', isEqualTo: true)
+        //.where('requestConfirmed', isEqualTo: true)
         .get();
 
     var searchedUserInfoList = <etoet.UserInfo>{};

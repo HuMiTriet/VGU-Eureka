@@ -96,9 +96,17 @@ class _AddFriendViewState extends State<AddFriendView> {
                           searchedUserInfoList.elementAt(index).email!,
                         ),
                         trailing: IconButton(
-                          onPressed: () {
+                          onPressed: () async {
+
                             FirestoreFriend.sendFriendRequest(user.uid,
                                 searchedUserInfoList.elementAt(index).uid);
+
+                            searchedUserInfoList =
+                                await FirestoreFriend.getUserInfoFromEmail(
+                                _searchBarController.text, user.uid);
+
+                            //Clear list after sent a friend request
+                            setState(() {});
                             showDialog(
                               context: context,
                               builder: (context) {
