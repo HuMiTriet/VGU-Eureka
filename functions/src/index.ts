@@ -35,4 +35,9 @@ export const notifyNewFriendReceiver = functions.region("asia-southeast1")
           .default(change, context);
     });
 
-
+export const unFriendNotification = functions.region("asia-southeast1")
+    .firestore.document("/users/{userUID}/friends/{friendUID}")
+    .onDelete(async (snapshot, context) => {
+      await (await import("./friend/unFriend"))
+          .default(snapshot, context);
+    });
