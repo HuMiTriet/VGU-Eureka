@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:etoet/services/database/firestore.dart';
@@ -146,32 +148,42 @@ class MainViewState extends State<MainView> {
       } else {
         Firestore.setFcmTokenAndNotificationStatus(
             uid: authUser!.uid, token: token);
-        FirebaseMessaging.onMessage.listen((event) {
-          print('LISTEN FROM MAIN VIEW');
-          var dataType = event.data['type'];
-          if (dataType == 'emegency'){
-          showDialog(
-              context: context,
-              builder: (context) {
-                var content = event.notification!.body;
-                return AlertDialog(
-                  title: const Text('EMERGENCY'),
-                  content: Text(content ?? 'null'),
-                  actions: [
-                    ElevatedButton(
-                      onPressed: () {},
-                      child: const Text('Accpet'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {},
-                      child: const Text('Reject'),
-                    )
-                  ],
-                );
-              });
-          }
-        });
       }
     });
+
+    setupInteractedMessage();
+  }
+
+  Future<void> setupInteractedMessage() async {
+    // Get any messages which caused the application to open from
+    // a terminated state.
+    RemoteMessage? initialMessage =
+        await FirebaseMessaging.instance.getInitialMessage();
+
+    if (initialMessage != null) {
+      _handleMessage(initialMessage);
+    }
+
+    // app is in background but open
+    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
+
+    // app is in foreground
+    FirebaseMessaging.onMessage.listen(_handleForeGroundMessage);
+  }
+
+  void _handleMessage(RemoteMessage message) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          var content = message.notification!.body;
+          return AlertDialog(
+            title: const Text('Notification tapped'),
+            content: Text(content!),
+          );
+        });
+  }
+
+  void _handleForeGroundMessage(RemoteMessage message) {
+    NotificationHandler.display(message);
   }
 }
