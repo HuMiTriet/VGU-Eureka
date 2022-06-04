@@ -1,28 +1,25 @@
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/auth_user.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:etoet/views/settingUI_lib/src/custom_section.dart';
 import 'package:etoet/views/settingUI_lib/src/settings_list.dart';
 import 'package:etoet/views/settingUI_lib/src/settings_section.dart';
 import 'package:etoet/views/settingUI_lib/src/settings_tile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 // import 'package:settings_ui/settings_ui.dart';
 import '../../services/auth/auth_user.dart';
 
-// enum MenuAction { signOut }
 
 class SettingsView extends StatefulWidget {
   @override
   const SettingsView({Key? key}) : super(key: key);
 
   @override
-  _SettingsViewState createState() => _SettingsViewState();
+  SettingsViewState createState() => SettingsViewState();
 }
 
-class _SettingsViewState extends State<SettingsView> {
+class SettingsViewState extends State<SettingsView> {
   bool notificationsEnabled = true;
   double _receivedRange = 5.0;
   // String _username = 'Doraemon';
@@ -41,44 +38,6 @@ class _SettingsViewState extends State<SettingsView> {
     return Scaffold(
       appBar: AppBar(title: const Text('Settings UI')),
       body: buildSettingsList(),
-    );
-  }
-
-  void showAlertDialog(BuildContext context) {
-    // set up the buttons
-    Widget cancelButton = FlatButton(
-      child: Text("No"),
-      onPressed:  () {
-        Navigator.of(context).pop();
-      },
-    );
-    Widget continueButton = FlatButton(
-      child: Text("Yes"),
-        onPressed: () async {
-        await FirebaseAuth.instance.signOut();
-        Navigator.of(context).pushNamedAndRemoveUntil(
-          loginRoute,
-          (_) => false,
-        );
-      }
-    );
-
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-      title: Text("Logout"),
-      content: Text("Are you sure you want to logout?"),
-      actions: [
-        cancelButton,
-        continueButton,
-      ],
-    );
-
-    // show the dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
     );
   }
 
@@ -163,14 +122,14 @@ class _SettingsViewState extends State<SettingsView> {
                 titleWidget: Row (
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Text('Notification-received range'),
+                    const Text('Notification-received range'),
                     Text('${_receivedRange.toStringAsFixed(1)} km'),
 
                     // Expanded(child: Container()),
                     // Icon(Icons.arrow_drop_down),
                   ],
                 ),
-                leading: Icon(Icons.collections_bookmark)
+                leading: const Icon(Icons.collections_bookmark)
             ),
             SettingsTile(
               titleWidget: Slider(
@@ -221,6 +180,44 @@ class _SettingsViewState extends State<SettingsView> {
          // ),
         //),
       ],
+    );
+  }
+
+  void showAlertDialog(BuildContext context) {
+    // set up the buttons
+    Widget cancelButton = TextButton(
+      child: const Text('No'),
+      onPressed:  () {
+        Navigator.of(context).pop();
+      },
+    );
+    Widget continueButton = TextButton(
+      child: const Text('Yes'),
+        onPressed: () async {
+        await FirebaseAuth.instance.signOut();
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          loginRoute,
+          (_) => false,
+        );
+      }
+    );
+
+    // set up the AlertDialog
+    var alert = AlertDialog(
+      title: const Text('Logout'),
+      content: const Text('Are you sure you want to logout?'),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (context) {
+        return alert;
+      },
     );
   }
 }
