@@ -24,18 +24,11 @@ export default async (
   const friendTokenSnap = await friendTokenPromise;
   const friendToken: string = friendTokenSnap.data()?.fcm_token;
 
-  // const fcmTokens = await Promise
-  // .all([userTokenPromise, friendTokenPromise]);
-
-  // const userToken = fcmTokens[0].data()?.fcm_token;
-  // const friendToken = fcmTokens[1].data()?.fcm_token;
-
   const tokens: string[] = [userToken, friendToken];
 
   const payload = {
     data: {
       type: "unFriend",
-      userUID: userUID,
       friendUID: friendUID,
     },
   };

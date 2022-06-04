@@ -12,12 +12,12 @@ export const sendPrivateNotification = functions.region("asia-southeast1").
     });
 
 
-// export const sendPublicNotification = functions.region("asia-southeast1")
-//     .firestore.document("/emergencies/{userId}")
-//     .onUpdate(async (change, context) => {
-//       await (await import("./emergency/publicSignal"))
-//           .default(change, context);
-//     });
+export const sendPublicNotification = functions.region("asia-southeast1")
+    .firestore.document("/emergencies/{userUID}")
+    .onUpdate(async (change, context) => {
+      await (await import("./emergency/publicSignal"))
+          .default(change, context);
+    });
 
 // Send a notification Annoucing new friend for Sender of that friend reques
 export const notifyNewFriendSender = functions.region("asia-southeast1")
