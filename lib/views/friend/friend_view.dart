@@ -44,22 +44,43 @@ class _FriendViewState extends State<FriendView> {
 
       var data = event.data;
 
-      print("Friend View Data fetched From FirebaseMessaging: $data");
-
       if (data['type'] == 'newFriend') {
+        print('new friend notification');
         if (data['uid'] == user.uid) {
           print('Data of self received, skipping...');
         } else {
-          print('Your friend request has been accepted by ' +
-              data['displayName']);
           var newFriend = etoet.UserInfo(
             uid: data['uid'],
             photoURL: data['photoUrl'],
             email: data['email'],
             displayName: data['displayName'],
           );
-          user.friendInfoList.add(newFriend);
-          setState(() {});
+          for (var i = 0; i < user.friendInfoList.length; ++i) {
+            if (i == (user.friendInfoList.length - 1) &&
+                newFriend.uid != user.friendInfoList.elementAt(i).uid) {
+              setState(() {
+                user.friendInfoList.add(newFriend);
+              });
+              print('Your are now friend with ' + data['displayName']);
+            }
+          }
+        }
+      } else if (data['type'] == 'unFriend') {
+        var unfriendFriendUID = data['friendUID'];
+        print('unfriend notification');
+        if (unfriendFriendUID == user.uid) {
+          print('Data of self received, skipping...');
+        } else {
+          for (var i = 0; i < user.friendInfoList.length; ++i) {
+            if (user.friendInfoList.elementAt(i).uid == unfriendFriendUID) {
+              var unfriendFriend = user.friendInfoList.elementAt(i);
+              setState(() {
+                user.friendInfoList.remove(unfriendFriend);
+              });
+              print('You are now unfriended with ' + unfriendFriendUID);
+              break;
+            }
+          }
         }
       }
     });
@@ -156,83 +177,83 @@ class _FriendViewState extends State<FriendView> {
                     Container(
                       color: topListViewColor,
                       child: ListView(
-                    shrinkWrap: true,
-                    children: [
-                      TextField(
-                        controller: _searchBarController,
-                        decoration: InputDecoration(
-                          hintText: 'Search by Display Name or Email',
-                          contentPadding: const EdgeInsets.all(20),
-                          // suffixIcon: IconButton(
-                          //   onPressed: () {
-                          //     _searchBarController.clear();
-                          //     setState(() {
-                          //       userListOnSearch = user.friendInfoList;
-                          //     });
-                          //   },
-                          //   icon: const Icon(Icons.clear),
-                          // ),
-                        ),
-                        onChanged: (keyword) {
-                          setState(() {
-                            userListOnSearch = getFilteredFriendList(
-                                friendList: user.friendInfoList,
-                                keyword: keyword);
-                          });
-                        },
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      ListTile(
-                        leading: Material(
-                          borderRadius: BorderRadius.circular(20),
-                          elevation: 2,
-                          shadowColor: Colors.black,
-                          child: const CircleAvatar(
-                            child: Icon(addFriendIcon),
+                        shrinkWrap: true,
+                        children: [
+                          TextField(
+                            controller: _searchBarController,
+                            decoration: InputDecoration(
+                              hintText: 'Search by Display Name or Email',
+                              contentPadding: const EdgeInsets.all(20),
+                              // suffixIcon: IconButton(
+                              //   onPressed: () {
+                              //     _searchBarController.clear();
+                              //     setState(() {
+                              //       userListOnSearch = user.friendInfoList;
+                              //     });
+                              //   },
+                              //   icon: const Icon(Icons.clear),
+                              // ),
+                            ),
+                            onChanged: (keyword) {
+                              setState(() {
+                                userListOnSearch = getFilteredFriendList(
+                                    friendList: user.friendInfoList,
+                                    keyword: keyword);
+                              });
+                            },
                           ),
-                        ),
-                        title: const Text('Add Friend'),
-                        shape: RoundedRectangleBorder(
-                            side: const BorderSide(
-                                color: Colors.black, width: 1),
-                            borderRadius: BorderRadius.circular(15)),
-                        onTap: () {
-                          showBarModalBottomSheet(
-                            context: context,
-                            backgroundColor: Colors.transparent,
-                            builder: (context) => const AddFriendView(),
-                          );
-                        },
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      ListTile(
-                        leading: Material(
-                          borderRadius: BorderRadius.circular(20),
-                          elevation: 2,
-                          shadowColor: Colors.black,
-                          child: const CircleAvatar(
-                            child: Icon(pendingFriendRequestIcon),
+                          const SizedBox(
+                            height: 5,
                           ),
-                        ),
-                        title: const Text('Pending Friend Request'),
-                        shape: RoundedRectangleBorder(
-                            side: BorderSide(color: Colors.black, width: 1),
-                            borderRadius: BorderRadius.circular(15)),
-                        onTap: () {
-                          showBarModalBottomSheet(
-                            context: context,
-                            backgroundColor: Colors.transparent,
-                            builder: (context) => const PendingFriendView(),
-                          );
-                        },
-                        trailing:
-                            Text(pendingFriendRequestCount.toString()),
-                      ),
-                    ],
+                          ListTile(
+                            leading: Material(
+                              borderRadius: BorderRadius.circular(20),
+                              elevation: 2,
+                              shadowColor: Colors.black,
+                              child: const CircleAvatar(
+                                child: Icon(addFriendIcon),
+                              ),
+                            ),
+                            title: const Text('Add Friend'),
+                            shape: RoundedRectangleBorder(
+                                side: const BorderSide(
+                                    color: Colors.black, width: 1),
+                                borderRadius: BorderRadius.circular(15)),
+                            onTap: () {
+                              showBarModalBottomSheet(
+                                context: context,
+                                backgroundColor: Colors.transparent,
+                                builder: (context) => const AddFriendView(),
+                              );
+                            },
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          ListTile(
+                            leading: Material(
+                              borderRadius: BorderRadius.circular(20),
+                              elevation: 2,
+                              shadowColor: Colors.black,
+                              child: const CircleAvatar(
+                                child: Icon(pendingFriendRequestIcon),
+                              ),
+                            ),
+                            title: const Text('Pending Friend Request'),
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(color: Colors.black, width: 1),
+                                borderRadius: BorderRadius.circular(15)),
+                            onTap: () {
+                              showBarModalBottomSheet(
+                                context: context,
+                                backgroundColor: Colors.transparent,
+                                builder: (context) => const PendingFriendView(),
+                              );
+                            },
+                            trailing:
+                                Text(pendingFriendRequestCount.toString()),
+                          ),
+                        ],
                       ),
                     ),
 
@@ -280,7 +301,8 @@ class _FriendViewState extends State<FriendView> {
                                       selectedUser = (_searchBarController
                                               .text.isNotEmpty)
                                           ? userListOnSearch.elementAt(index)
-                                          : user.friendInfoList.elementAt(index);
+                                          : user.friendInfoList
+                                              .elementAt(index);
                                       showDialog(
                                           context: context,
                                           builder: (context) {
@@ -290,14 +312,14 @@ class _FriendViewState extends State<FriendView> {
                                               actions: [
                                                 TextButton(
                                                   onPressed: () {
-                                                    FirestoreFriend.deleteFriend(
-                                                        user.uid,
-                                                        selectedUser.uid);
+                                                    FirestoreFriend
+                                                        .deleteFriend(user.uid,
+                                                            selectedUser.uid);
 
                                                     // Not a good way to delete Friend from local friendList
                                                     // Pleased noted to change to listener to database
-                                                    user.friendInfoList
-                                                        .remove(selectedUser);
+                                                    // user.friendInfoList
+                                                    //     .remove(selectedUser);
                                                     setState(() {});
                                                     Navigator.pop(context);
                                                   },
@@ -361,22 +383,23 @@ class _FriendViewState extends State<FriendView> {
                                               .elementAt(index)
                                               .photoURL!),
                                 ),
-                                title: Text((_searchBarController.text.isNotEmpty)
-                                    ? userListOnSearch
-                                        .elementAt(index)
-                                        .displayName!
-                                    : user.friendInfoList
-                                        .elementAt(index)
-                                        .displayName!),
-                                subtitle: Text(
+                                title: Text(
                                     (_searchBarController.text.isNotEmpty)
-                                        ? userListOnSearch.elementAt(index).email!
+                                        ? userListOnSearch
+                                            .elementAt(index)
+                                            .displayName!
                                         : user.friendInfoList
                                             .elementAt(index)
-                                            .email!),
+                                            .displayName!),
+                                subtitle: Text((_searchBarController
+                                        .text.isNotEmpty)
+                                    ? userListOnSearch.elementAt(index).email!
+                                    : user.friendInfoList
+                                        .elementAt(index)
+                                        .email!),
                                 shape: RoundedRectangleBorder(
-                                    side:
-                                        BorderSide(color: Colors.black, width: 1),
+                                    side: BorderSide(
+                                        color: Colors.black, width: 1),
                                     borderRadius: BorderRadius.circular(15)),
                               ),
                             );
