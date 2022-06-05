@@ -1,5 +1,6 @@
 import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:etoet/services/database/firestore.dart';
+import 'package:etoet/services/database/firestore_friend.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -37,7 +38,7 @@ class _PendingFriendViewState extends State<PendingFriendView> {
   Widget build(BuildContext context) {
     user = context.watch<AuthUser>();
     return FutureBuilder(
-        future: Firestore.getPendingRequestUserInfo(user.uid),
+        future: FirestoreFriend.getPendingRequestUserInfo(user.uid),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             var pendingUserInfoList = snapshot.data as Set<etoet.UserInfo>;
@@ -101,7 +102,7 @@ class _PendingFriendViewState extends State<PendingFriendView> {
                                     children: [
                                       IconButton(
                                         onPressed: () {
-                                          Firestore.deleteFriendRequest(
+                                          FirestoreFriend.deleteFriendRequest(
                                               user.uid,
                                               pendingUserInfoList
                                                   .elementAt(index)
@@ -115,7 +116,7 @@ class _PendingFriendViewState extends State<PendingFriendView> {
                                       ),
                                       IconButton(
                                         onPressed: () {
-                                          Firestore.acceptFriendRequest(
+                                          FirestoreFriend.acceptFriendRequest(
                                               user.uid,
                                               pendingUserInfoList
                                                   .elementAt(index)
