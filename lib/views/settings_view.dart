@@ -23,8 +23,8 @@ class SettingsViewState extends State<SettingsView> {
   bool notificationsEnabled = true;
   double _receivedRange = 5.0;
   // String _username = 'Doraemon';
-  late AuthUser? user;
   // String _userName = user!.displayName ?? '';
+  late AuthUser? user;
   String? photoURL;
 
 
@@ -38,6 +38,44 @@ class SettingsViewState extends State<SettingsView> {
     return Scaffold(
       appBar: AppBar(title: const Text('Settings UI')),
       body: buildSettingsList(),
+    );
+  }
+
+  void showAlertDialog(BuildContext context) {
+    // set up the buttons
+    Widget cancelButton = TextButton(
+      child: Text("No"),
+      onPressed:  () {
+        Navigator.of(context).pop();
+      },
+    );
+    Widget continueButton = TextButton(
+      child: Text("Yes"),
+        onPressed: () async {
+        await FirebaseAuth.instance.signOut();
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          loginRoute,
+          (_) => false,
+        );
+      }
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Logout"),
+      content: Text("Are you sure you want to logout?"),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
     );
   }
 
