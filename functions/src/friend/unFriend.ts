@@ -38,13 +38,12 @@ export default async (
 };
 
 /**
- @param {functions.EventContext} context provide the path to the specific user
  @param {string} uid the unique string that identify a user and is the key
  specifying each user in firestore.
  @return {Promise<DocumentSnapshot<DocumentData>>} Promise that return the
 document along with the data inside it (the user's fcm token)
 */
-async function getFcmToken(context: functions.EventContext, uid: string ):
+async function getFcmToken(uid: string ):
     Promise<admin.firestore.DocumentSnapshot<admin.firestore.DocumentData>> {
   const fcmTokenRef = db
       .collection("users")
