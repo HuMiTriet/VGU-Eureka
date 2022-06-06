@@ -47,62 +47,71 @@ class _ChatScreenState extends State<ChatRoomView> {
         height: 0,
       );
     }
-    return Wrap(
-      direction: Axis.horizontal,
-      textDirection:
-          (senderUID == user.uid) ? TextDirection.rtl : TextDirection.ltr,
-      children: [
-        CircleAvatar(
-          backgroundImage: NetworkImage(
-            (senderUID == user.uid)
-                ? user.photoURL!
-                : widget.selectedUser.photoURL!,
-          ),
-          radius: 15,
+
+    return Wrap(direction: Axis.horizontal, children: [
+      Container(
+        margin: const EdgeInsets.only(left: 10, top: 5, bottom: 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          textDirection:
+              (senderUID == user.uid) ? TextDirection.rtl : TextDirection.ltr,
+          children: [
+            Row(children: [
+              CircleAvatar(
+                backgroundImage: NetworkImage(
+                  (senderUID == user.uid)
+                      ? user.photoURL!
+                      : widget.selectedUser.photoURL!,
+                ),
+                radius: 15,
+              ),
+            ]),
+            const SizedBox(
+              width: 10,
+            ),
+            Text(timestampString),
+          ],
         ),
-        const SizedBox(
-          width: 1,
-        ),
-        Text(timestampString),
-      ],
-    );
+      ),
+    ]);
   }
 
   Widget chatMessageTile(String message, String senderUID, Timestamp timestamp,
       bool isSameUserLastMessage) {
-    return Row(
-      mainAxisAlignment: (senderUID == user.uid)
-          ? MainAxisAlignment.end
-          : MainAxisAlignment.start,
+    return Column(
+      crossAxisAlignment: (senderUID == user.uid)
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.start,
       children: [
         Column(
-            crossAxisAlignment: (senderUID == user.uid)
-                ? CrossAxisAlignment.end
-                : CrossAxisAlignment.start,
-            children: [
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(24),
-                    bottomRight: (senderUID == user.uid)
-                        ? Radius.circular(0)
-                        : Radius.circular(24),
-                    topRight: Radius.circular(24),
-                    bottomLeft: (senderUID == user.uid)
-                        ? Radius.circular(24)
-                        : Radius.circular(0),
-                  ),
-                  color: Colors.blue,
+          crossAxisAlignment: (senderUID == user.uid)
+              ? CrossAxisAlignment.end
+              : CrossAxisAlignment.start,
+          children: [
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  bottomRight: (senderUID == user.uid)
+                      ? Radius.circular(0)
+                      : Radius.circular(24),
+                  topRight: Radius.circular(24),
+                  bottomLeft: (senderUID == user.uid)
+                      ? Radius.circular(24)
+                      : Radius.circular(0),
                 ),
-                padding: EdgeInsets.all(16),
-                child: Text(
-                  message,
-                  style: TextStyle(color: Colors.white),
-                ),
+                color: Colors.blue,
               ),
-              avatarAndTime(senderUID, timestamp, isSameUserLastMessage)
-            ]),
+              padding: EdgeInsets.all(16),
+              child: Text(
+                message,
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+            avatarAndTime(senderUID, timestamp, isSameUserLastMessage),
+          ],
+        ),
       ],
     );
   }
