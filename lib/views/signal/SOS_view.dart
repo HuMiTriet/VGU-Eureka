@@ -82,9 +82,10 @@ class _SOSViewState extends State<SOSView> {
                         )),
                     TextSpan(text: 'When you choose'),
                     TextSpan(
-                        text: ' PUBLIC SIGNAL',
-                        style: TextStyle(
-                            color: Colors.red, fontWeight: FontWeight.bold)),
+                      text: ' PUBLIC SIGNAL',
+                      style: TextStyle(
+                          color: Colors.red, fontWeight: FontWeight.bold),
+                    ),
                     TextSpan(
                         text:
                             ", your location will be public for all ETOET's users. This may put you in danger! Choose wisingly and intentinally"),
