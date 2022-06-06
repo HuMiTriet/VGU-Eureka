@@ -1,11 +1,9 @@
 import 'package:etoet/services/auth/location.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 
 // This annotation immutable tells the compiler that the content of this class
 // and its subclasses will not change.
-@immutable
 class AuthUser extends etoet.UserInfo {
   //// provide current location of the user
   final Location location = Location();
@@ -18,9 +16,12 @@ class AuthUser extends etoet.UserInfo {
 
   final Set<etoet.UserInfo> pendingFriendInfoList = {};
 
+  int helpRange = 5;
+
   AuthUser({
     required this.isEmailVerified,
     required super.uid,
+    this.helpRange = 5,
     super.email,
     super.phoneNumber,
     super.displayName,

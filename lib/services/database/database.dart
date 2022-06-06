@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer' as devtools show log;
 
 import 'package:etoet/services/auth/auth_user.dart';
+import 'package:etoet/services/map/geoflutterfire/geoflutterfire.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 class Realtime {
@@ -14,10 +15,16 @@ class Realtime {
   }
 
   static void updateUserLocation(AuthUser authUser) {
-    var location =
-        databaseReference.child('users').child(authUser.uid).child('location');
+    var userReference = databaseReference.child('users').child(authUser.uid);
 
-    location.set(authUser.location.toJson()).then((value) => devtools.log(
+    var geohash = GeoFlutterFire.getGeohash(
+        latitude: authUser.location.latitude,
+        longitude: authUser.location.longitude);
+
+    userReference.set({
+      'location': authUser.location.toJson(),
+      'geohash': geohash
+    }).then((value) => devtools.log(
         'location updated to database: $databaseReference'
         '\n'
         'userId: ${authUser.uid}'

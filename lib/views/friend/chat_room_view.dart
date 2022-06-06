@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:etoet/services/database/firestore.dart';
+import 'package:etoet/services/database/firestore/firestore.dart';
 import 'package:etoet/views/friend/friend_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +7,7 @@ import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:provider/provider.dart';
 
 import '../../services/auth/auth_user.dart';
+import '../../services/database/firestore/firestore_chat.dart';
 
 class ChatRoomView extends StatefulWidget {
   // @override
@@ -114,11 +115,11 @@ class _ChatScreenState extends State<ChatRoomView> {
   Widget build(BuildContext context) {
     user = context.watch<AuthUser>();
     return FutureBuilder(
-        future: Firestore.getChatroomUID(user.uid, widget.selectedUser.uid),
+        future: FirestoreChat.getChatroomUID(user.uid, widget.selectedUser.uid),
         builder: (context, futureSnapshot) {
           if (futureSnapshot.connectionState == ConnectionState.done) {
             chatroomUID = futureSnapshot.data as String;
-            messageStream = Firestore.getMessageStream(chatroomUID);
+            messageStream = FirestoreChat.getMessageStream(chatroomUID);
 
             return Scaffold(
               appBar: AppBar(
@@ -208,7 +209,7 @@ class _ChatScreenState extends State<ChatRoomView> {
                             )),
                             GestureDetector(
                               onTap: () {
-                                Firestore.setMessage(
+                                FirestoreChat.setMessage(
                                     chatroomUID,
                                     messageTextEditingController.text,
                                     user.uid);

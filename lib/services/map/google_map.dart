@@ -166,10 +166,12 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
       Routing.location = location;
       widget._markers.removeWhere(
           (element) => element.markerId == MarkerId(widget.authUser!.uid));
-      widget._markers.add(Marker(
-          markerId: MarkerId(widget.authUser!.uid),
-          position: location,
-          icon: icon));
+      setState(() {
+        widget._markers.add(Marker(
+            markerId: MarkerId(widget.authUser!.uid),
+            position: location,
+            icon: icon));
+      });
       devtools.log('location: $location, user marker: ${widget._markers.first}',
           name: 'GoogleMap: _getLocationStream');
     }, 5);
@@ -221,8 +223,9 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
             await friendMarkerCreator.createFriendMarker(friendLatLng: latLng);
         widget._markers.removeWhere(
             (marker) => marker.markerId == MarkerId(friendInfo.uid));
-        widget._markers.add(friendMarker);
-        setState(() {});
+        setState(() {
+          widget._markers.add(friendMarker);
+        });
         devtools.log(
             'marker list: ${widget._markers.length}, displayName: ${friendInfo.displayName}, location: $latLng',
             name: 'GoogleMap: updateFriendMarker');
