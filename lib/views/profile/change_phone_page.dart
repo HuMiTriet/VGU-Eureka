@@ -4,7 +4,7 @@ import 'dart:developer' as devtools show log;
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/auth_service.dart';
 import 'package:etoet/services/auth/auth_user.dart';
-import 'package:etoet/services/database/firestore.dart';
+import 'package:etoet/services/database/firestore/firestore.dart';
 import 'package:etoet/views/profile/verification_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

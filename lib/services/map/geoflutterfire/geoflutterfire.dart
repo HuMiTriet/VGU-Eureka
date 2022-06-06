@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:etoet/services/database/firestore.dart';
+import 'package:etoet/services/database/firestore/firestore.dart';
 import 'package:geoflutterfire/geoflutterfire.dart';
 
 class GeoFlutterFire {
@@ -26,5 +26,11 @@ class GeoFlutterFire {
         .within(center: center, radius: radius, field: field, strictMode: true)
         .listen((event) {});
     return subcription;
+  }
+
+  static String getGeohash(
+      {required double latitude, required double longitude}) {
+    var geoFirePoint = GeoFirePoint(latitude, longitude);
+    return geoFirePoint.hash;
   }
 }

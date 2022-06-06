@@ -1,120 +1,13 @@
 import 'dart:async';
-import 'dart:developer' as devtools show log;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:etoet/services/map/geoflutterfire/geoflutterfire.dart';
+import 'package:etoet/services/database/firestore//firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:etoet/services/auth/user_info.dart' as etoet;
 
-import '../auth/auth_user.dart';
-import '../auth/user_info.dart' as etoet;
-
-class Firestore {
-  static final firestoreReference = FirebaseFirestore.instance;
-
-  Firestore._();
-
-  static void addUserInfo(AuthUser user) {
-    var userRef = firestoreReference.collection('users').doc(user.uid);
-    userRef.set(
-      {
-        'uid': user.uid,
-        'email': user.email,
-        'displayName': user.displayName,
-        'photoUrl': user.photoURL,
-      },
-    );
-
-    /// attributes that are related to the fact that the user is helping someone else
-    var userHelperRef = userRef.collection('helper').doc('helper');
-
-    userHelperRef.set(
-      {
-        'helpRange': user.helpRange,
-        'isHelping': false,
-      },
-    );
-  }
-
-  static void updateUserInfo(AuthUser authUser) async {
-    var userRef = firestoreReference.collection('users').doc(authUser.uid);
-    userRef.update({
-      'email': authUser.email,
-      'displayName': authUser.displayName,
-      'photoUrl': authUser.photoURL,
-      'phoneNumber': authUser.phoneNumber,
-    });
-    var userHelperRef = userRef.collection('helper').doc('helper');
-
-    userHelperRef.update(
-      {
-        'helpRange': authUser.helpRange,
-      },
-    );
-  }
-
-  static void setFcmTokenAndNotificationStatus(
-      {required String uid, required String token}) {
-    firestoreReference
-        .collection('users')
-        .doc(uid)
-        .collection('notification')
-        .doc('fcm_token')
-        .set(
-      {
-        'enable_notification': true,
-        'fcm_token': token,
-      },
-    );
-  }
-
-  static void setEmergencySignal({
-    required String uid,
-    required String locationDescription,
-    required String situationDetail,
-    bool isPublic = false,
-  }) {
-    firestoreReference.collection('emergencies').doc(uid).set(
-      {
-        'isPublic': isPublic,
-        'locationDescription': locationDescription,
-        'situationDetail': situationDetail,
-        'uid': uid,
-      },
-      SetOptions(merge: true),
-    );
-  }
-
-  static void updateEmergencySignalLocation(
-      {required String uid, required double lat, required double lng}) async {
-    GeoFlutterFire.updateEmergencySignalLocation(uid: uid, lat: lat, lng: lng);
-  }
-
-  static Future<etoet.UserInfo> getUserInfo(String uid) async {
-    const source = Source.serverAndCache;
-    final userDocument = await firestoreReference
-        .collection('users')
-        .doc(uid)
-        .get(const GetOptions(source: source));
-
-    final data = userDocument.data() as Map<String, dynamic>;
-
-    return etoet.UserInfo(
-      uid: uid,
-      email: data['email'],
-      displayName: data['displayName'],
-      photoURL: data['photoUrl'],
-      phoneNumber: data['phoneNumber'],
-    );
-  }
-
-  static Future<bool> userExists(String uid) async {
-    final userDocument = await firestoreReference
-        .collection('users')
-        .where('uid', isEqualTo: uid)
-        .get(const GetOptions(source: Source.serverAndCache));
-
-    return userDocument.docs.isNotEmpty;
-  }
+class FirestoreFriend extends Firestore {
+  //Constructor
+  FirestoreFriend() : super();
 
   //Function name is abit misleading, only used for finding friends using email
   static Future<Set<etoet.UserInfo>> getUserInfoFromEmail(
@@ -122,18 +15,18 @@ class Firestore {
     //
     emailQuery = emailQuery.toLowerCase();
 
-    var res = await firestoreReference
+    var res = await Firestore.firestoreReference
         .collection('users')
         .where('email', isGreaterThanOrEqualTo: emailQuery)
         .where('email', isLessThanOrEqualTo: '$emailQuery\uf8ff')
         // .where('uid', )
         .get();
 
-    var alrFriend = await firestoreReference
+    var alrFriend = await Firestore.firestoreReference
         .collection('users')
         .doc(userUID)
         .collection('friends')
-        .where('requestConfirmed', isEqualTo: true)
+        //.where('requestConfirmed', isEqualTo: true)
         .get();
 
     var searchedUserInfoList = <etoet.UserInfo>{};
@@ -183,13 +76,13 @@ class Firestore {
       'friendUID': senderUID
     };
 
-    firestoreReference
+    Firestore.firestoreReference
         .collection('users')
         .doc(senderUID)
         .collection('friends')
         .doc(receiverUID)
         .set(senderData);
-    firestoreReference
+    Firestore.firestoreReference
         .collection('users')
         .doc(receiverUID)
         .collection('friends')
@@ -199,7 +92,7 @@ class Firestore {
 
   static Future<Set<etoet.UserInfo>> getPendingRequestUserInfo(
       String userUID) async {
-    var pendingFriendRequestData = await firestoreReference
+    var pendingFriendRequestData = await Firestore.firestoreReference
         .collection('users')
         .doc(userUID)
         .collection('friends')
@@ -210,11 +103,11 @@ class Firestore {
     var pendingFriendInfoList = <etoet.UserInfo>{};
     for (var i = 0; i < pendingFriendRequestData.docs.length; ++i) {
       var source =
-          pendingFriendRequestData.metadata.isFromCache ? "cache" : "server";
-      print('Pending fetched from ' + source);
+          pendingFriendRequestData.metadata.isFromCache ? 'cache' : 'server';
+      print('Pending fetched from $source');
       var data = pendingFriendRequestData.docs.elementAt(i).data();
 
-      var pendingFriendInfo = await getUserInfo(data['friendUID']);
+      var pendingFriendInfo = await Firestore.getUserInfo(data['friendUID']);
       pendingFriendInfoList.add(pendingFriendInfo);
     }
 
@@ -222,7 +115,7 @@ class Firestore {
   }
 
   static Future<Set<etoet.UserInfo>> getAcceptedUserInfo(String userUID) async {
-    var pendingFriendRequestData = await firestoreReference
+    var pendingFriendRequestData = await Firestore.firestoreReference
         .collection('users')
         .doc(userUID)
         .collection('friends')
@@ -232,11 +125,11 @@ class Firestore {
     var pendingFriendInfoList = <etoet.UserInfo>{};
     for (var i = 0; i < pendingFriendRequestData.docs.length; ++i) {
       var source =
-          pendingFriendRequestData.metadata.isFromCache ? "cache" : "server";
-      print('Pending fetched from ' + source);
+          pendingFriendRequestData.metadata.isFromCache ? 'cache' : 'server';
+      print('Pending fetched from $source');
       var data = pendingFriendRequestData.docs.elementAt(i).data();
 
-      var pendingFriendInfo = await getUserInfo(data['friendUID']);
+      var pendingFriendInfo = await Firestore.getUserInfo(data['friendUID']);
       pendingFriendInfoList.add(pendingFriendInfo);
     }
 
@@ -244,13 +137,13 @@ class Firestore {
   }
 
   static void deleteFriendRequest(String receiverUID, String senderUID) {
-    firestoreReference
+    Firestore.firestoreReference
         .collection('users')
         .doc(receiverUID)
         .collection('friends')
         .doc(senderUID)
         .delete();
-    firestoreReference
+    Firestore.firestoreReference
         .collection('users')
         .doc(senderUID)
         .collection('friends')
@@ -259,13 +152,13 @@ class Firestore {
   }
 
   static void acceptFriendRequest(String receiverUID, String senderUID) {
-    firestoreReference
+    Firestore.firestoreReference
         .collection('users')
         .doc(receiverUID)
         .collection('friends')
         .doc(senderUID)
         .update({'requestConfirmed': true});
-    firestoreReference
+    Firestore.firestoreReference
         .collection('users')
         .doc(senderUID)
         .collection('friends')
@@ -274,7 +167,7 @@ class Firestore {
   }
 
   static Future<Set<etoet.UserInfo>> getFriendInfoList(String uid) async {
-    var friendData = await firestoreReference
+    var friendData = await Firestore.firestoreReference
         .collection('users')
         .doc(uid)
         .collection('friends')
@@ -284,7 +177,7 @@ class Firestore {
     var friendInfoList = <etoet.UserInfo>{};
     for (var i = 0; i < friendData.docs.length; ++i) {
       var data = friendData.docs.elementAt(i).data();
-      friendInfoList.add(await getUserInfo(data['friendUID']));
+      friendInfoList.add(await Firestore.getUserInfo(data['friendUID']));
     }
 
     return friendInfoList;
@@ -292,7 +185,7 @@ class Firestore {
 
   static StreamSubscription<QuerySnapshot<Map<String, dynamic>>>
       pendingFriendRequestReceiverListener(String uid, BuildContext context) {
-    var subscriber = firestoreReference
+    var subscriber = Firestore.firestoreReference
         .collection('users')
         .doc(uid)
         .collection('friends')
@@ -318,7 +211,7 @@ class Firestore {
 
   static StreamSubscription<QuerySnapshot<Map<String, dynamic>>>
       pendingFriendRequestSenderListener(String uid, BuildContext context) {
-    var subscriber = firestoreReference
+    var subscriber = Firestore.firestoreReference
         .collection('users')
         .doc(uid)
         .collection('friends')
@@ -352,61 +245,18 @@ class Firestore {
     return pendingFriendStream;
   }
 
-  static Stream<QuerySnapshot> getMessageStream(String chatRoomUID) {
-    Stream<QuerySnapshot> messageStream = Firestore.firestoreReference
-        .collection('chatrooms')
-        .doc(chatRoomUID)
-        .collection('messages')
-        .orderBy('ts', descending: true)
-        .snapshots();
-    return messageStream;
-  }
-
-  static Future<void> createFriendChatroom(
-      String userUID1, String userUID2, String chatroomUID) async {
-    final user1Ref = Firestore.firestoreReference
+  static Future<void> deleteFriend(String userUID, String friendUID) async {
+    Firestore.firestoreReference
         .collection('users')
-        .doc(userUID1)
+        .doc(userUID)
         .collection('friends')
-        .doc(userUID2);
-    final user2Ref = Firestore.firestoreReference
+        .doc(friendUID)
+        .delete();
+    Firestore.firestoreReference
         .collection('users')
-        .doc(userUID2)
+        .doc(friendUID)
         .collection('friends')
-        .doc(userUID1);
-
-    var data1 = await user1Ref.get();
-    var data2 = await user2Ref.get();
-
-    if (data1.data()!['chatroomUID'] == null ||
-        data2.data()!['chatroomUID'] == null) {
-      user1Ref.set({'chatroomUID': chatroomUID}, SetOptions(merge: true));
-      user2Ref.set({'chatroomUID': chatroomUID}, SetOptions(merge: true));
-      Firestore.firestoreReference
-          .collection('chatrooms')
-          .doc(chatroomUID)
-          .set({'user1UID': userUID1, 'user2UID': userUID2});
-    }
-  }
-
-  static Future<String> getChatroomUID(String user1UID, String user2UID) async {
-    var ref = await firestoreReference
-        .collection('users')
-        .doc(user1UID)
-        .collection('friends')
-        .doc(user2UID)
-        .get();
-
-    return ref.data()!['chatroomUID'];
-  }
-
-  static void setMessage(String chatroomUID, String message, String senderUID) {
-    var ts = Timestamp.now();
-    final data = {'message': message, 'senderUID': senderUID, 'ts': ts};
-    FirebaseFirestore.instance
-        .collection('chatrooms')
-        .doc(chatroomUID)
-        .collection('messages')
-        .add(data);
+        .doc(userUID)
+        .delete();
   }
 }

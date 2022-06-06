@@ -52,7 +52,11 @@ export default async (
         body: String(snapshot.data()?.situationDetail),
       },
       data: {
+<<<<<<< HEAD
         type: "emegency",
+=======
+        type: "privateEmegency",
+>>>>>>> origin/dev
         locationDescription: String(snapshot.data()?.locationDescription),
       },
     };

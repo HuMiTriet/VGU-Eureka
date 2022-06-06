@@ -1,10 +1,10 @@
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
-import 'package:etoet/services/database/firestore.dart';
+import 'package:etoet/services/database/firestore/firestore.dart';
+import 'package:etoet/services/database/firestore/firestore_friend.dart';
 import 'package:etoet/services/map/map_factory.dart' as etoet;
 import 'package:etoet/services/notification/notification.dart';
 import 'package:etoet/views/friend/friend_view.dart';
-import 'package:etoet/views/signal/SOS_view.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -31,7 +31,7 @@ class MainViewState extends State<MainView> {
     authUser = context.watch<AuthUser?>();
 
     return FutureBuilder(
-        future: Firestore.getFriendInfoList(authUser!.uid),
+        future: FirestoreFriend.getFriendInfoList(authUser!.uid),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             var friendInfoList = snapshot.data as Set<etoet.UserInfo>;

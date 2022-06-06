@@ -59,6 +59,8 @@ dependencies:
   geoflutterfire: ^3.0.2
   random_string: ^2.3.1
   uuid: 3.0.6
+  geoflutterfire: ^3.0.2
+  flutter_slidable: ^1.3.0
 
     #dev dependencies will not be included in the final build
 dev_dependencies:
