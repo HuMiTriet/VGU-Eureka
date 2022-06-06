@@ -1,6 +1,5 @@
 import 'package:etoet/services/auth/auth_user.dart';
-import 'package:etoet/services/database/firestore.dart';
-import 'package:etoet/services/map/geoflutterfire/geoflutterfire.dart';
+import 'package:etoet/services/database/firestore/firestore_emergency.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -168,15 +167,13 @@ class _SOSViewState extends State<SOSView> {
                 var situationDetail = situationDetailTextController.text;
                 var locationDescription =
                     locationDescriptionTextController.text;
-                Firestore.setEmergencySignal(
+                FirestoreEmergency.setEmergencySignal(
                     uid: authUser!.uid,
                     situationDetail: situationDetail,
                     locationDescription: locationDescription,
-                    isPublic: false);
-                Firestore.updateEmergencySignalLocation(
-                    uid: authUser!.uid,
                     lat: authUser!.location.latitude,
-                    lng: authUser!.location.longitude);
+                    lng: authUser!.location.longitude,
+                    isPublic: false);
                 Navigator.pop(context);
               },
             ),
@@ -191,15 +188,13 @@ class _SOSViewState extends State<SOSView> {
               onTap: () {
                 var situationDetail = locationDescriptionTextController.text;
                 var locationDescription = situationDetailTextController.text;
-                Firestore.setEmergencySignal(
+                FirestoreEmergency.setEmergencySignal(
                     uid: authUser!.uid,
                     situationDetail: situationDetail,
                     locationDescription: locationDescription,
-                    isPublic: true);
-                GeoFlutterFire.updateEmergencySignalLocation(
-                    uid: authUser!.uid,
                     lat: authUser!.location.latitude,
-                    lng: authUser!.location.longitude);
+                    lng: authUser!.location.longitude,
+                    isPublic: true);
                 Navigator.pop(context);
               },
             ),
