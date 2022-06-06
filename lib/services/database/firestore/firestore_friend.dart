@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:etoet/services/database/firestore.dart';
+import 'package:etoet/services/database/firestore//firestore.dart';
 import 'package:flutter/material.dart';
-import '../auth/user_info.dart' as etoet;
+import 'package:etoet/services/auth/user_info.dart' as etoet;
 
 class FirestoreFriend extends Firestore {
   //Constructor

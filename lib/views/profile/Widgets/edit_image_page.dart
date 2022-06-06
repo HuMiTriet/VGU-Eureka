@@ -7,7 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../../services/database/firestore.dart';
+import '../../../services/database/firestore/firestore.dart';
 
 class EditImagePage extends StatefulWidget {
   final ImageSource imageSource;

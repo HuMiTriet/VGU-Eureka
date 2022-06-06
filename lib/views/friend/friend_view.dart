@@ -1,23 +1,19 @@
 import 'dart:async';
-import 'package:etoet/services/database/firestore_friend.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:pinput/pinput.dart';
-import 'package:uuid/uuid.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
-import 'package:etoet/services/database/firestore.dart';
+import 'package:etoet/services/database/firestore/firestore_friend.dart';
 import 'package:etoet/views/friend/chat_room_view.dart';
 import 'package:etoet/views/friend/pending_friend_view.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
-import 'package:random_string/random_string.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../services/auth/auth_user.dart';
-import '../../services/database/firestore_chat.dart';
+import '../../services/database/firestore/firestore_chat.dart';
 import 'add_friend_view.dart';
 
 class FriendView extends StatefulWidget {
@@ -29,8 +25,12 @@ class FriendView extends StatefulWidget {
 }
 
 class _FriendViewState extends State<FriendView> {
-  late AuthUser user;
   static late etoet.UserInfo selectedUser;
+  static const IconData addFriendIcon = Icons.add;
+  static const IconData pendingFriendRequestIcon = Icons.group_add;
+
+  late AuthUser user;
+
   Set<etoet.UserInfo> userListOnSearch = {};
 
   //Used to implements some of the search bar's function
@@ -136,15 +136,13 @@ class _FriendViewState extends State<FriendView> {
   //Variables for easier config:
 
   final double friendViewHeight = 0.9; // Should be between 0.7 - 1.0
+
   final Color backgroundColor = const Color.fromARGB(200, 255, 210, 177);
   final Color topListViewColor = const Color.fromARGB(200, 255, 210,
       177); // The background color of search and add friend part.
   final Color bottomListViewColor = const Color.fromARGB(
       200, 255, 210, 177); // The background color of friend list.
   final Color spacingColor = Colors.orange;
-  static const IconData addFriendIcon = Icons.add;
-  static const IconData pendingFriendRequestIcon = Icons.group_add;
-
   // The relative height of topListView and bottomListView
   // No longer used since widget Flexible is used.
   // final int topListViewFlex = 39;
@@ -417,9 +415,109 @@ class _FriendViewState extends State<FriendView> {
               )));
         });
   }
-
   @override
   void dispose() {
     super.dispose();
+  }
+  Set<etoet.UserInfo> getFilteredFriendList(
+      {required Set<etoet.UserInfo> friendList, required String keyword}) {
+    var filteredList = <etoet.UserInfo>{};
+    for (var i = 0; i < friendList.length; ++i) {
+      //Make all things to lowercase for comparision:
+      var email = friendList.elementAt(i).email?.toLowerCase();
+      var displayName = friendList.elementAt(i).displayName?.toLowerCase();
+      keyword = keyword.toLowerCase();
+
+      //Guard clauses for null check
+      if (email == null) continue;
+      if (displayName == null) continue;
+
+      //Condition 1: Email
+      if (email.contains(keyword)) {
+        filteredList.add(friendList.elementAt(i));
+        continue;
+      }
+      //Condition 2: DisplayName
+      else if (displayName.contains(keyword)) {
+        filteredList.add(friendList.elementAt(i));
+        continue;
+      }
+    }
+
+    return filteredList;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    FirebaseMessaging.onMessage.listen((event) {
+      print('Listened from Friend View!');
+
+      var data = event.data;
+
+      if (data['type'] == 'newFriend') {
+        print('new friend notification');
+        if (data['uid'] == user.uid) {
+          print('Data of self received, skipping...');
+        } else {
+          var newFriend = etoet.UserInfo(
+            uid: data['uid'],
+            photoURL: data['photoUrl'],
+            email: data['email'],
+            displayName: data['displayName'],
+          );
+
+          // Very scruffed fix when you got accepted but you have no friend
+          //TODO: make for loop run at least once
+          if(user.friendInfoList.length == 0)
+            {
+              setState(() {
+                user.friendInfoList.add(newFriend);
+              });
+              print('Your are now friend with ' + data['displayName']);
+            }
+          for (var i = 0; i < user.friendInfoList.length; ++i) {
+            if (i == (user.friendInfoList.length - 1) &&
+                newFriend.uid != user.friendInfoList.elementAt(i).uid) {
+              setState(() {
+                user.friendInfoList.add(newFriend);
+              });
+              print('Your are now friend with ' + data['displayName']);
+            }
+          }
+        }
+      } else if (data['type'] == 'unFriend') {
+        var unfriendFriendUID = data['friendUID'];
+        print('unfriend notification');
+        if (unfriendFriendUID == user.uid) {
+          print('Data of self received, skipping...');
+        } else {
+          for (var i = 0; i < user.friendInfoList.length; ++i) {
+            if (user.friendInfoList.elementAt(i).uid == unfriendFriendUID) {
+              var unfriendFriend = user.friendInfoList.elementAt(i);
+              setState(() {
+                user.friendInfoList.remove(unfriendFriend);
+              });
+              print('You are now unfriended with ' + unfriendFriendUID);
+              break;
+            }
+          }
+        }
+      }
+    });
+  }
+
+  Future<void> toFriendChatView(int index) async {
+    selectedUser = (_searchBarController.text.isNotEmpty)
+        ? userListOnSearch.elementAt(index)
+        : user.friendInfoList.elementAt(index);
+    var chatroomUID = const Uuid().v4().toString();
+    await FirestoreChat.createFriendChatroom(
+        user.uid, selectedUser.uid, chatroomUID);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ChatRoomView(selectedUser)),
+    );
   }
 }
