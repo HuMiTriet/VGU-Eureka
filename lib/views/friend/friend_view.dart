@@ -60,17 +60,13 @@ class _FriendViewState extends State<FriendView> {
           //TODO: make for loop run at least once
           if(user.friendInfoList.length == 0)
             {
-              setState(() {
-                user.friendInfoList.add(newFriend);
-              });
+              user.friendInfoList.add(newFriend);
               print('Your are now friend with ' + data['displayName']);
             }
           for (var i = 0; i < user.friendInfoList.length; ++i) {
             if (i == (user.friendInfoList.length - 1) &&
                 newFriend.uid != user.friendInfoList.elementAt(i).uid) {
-              setState(() {
                 user.friendInfoList.add(newFriend);
-              });
               print('Your are now friend with ' + data['displayName']);
             }
           }
@@ -81,12 +77,11 @@ class _FriendViewState extends State<FriendView> {
         if (unfriendFriendUID == user.uid) {
           print('Data of self received, skipping...');
         } else {
+          print('User friend list length: ' + user.friendInfoList.length.toString());
           for (var i = 0; i < user.friendInfoList.length; ++i) {
             if (user.friendInfoList.elementAt(i).uid == unfriendFriendUID) {
               var unfriendFriend = user.friendInfoList.elementAt(i);
-              setState(() {
-                user.friendInfoList.remove(unfriendFriend);
-              });
+              user.friendInfoList.remove(unfriendFriend);
               print('You are now unfriended with ' + unfriendFriendUID);
               break;
             }
