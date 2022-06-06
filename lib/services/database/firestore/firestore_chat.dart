@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:etoet/services/database/firestore.dart';
+import 'package:etoet/services/database/firestore/firestore.dart';
 
 class FirestoreChat extends Firestore {
   //Constructor
@@ -33,7 +33,6 @@ class FirestoreChat extends Firestore {
 
     //Check if there is already a chatroom when two user unfriended
     var oldChatroomUID = await oldFriendChatroom(userUID1, userUID2);
-    print(oldChatroomUID);
     if(oldChatroomUID.isNotEmpty)
     {
       user1Ref.set({'chatroomUID': oldChatroomUID}, SetOptions(merge: true));

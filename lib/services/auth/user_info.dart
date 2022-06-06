@@ -4,7 +4,7 @@ class UserInfo {
   String? email;
   String? phoneNumber;
   String? displayName;
-  String photoURL;
+  String? photoURL;
 
   UserInfo({
     required this.uid,

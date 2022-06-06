@@ -2,7 +2,7 @@
 import 'dart:developer' as devtools show log;
 
 import 'package:etoet/constants/routes.dart';
-import 'package:etoet/services/database/firestore.dart';
+import 'package:etoet/services/database/firestore/firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../../services/auth/auth_service.dart';

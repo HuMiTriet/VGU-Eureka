@@ -2,10 +2,9 @@ import 'dart:async';
 import 'dart:developer' as devtools show log;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
+import 'package:etoet/services/auth/auth_user.dart';
 
-import '../auth/auth_user.dart';
-import '../auth/user_info.dart' as etoet;
+import 'package:etoet/services/auth/user_info.dart' as etoet;
 
 class Firestore {
   static final firestoreReference = FirebaseFirestore.instance;
