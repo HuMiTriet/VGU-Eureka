@@ -2,10 +2,9 @@ import 'dart:async';
 import 'dart:developer' as devtools show log;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
+import 'package:etoet/services/auth/auth_user.dart';
 
-import '../auth/auth_user.dart';
-import '../auth/user_info.dart' as etoet;
+import 'package:etoet/services/auth/user_info.dart' as etoet;
 
 class Firestore {
   static final firestoreReference = FirebaseFirestore.instance;
@@ -13,7 +12,8 @@ class Firestore {
   Firestore();
 
   static void addUserInfo(AuthUser user) {
-    firestoreReference.collection('users').doc(user.uid).set(
+    var userRef = firestoreReference.collection('users').doc(user.uid);
+    userRef.set(
       {
         'uid': user.uid,
         'email': user.email,
@@ -21,15 +21,33 @@ class Firestore {
         'photoUrl': user.photoURL,
       },
     );
+
+    /// attributes that are related to the fact that the user is helping someone else
+    var userHelperRef = userRef.collection('helper').doc('helper');
+
+    userHelperRef.set(
+      {
+        'helpRange': user.helpRange,
+        'isHelping': false,
+      },
+    );
   }
 
   static void updateUserInfo(AuthUser authUser) async {
-    firestoreReference.collection('users').doc(authUser.uid).update({
+    var userRef = firestoreReference.collection('users').doc(authUser.uid);
+    userRef.update({
       'email': authUser.email,
       'displayName': authUser.displayName,
       'photoUrl': authUser.photoURL,
       'phoneNumber': authUser.phoneNumber,
     });
+    var userHelperRef = userRef.collection('helper').doc('helper');
+
+    userHelperRef.set(
+      {
+        'helpRange': authUser.helpRange,
+      },
+    );
   }
 
   static void setFcmTokenAndNotificationStatus(
@@ -49,13 +67,15 @@ class Firestore {
 
   static void setEmergencySignal({
     required String uid,
-    required String message,
+    required String locationDescription,
+    required String situationDetail,
     bool isPublic = false,
   }) {
     firestoreReference.collection('emergencies').doc(uid).set(
       {
         'isPublic': isPublic,
-        'message': message,
+        'locationDescription': locationDescription,
+        'situationDetail': situationDetail,
         'uid': uid,
       },
       SetOptions(merge: true),

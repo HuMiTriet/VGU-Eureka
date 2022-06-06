@@ -1,5 +1,5 @@
 import 'package:etoet/services/auth/auth_user.dart';
-import 'package:etoet/services/database/firestore.dart';
+import 'package:etoet/services/database/firestore/firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
