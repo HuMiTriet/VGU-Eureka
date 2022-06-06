@@ -1,15 +1,44 @@
-// ignore_for_file: deprecated_member_use
-
+import 'package:etoet/constants/routes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'dart:developer' as devtools show log;
 import '../main_view.dart';
 
-class MySOSViewState extends StatelessWidget {
-  const MySOSViewState({Key? key}) : super(key: key);
+enum SosScreenState { SHOW_SOS_FORM, SHOW_USER_SIGNAL }
+
+const int maxLines = 3;
+const int maxLength = 1000;
+
+class SOSView extends StatefulWidget {
+  const SOSView({Key? key}) : super(key: key);
+
+  @override
+  // ignore: library_private_types_in_public_api
+  _SOSViewState createState() => _SOSViewState();
+}
+
+class _SOSViewState extends State<SOSView> {
+  SosScreenState currentState = SosScreenState.SHOW_SOS_FORM;
+
+  bool showLoading = false;
+  bool privateSignal = false;
+  bool publicSignal = false;
 
   @override
   Widget build(BuildContext context) {
+    return showLoading
+        ? const Scaffold(
+            body: SafeArea(
+                child: Center(
+              child: CircularProgressIndicator(),
+            )),
+          )
+        : currentState == SosScreenState.SHOW_SOS_FORM
+            ? showSOSFormView(context)
+            : showUserFormView(context);
+  }
+
+  Widget showUserFormView(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromRGBO(239, 172, 172, 2),
       body: SafeArea(
@@ -31,7 +60,8 @@ class MySOSViewState extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => MainView()),
+                        MaterialPageRoute(
+                            builder: (context) => const MainView()),
                       );
                     },
                     icon: const Icon(Icons.close),
@@ -64,8 +94,8 @@ class MySOSViewState extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: Center(child: buildTextDescriptionField()),
               ),
-              MultiSwitch(),
-              ProblemSolvedButton(),
+              MultiSwitch(val: privateSignal),
+              const ProblemSolvedButton(),
             ],
           ),
         ),
@@ -73,8 +103,118 @@ class MySOSViewState extends StatelessWidget {
     );
   }
 
-  final int maxLines = 3;
-  final int maxLength = 1000;
+  Widget showSOSFormView(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color.fromRGBO(239, 172, 172, 2),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Text(
+                    'EMERGENCY!',
+                    style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const MainView()),
+                      );
+                    },
+                    icon: const Icon(Icons.close),
+                    color: Colors.white,
+                  ),
+                ],
+              ),
+              const Text(
+                'What kind of problem you need to help with?',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Theme(
+                data: ThemeData(unselectedWidgetColor: Colors.white),
+                child: CheckBoxList(
+                  children: const [
+                    'Lost and Found',
+                    'Accident',
+                    'Thieves',
+                    'Other'
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(child: buildSituationField()),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(child: buildTextDescriptionField()),
+              ),
+              RichText(
+                  text: const TextSpan(
+                      style: TextStyle(
+                          color: Colors.black, fontWeight: FontWeight.bold),
+                      children: <TextSpan>[
+                    TextSpan(
+                        text: 'WARNING: ',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        )),
+                    TextSpan(text: 'When you choose'),
+                    TextSpan(
+                      text: ' PUBLIC SIGNAL',
+                      style: TextStyle(
+                          color: Colors.red, fontWeight: FontWeight.bold),
+                    ),
+                    TextSpan(
+                        text:
+                            ", your location will be public for all ETOET's users. This may put you in danger! Choose wisingly and intentinally"),
+                  ])),
+              const SizedBox(
+                height: 15,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Buttons(
+                      currentState: currentState,
+                      check: privateSignal,
+                      color: Colors.green,
+                      text: 'PRIVATE SIGNAL',
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    child: Buttons(
+                      currentState: currentState,
+                      check: publicSignal,
+                      color: Colors.red,
+                      text: 'PUBLIC SIGNAL',
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 15,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   Widget buildTextDescriptionField() => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,23 +265,52 @@ class MySOSViewState extends StatelessWidget {
         borderRadius: BorderRadius.all(Radius.circular(2)),
         borderSide: BorderSide(color: Colors.black, width: 0.5),
       );
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 }
 
-class _Buttons extends StatelessWidget {
+class Buttons extends StatefulWidget {
   final Color color;
   final String text;
+  bool check;
+  SosScreenState currentState;
 
-  const _Buttons({
-    required this.color,
-    required this.text,
-  });
+  Buttons(
+      {Key? key,
+      required this.color,
+      required this.text,
+      required this.check,
+      required this.currentState})
+      : super(key: key);
 
+  @override
+  _ButtonsState createState() => _ButtonsState();
+}
+
+class _ButtonsState extends State<Buttons> {
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: GestureDetector(
-        onTap: () {},
+        onTap: () {
+          widget.check = !widget.check;
+          devtools.log('Check: ${widget.check}', name: 'Buttons');
+          setState(() {
+            widget.currentState = SosScreenState.SHOW_USER_SIGNAL;
+            devtools.log('Current state: ${widget.currentState}',
+                name: 'Buttons');
+          });
+          Navigator.of(context).pushNamed(mainRoute);
+        },
         child: Container(
           alignment: Alignment.center,
           constraints: const BoxConstraints.tightForFinite(
@@ -149,7 +318,7 @@ class _Buttons extends StatelessWidget {
             height: 40,
           ),
           decoration: BoxDecoration(
-            color: color,
+            color: widget.color,
             borderRadius: BorderRadius.circular(5),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -161,7 +330,7 @@ class _Buttons extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      text,
+                      widget.text,
                       style: const TextStyle(color: Colors.white, fontSize: 10),
                     ),
                     const SizedBox(width: 15),
@@ -216,22 +385,24 @@ class CheckBoxListState extends State<CheckBoxList> {
 }
 
 class MultiSwitch extends StatefulWidget {
+  final bool val;
+
+  const MultiSwitch({Key? key, required this.val}) : super(key: key);
   @override
   _MultiSwitchState createState() => _MultiSwitchState();
 }
 
 class _MultiSwitchState extends State<MultiSwitch> {
-  bool val1 = true;
-
+  bool val1 = false;
   void toggleSwitch(bool value) {
-    if (val1 == false) {
+    if (widget.val) {
       setState(() {
         val1 = true;
+        showAlertDialog(context);
       });
     } else {
       setState(() {
         val1 = false;
-        showAlertDialog(context);
       });
     }
   }
