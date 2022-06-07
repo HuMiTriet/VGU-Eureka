@@ -161,29 +161,62 @@ class MainViewState extends State<MainView> {
         await FirebaseMessaging.instance.getInitialMessage();
 
     if (initialMessage != null) {
-      _handleMessage(initialMessage);
+      // _handleMessage(initialMessage);
     }
 
     // app is in background but open
+    // handle firebase messaging
     FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
 
     // app is in foreground
+    // handle firebase messaging
     FirebaseMessaging.onMessage.listen(_handleForeGroundMessage);
+
+    // handle onclick local push notification
+    NotificationHandler.onNotifications.stream.listen(onClickNotification);
+  }
+
+  // foreground notification
+  void onClickNotification(String? payload) {
+    log('onclick local notification');
+
+    if (payload != null) {
+      switch (payload) {
+        case 'emegency':
+          break;
+
+        case 'newFriend':
+          showBarModalBottomSheet(
+            //expand: true,
+            context: context,
+            backgroundColor: Colors.transparent,
+            builder: (context) => const FriendView(),
+          );
+      }
+    }
   }
 
   void _handleMessage(RemoteMessage message) {
-    showDialog(
+    log('message comming while app is in background');
+
+    if (message.data['type'] == 'friend') {
+      showBarModalBottomSheet(
+        //expand: true,
         context: context,
-        builder: (context) {
-          var content = message.notification!.body;
-          return AlertDialog(
-            title: const Text('Notification tapped'),
-            content: Text(content!),
-          );
-        });
+        backgroundColor: Colors.transparent,
+        builder: (context) => const FriendView(),
+      );
+    }
   }
 
   void _handleForeGroundMessage(RemoteMessage message) {
-    NotificationHandler.display(message);
+    if (message.notification != null) {
+      log('${message.notification!.title}');
+      log('${message.notification!.body}');
+      log('message comming while app is in foreground');
+      NotificationHandler.display(message);
+    } else {
+      log('message is null');
+    }
   }
 }
