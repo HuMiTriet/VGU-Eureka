@@ -19,7 +19,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
-import '../database/firestore.dart';
+import '../database/firestore/firestore.dart';
 import 'geocoding.dart';
 
 /// This is the implementation of the [Map] interface using [GoogleMap].
@@ -147,6 +147,7 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
   late Future<LatLng> location = widget._getCurrentLocation();
   late BitmapDescriptor userIcon;
   final mapEmergencyUidLocation = <String, LatLng>{};
+  late StreamSubscription emergencySubcription;
 
   void _initializeMap() async {
     devtools.log('_initializeMap', name: 'GoogleMap: _initializeMap');
@@ -240,22 +241,28 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
   }
 
   /// Update markers of nearby emergency signal
-  void updateEmergencyMarker(String emergencyId) async {
+  void updateEmergencyMarker(
+      {required String emergencyId,
+      required String situationDetail,
+      required String locationDescription}) async {
     var emergencyInfo = await Firestore.getUserInfo(emergencyId);
     var emergencyMarkerCreator = EmergencyMarker(
         context: context,
         emergencyInfo: emergencyInfo,
         polylines: widget._polylines,
-        uid: emergencyId);
+        uid: emergencyId,
+        locationDescription: locationDescription,
+        situationDetail: situationDetail);
     var location = mapEmergencyUidLocation[emergencyId];
     var latLng = LatLng(location!.latitude, location.longitude);
     var emergencyMarker = await emergencyMarkerCreator.createEmergencyMarker(
         emergencyLatLng: latLng);
     widget._markers
         .removeWhere((marker) => marker.markerId == MarkerId(emergencyId));
-    widget._markers.add(emergencyMarker);
+    setState(() {
+      widget._markers.add(emergencyMarker);
+    });
 
-    setState(() {});
     devtools.log(
         'marker list: ${widget._markers.length}, displayName: ${emergencyInfo.displayName}, location: $latLng',
         name: 'GoogleMap: updateEmergencyMarker');
@@ -274,7 +281,7 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
 
     // subcription to listen to all public signal in radius
     var emergencyRadius = 20.0;
-    var emergencySubcription = GeoFlutterFire.querySignalInRadius(
+    emergencySubcription = GeoFlutterFire.querySignalInRadius(
         lat: widget._location.latitude,
         lng: widget._location.longitude,
         radius: emergencyRadius);
@@ -288,8 +295,14 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
           var geoPoint = doc['position']['geopoint'] as GeoPoint;
           var emergencyLocation = LatLng(geoPoint.latitude, geoPoint.longitude);
           var emergencyId = doc['uid'] as String;
+          var locationDescription = doc['locationDescription'] as String;
+          var situationDetail = doc['situationDetail'] as String;
           mapEmergencyUidLocation[emergencyId] = emergencyLocation;
-          updateEmergencyMarker(emergencyId);
+          updateEmergencyMarker(
+            emergencyId: emergencyId,
+            locationDescription: locationDescription,
+            situationDetail: situationDetail,
+          );
         }
       }
     });
@@ -297,11 +310,17 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
   }
 
   void toDefaultState() {
+    // resume friends stream
     for (var subscription in widget._friendsLocationSubscriptions) {
       subscription.resume();
     }
+    emergencySubcription.cancel();
+
+    // remove emergency markers
     widget._markers.removeWhere(
         (marker) => marker.markerId != MarkerId(widget.authUser!.uid));
+
+    // add friend markers
     setState(() {
       widget._markers.addAll(widget._friendsMarkers);
     });
@@ -384,22 +403,6 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
                   toDefaultState: toDefaultState,
                 ),
               ),
-
-              // mock emergency signal
-              // ElevatedButton(
-              //     onPressed: () async {
-              //       var latLng = await widget._mapController.getLatLng(
-              //           ScreenCoordinate(
-              //               x: (widget.deviceWidth / 2).round(),
-              //               y: (widget.deviceHeight / 2).round()));
-              //       Firestore.setEmergencySignal(
-              //           uid: latLng.toString(), message: 'I need help!');
-              //       GeoFlutterFire.updateEmergencySignalLocation(
-              //           uid: latLng.toString(),
-              //           lat: latLng.latitude,
-              //           lng: latLng.longitude);
-              //     },
-              //     child: const Text('Send emergency signal')),
             ],
           );
         } else {

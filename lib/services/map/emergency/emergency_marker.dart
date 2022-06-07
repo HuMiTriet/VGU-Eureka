@@ -8,7 +8,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../marker/marker.dart';
 
-/// This class is used to create a marker for a friend
+/// This class is used to create a marker for an emergency signal.
 class EmergencyMarker {
   Routing routing = Routing.getInstance();
   late etoet.UserInfo emergencyInfo;
@@ -17,11 +17,15 @@ class EmergencyMarker {
   late Set<Polyline> polylines;
   late BuildContext context;
   late String uid;
+  late String locationDescription;
+  late String situationDetail;
   EmergencyMarker({
     required this.emergencyInfo,
     required this.context,
     required this.polylines,
     required this.uid,
+    required this.locationDescription,
+    required this.situationDetail,
   });
   Future<Marker> createEmergencyMarker({
     required LatLng emergencyLatLng,
