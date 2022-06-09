@@ -11,7 +11,7 @@ import 'package:etoet/views/main_view.dart';
 import 'package:etoet/views/profile/profile_page.dart';
 import 'package:etoet/views/settings_view.dart';
 import 'package:etoet/views/sign_post.dart';
-import 'package:etoet/views/signal/MySOSSignalScreen.dart';
+import 'package:etoet/views/signal/sos_signal_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

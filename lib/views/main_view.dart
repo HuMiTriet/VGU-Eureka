@@ -5,6 +5,7 @@ import 'package:etoet/services/database/firestore/firestore_friend.dart';
 import 'package:etoet/services/map/map_factory.dart' as etoet;
 import 'package:etoet/services/notification/notification.dart';
 import 'package:etoet/views/friend/friend_view.dart';
+import 'package:etoet/views/signal/sos_signal_screen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -13,9 +14,13 @@ import 'package:provider/provider.dart';
 import '../services/auth/auth_user.dart';
 
 class MainView extends StatefulWidget {
+  final SosScreenState? sosScreenState;
+  final SignalType? signalType;
   @override
   const MainView({
     Key? key,
+    this.sosScreenState,
+    this.signalType,
   }) : super(key: key);
 
   @override
@@ -101,7 +106,15 @@ class MainViewState extends State<MainView> {
                   FloatingActionButton(
                       heroTag: 'goToSOSFromMain',
                       onPressed: () {
-                        Navigator.of(context).pushNamed(sosRoute);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SOSView(
+                              sosScreenState: widget.sosScreenState,
+                              signalType: widget.signalType,
+                            ),
+                          ),
+                        );
                       },
                       child: const Icon(Icons.add_alert)),
                   FloatingActionButton(
@@ -148,27 +161,27 @@ class MainViewState extends State<MainView> {
             uid: authUser!.uid, token: token);
         FirebaseMessaging.onMessage.listen((event) {
           var dataType = event.data['type'];
-          if (dataType == 'emegency'){
-          showDialog(
-              context: context,
-              builder: (context) {
-                var content = event.notification!.body;
-                var title = event.notification!.title;
-                return AlertDialog(
-                  title: Text(title ?? 'Emergency alert'),
-                  content: Text(content ?? 'null'),
-                  actions: [
-                    ElevatedButton(
-                      onPressed: () {},
-                      child: const Text('Accpet'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {},
-                      child: const Text('Reject'),
-                    )
-                  ],
-                );
-              });
+          if (dataType == 'emegency') {
+            showDialog(
+                context: context,
+                builder: (context) {
+                  var content = event.notification!.body;
+                  var title = event.notification!.title;
+                  return AlertDialog(
+                    title: Text(title ?? 'Emergency alert'),
+                    content: Text(content ?? 'null'),
+                    actions: [
+                      ElevatedButton(
+                        onPressed: () {},
+                        child: const Text('Accpet'),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {},
+                        child: const Text('Reject'),
+                      )
+                    ],
+                  );
+                });
           }
         });
       }

@@ -1,16 +1,29 @@
+import 'dart:developer' as devtools show log;
+
 import 'package:etoet/constants/routes.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'dart:developer' as devtools show log;
+
 import '../main_view.dart';
 
 enum SosScreenState { SHOW_SOS_FORM, SHOW_USER_SIGNAL }
+
+enum SignalType { PUBLIC, PRIVATE }
 
 const int maxLines = 3;
 const int maxLength = 1000;
 
 class SOSView extends StatefulWidget {
-  const SOSView({Key? key}) : super(key: key);
+  final SosScreenState? sosScreenState;
+  final SignalType? signalType;
+  const SOSView({
+    Key? key,
+    this.sosScreenState,
+    this.signalType,
+  }) : super(key: key);
+
+  // ignore: type_annotate_public_apis
+  get currentState => sosScreenState ?? SosScreenState.SHOW_SOS_FORM;
 
   @override
   // ignore: library_private_types_in_public_api
@@ -18,11 +31,7 @@ class SOSView extends StatefulWidget {
 }
 
 class _SOSViewState extends State<SOSView> {
-  SosScreenState currentState = SosScreenState.SHOW_SOS_FORM;
-
   bool showLoading = false;
-  bool privateSignal = false;
-  bool publicSignal = false;
 
   @override
   Widget build(BuildContext context) {
@@ -33,9 +42,9 @@ class _SOSViewState extends State<SOSView> {
               child: CircularProgressIndicator(),
             )),
           )
-        : currentState == SosScreenState.SHOW_SOS_FORM
-            ? showSOSFormView(context)
-            : showUserFormView(context);
+        : widget.sosScreenState == SosScreenState.SHOW_USER_SIGNAL
+            ? showUserFormView(context)
+            : showSOSFormView(context);
   }
 
   Widget showUserFormView(BuildContext context) {
@@ -187,7 +196,7 @@ class _SOSViewState extends State<SOSView> {
                 children: [
                   Expanded(
                     child: Buttons(
-                      currentState: currentState,
+                      currentState: widget.currentState,
                       check: privateSignal,
                       color: Colors.green,
                       text: 'PRIVATE SIGNAL',
@@ -198,8 +207,8 @@ class _SOSViewState extends State<SOSView> {
                   ),
                   Expanded(
                     child: Buttons(
-                      currentState: currentState,
-                      check: publicSignal,
+                      currentState: widget.currentState,
+                      signalType: ,
                       color: Colors.red,
                       text: 'PUBLIC SIGNAL',
                     ),
@@ -280,14 +289,14 @@ class _SOSViewState extends State<SOSView> {
 class Buttons extends StatefulWidget {
   final Color color;
   final String text;
-  bool check;
+  SignalType signalType;
   SosScreenState currentState;
 
   Buttons(
       {Key? key,
       required this.color,
       required this.text,
-      required this.check,
+      required this.signalType,
       required this.currentState})
       : super(key: key);
 
@@ -302,14 +311,25 @@ class _ButtonsState extends State<Buttons> {
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: GestureDetector(
         onTap: () {
-          widget.check = !widget.check;
-          devtools.log('Check: ${widget.check}', name: 'Buttons');
+          setState(() {
+            widget.signalType = widget.signalType == SignalType.PUBLIC
+                ? SignalType.PRIVATE
+                : SignalType.PUBLIC;
+            devtools.log('Check: ${widget.signalType}', name: 'Buttons');
+          });
           setState(() {
             widget.currentState = SosScreenState.SHOW_USER_SIGNAL;
             devtools.log('Current state: ${widget.currentState}',
                 name: 'Buttons');
           });
-          Navigator.of(context).pushNamed(mainRoute);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => MainView(
+                      sosScreenState: widget.currentState,
+                      signalType: widget.signalType,
+                    )),
+          );
         },
         child: Container(
           alignment: Alignment.center,
