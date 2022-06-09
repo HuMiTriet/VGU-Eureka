@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:etoet/constants/routes.dart';
@@ -157,8 +158,7 @@ class MainViewState extends State<MainView> {
   Future<void> setupInteractedMessage() async {
     // Get any messages which caused the application to open from
     // a terminated state.
-    RemoteMessage? initialMessage =
-        await FirebaseMessaging.instance.getInitialMessage();
+    var initialMessage = await FirebaseMessaging.instance.getInitialMessage();
 
     if (initialMessage != null) {
       // _handleMessage(initialMessage);
@@ -178,11 +178,13 @@ class MainViewState extends State<MainView> {
 
   // foreground notification
   void onClickNotification(String? payload) {
-    log('onclick local notification');
-
     if (payload != null) {
-      switch (payload) {
+      var data = json.decode(payload);
+      log('payload in object: ${data.runtimeType}');
+
+      switch (data['type']) {
         case 'emegency':
+          // go to emergency screen
           break;
 
         case 'newFriend':
@@ -192,6 +194,8 @@ class MainViewState extends State<MainView> {
             backgroundColor: Colors.transparent,
             builder: (context) => const FriendView(),
           );
+          break;
+        case 'newChat':
       }
     }
   }
@@ -199,7 +203,8 @@ class MainViewState extends State<MainView> {
   void _handleMessage(RemoteMessage message) {
     log('message comming while app is in background');
 
-    if (message.data['type'] == 'friend') {
+    if (message.data['type'] == 'newFriend') {
+      log('${message.data}');
       showBarModalBottomSheet(
         //expand: true,
         context: context,
@@ -211,9 +216,7 @@ class MainViewState extends State<MainView> {
 
   void _handleForeGroundMessage(RemoteMessage message) {
     if (message.notification != null) {
-      log('${message.notification!.title}');
-      log('${message.notification!.body}');
-      log('message comming while app is in foreground');
+      log('${message.data}');
       NotificationHandler.display(message);
     } else {
       log('message is null');

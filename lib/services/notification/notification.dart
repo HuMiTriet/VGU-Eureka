@@ -1,12 +1,9 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'dart:developer';
-import 'package:etoet/main.dart';
-import 'package:etoet/constants/routes.dart';
+import 'dart:convert';
+import 'dart:developer' as dev;
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:rxdart/rxdart.dart';
 
 class NotificationHandler {
@@ -20,16 +17,16 @@ class NotificationHandler {
 
   // define hight_importance notification channel
   static AndroidNotificationChannel channel = AndroidNotificationChannel(
-    'high_importance_channel', // id
-    'High Importance Notifications', // title
+    'default_channel', // id
+    'Default Channel', // title
     importance: Importance.max,
     playSound: true,
-    sound: RawResourceAndroidNotificationSound('pristine'),
+    sound: RawResourceAndroidNotificationSound('door_bell'),
   );
 
   // intialize all configuration for android
   static void initialize() async {
-    final androiSettings = AndroidInitializationSettings('ic_launcher');
+    final androiSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
 
     final initializationSettings =
         InitializationSettings(android: androiSettings);
@@ -45,7 +42,7 @@ class NotificationHandler {
   }
 
   static void onSelectNotification(payload) {
-    log('add payload to onNotification object');
+    dev.log('add payload to onNotification object');
     onNotifications.add(payload);
   }
 
@@ -54,20 +51,21 @@ class NotificationHandler {
     try {
       final notificationDetails = NotificationDetails(
           android: AndroidNotificationDetails(
-        "hight_important",
-        "high important channel",
+        "default_channel",
+        "Default Channel",
         importance: Importance.max,
         // priority: Priority.high,
-        playSound: true,
-        sound: RawResourceAndroidNotificationSound('pristine'),
-        icon: "ic_launcher", //<-- Add this parameter
+        // playSound: true,
+        // sound: RawResourceAndroidNotificationSound('pristine'),
+        // icon: "ic_launcher", //<-- Add this parameter
       ));
-
-      await _notificationsPlugin.show(0, message.notification!.title,
+      var id = DateTime.now().millisecondsSinceEpoch % 2147483648;
+      dev.log('${id}');
+      await _notificationsPlugin.show(id, message.notification!.title,
           message.notification!.body, notificationDetails,
-          payload: 'friend');
+          payload: json.encode(message.data));
     } on Exception catch (e) {
-      log('cannot show heads up message in forground');
+      dev.log('cannot show heads up message in forground');
       print(e);
     }
   }
