@@ -122,6 +122,7 @@ export default async (
         data: {
           type: "publicEmergency",
           locationDescription: locationDescription,
+          displayName: displayName,
         },
       };
 

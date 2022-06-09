@@ -41,3 +41,10 @@ export const unFriendNotification = functions.region("asia-southeast1")
       await (await import("./friend/unFriend"))
           .default(snapshot, context);
     });
+
+export const userUpdateProfileNotification = functions.region("asia-southeast1")
+    .firestore.document("/users/{userUID}")
+    .onUpdate(async (change, context) => {
+      await (await import("./friend/userUpdateProfileNotification"))
+          .default(change, context);
+    });
