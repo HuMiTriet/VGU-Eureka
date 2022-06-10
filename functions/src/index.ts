@@ -11,7 +11,6 @@ export const sendPrivateNotification = functions.region("asia-southeast1").
           .default(snapshot, context);
     });
 
-
 export const sendPublicNotification = functions.region("asia-southeast1")
     .firestore.document("/emergencies/{userUID}")
     .onUpdate(async (change, context) => {
@@ -49,3 +48,17 @@ export const unFriendNotification = functions.region("asia-southeast1")
       await (await import("./friend/unFriend"))
           .default(snapshot, context);
     });
+
+export const userUpdateProfileNotification = functions.region("asia-southeast1")
+    .firestore.document("/users/{userUID}")
+    .onUpdate(async (change, context) => {
+      await (await import("./friend/userUpdateProfileNotification"))
+          .default(change, context);
+    });
+
+// export
+// const autofillDefaultUserPhotoUrl = functions.region("asia-southeast1")
+//     .auth.user().onCreate(async (user) => {
+//       await (await import("./auth/autofillUserPhotoUrl"))
+//           .default(user);
+//     });
