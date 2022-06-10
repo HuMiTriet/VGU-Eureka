@@ -256,7 +256,14 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
     var location = mapEmergencyUidLocation[emergencyId];
     var latLng = LatLng(location!.latitude, location.longitude);
     var emergencyMarker = await emergencyMarkerCreator.createEmergencyMarker(
-        emergencyLatLng: latLng);
+        emergencyLatLng: latLng,
+        helpButtonPressed: () {
+          // remove and add new marker
+          widget._markers.removeWhere(
+              (marker) => marker.markerId == MarkerId(emergencyId));
+
+          setState(() {});
+        });
     widget._markers
         .removeWhere((marker) => marker.markerId == MarkerId(emergencyId));
     setState(() {

@@ -29,9 +29,9 @@ class EmergencyMarker {
   });
   Future<Marker> createEmergencyMarker({
     required LatLng emergencyLatLng,
+    required Function helpButtonPressed,
   }) async {
     var location = await Geocoding.getAddress(emergencyLatLng);
-    var isShowDirection = false;
     return Marker(
       markerId: MarkerId(uid),
       position: emergencyLatLng,
@@ -41,76 +41,36 @@ class EmergencyMarker {
         snippet: 'Tap to see user\'s location',
       ),
       onTap: () {
-        showBottomSheet(
-            backgroundColor: Colors.transparent,
+        showDialog(
             context: context,
-            builder: (_) {
-              return Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height * 0.25,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFffa858),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(10.0),
-                    topRight: Radius.circular(10.0),
-                  ),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text('User\'s location'),
+                content: Column(
                   mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Spacer(),
-                    Text(
-                      emergencyInfo.displayName ?? 'Etoet User',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const Spacer(),
-                    Text('Location: $location',
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        )),
-                    const Spacer(),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: const Color(0xfff46135),
-                        shape: RoundedRectangleBorder(
-                          side: BorderSide.none,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        // fixedSize: const Size(320, 50),
-                      ),
-                      child: Text(
-                        isShowDirection
-                            ? 'Hide direction to ${emergencyInfo.displayName}'
-                            : 'Show direction to ${emergencyInfo.displayName}',
-                        style: const TextStyle(fontWeight: ui.FontWeight.bold),
-                      ),
-                      onPressed: () async {
-                        Navigator.pop(context);
-                        isShowDirection
-                            ? {polylines.clear()}
-                            : {
-                                polylines.clear(),
-                                polylines.add(Polyline(
-                                    polylineId: const PolylineId('polyline'),
-                                    visible: true,
-                                    points: await routing
-                                        .getPointsFromUser(emergencyLatLng),
-                                    width: 5,
-                                    color: Colors.blue))
-                              };
-                        isShowDirection = !isShowDirection;
-                      },
-                    ),
-                    const Spacer(),
+                    Text(location),
+                    Text('Location description: $locationDescription'),
+                    Text('Situation detail: $situationDetail'),
                   ],
                 ),
+                actions: <Widget>[
+                  ElevatedButton(
+                    child: const Text('Cancel'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  ElevatedButton(
+                    child: const Text('Help'),
+                    onPressed: () {
+                      helpButtonPressed();
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
               );
             });
       },
