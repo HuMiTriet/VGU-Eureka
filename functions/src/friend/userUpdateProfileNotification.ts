@@ -16,6 +16,7 @@ export default async (
   const userEmail = String(userSnap.email);
   const userPhotoUrl = String(userSnap.photoUrl);
   const userUID = context.params.userUID;
+
   const payload = {
     data: {
       type: "friendDataChanged",
@@ -25,6 +26,7 @@ export default async (
       uid: userUID,
     },
   };
+
   console.log(payload);
   console.log(context.params.userUID);
 
