@@ -198,15 +198,7 @@ class MainViewState extends State<MainView> {
 
   void _handleForeGroundMessage(RemoteMessage message) {
     if (message.notification != null) {
-      // if (ModalRoute.of(context)!.settings.name != null) {
-      //   log('current route when receiving message: ${ModalRoute.of(context)!.settings.name}');
-      //   print(ModalRoute.of(context)!.settings.name);
-      // } else {
-      //   log('current route is null');
-      // }
-
       log('received message: ${message.data}');
-
       NotificationHandler.display(message);
     } else {
       log('message is null');
@@ -229,19 +221,16 @@ class MainViewState extends State<MainView> {
         break;
       case 'newChat':
         // create user from payload data
-        log('before creat auth user');
         var sender = UserInfo(
             uid: data['uid'],
             email: data['email'],
             photoURL: data['photoUrl'],
             displayName: data['displayName']);
 
-        log('user:');
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => ChatRoomView(sender)),
         );
-        log('push to chatroom');
         break;
       case 'sos':
         break;
