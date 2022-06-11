@@ -3,9 +3,11 @@ import 'dart:developer';
 
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
+import 'package:etoet/services/auth/user_info.dart';
 import 'package:etoet/services/database/firestore.dart';
 import 'package:etoet/services/map/map_factory.dart' as etoet;
 import 'package:etoet/services/notification/notification.dart';
+import 'package:etoet/views/friend/chat_room_view.dart';
 import 'package:etoet/views/friend/friend_view.dart';
 import 'package:etoet/views/signal/SOS_view.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -149,10 +151,9 @@ class MainViewState extends State<MainView> {
       } else {
         Firestore.setFcmTokenAndNotificationStatus(
             uid: authUser!.uid, token: token);
+        setupInteractedMessage();
       }
     });
-
-    setupInteractedMessage();
   }
 
   Future<void> setupInteractedMessage() async {
@@ -161,7 +162,10 @@ class MainViewState extends State<MainView> {
     var initialMessage = await FirebaseMessaging.instance.getInitialMessage();
 
     if (initialMessage != null) {
-      // _handleMessage(initialMessage);
+      _handleMessage(initialMessage);
+      log('resume message');
+    } else {
+      log('message which opens app is null');
     }
 
     // app is in background but open
@@ -180,46 +184,67 @@ class MainViewState extends State<MainView> {
   void onClickNotification(String? payload) {
     if (payload != null) {
       var data = json.decode(payload);
-      log('payload in object: ${data.runtimeType}');
+      log('payload in object: ${data}');
 
-      switch (data['type']) {
-        case 'emegency':
-          // go to emergency screen
-          break;
-
-        case 'newFriend':
-          showBarModalBottomSheet(
-            //expand: true,
-            context: context,
-            backgroundColor: Colors.transparent,
-            builder: (context) => const FriendView(),
-          );
-          break;
-        case 'newChat':
-      }
+      onClickNotificationRouting(data);
     }
   }
 
   void _handleMessage(RemoteMessage message) {
     log('message comming while app is in background');
 
-    if (message.data['type'] == 'newFriend') {
-      log('${message.data}');
-      showBarModalBottomSheet(
-        //expand: true,
-        context: context,
-        backgroundColor: Colors.transparent,
-        builder: (context) => const FriendView(),
-      );
-    }
+    onClickNotificationRouting(message.data);
   }
 
   void _handleForeGroundMessage(RemoteMessage message) {
     if (message.notification != null) {
-      log('${message.data}');
+      // if (ModalRoute.of(context)!.settings.name != null) {
+      //   log('current route when receiving message: ${ModalRoute.of(context)!.settings.name}');
+      //   print(ModalRoute.of(context)!.settings.name);
+      // } else {
+      //   log('current route is null');
+      // }
+
+      log('received message: ${message.data}');
+
       NotificationHandler.display(message);
     } else {
       log('message is null');
+    }
+  }
+
+  void onClickNotificationRouting(data) {
+    switch (data['type']) {
+      case 'emegency':
+        // go to emergency screen
+        break;
+
+      case 'newFriend':
+        showBarModalBottomSheet(
+          //expand: true,
+          context: context,
+          backgroundColor: Colors.transparent,
+          builder: (context) => const FriendView(),
+        );
+        break;
+      case 'newChat':
+        // create user from payload data
+        log('before creat auth user');
+        var sender = UserInfo(
+            uid: data['uid'],
+            email: data['email'],
+            photoURL: data['photoUrl'],
+            displayName: data['displayName']);
+
+        log('user:');
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ChatRoomView(sender)),
+        );
+        log('push to chatroom');
+        break;
+      case 'sos':
+        break;
     }
   }
 }
