@@ -21,7 +21,7 @@ class NotificationHandler {
     'Default Channel', // title
     importance: Importance.max,
     playSound: true,
-    sound: RawResourceAndroidNotificationSound('door_bell'),
+    sound: RawResourceAndroidNotificationSound('notif'),
   );
 
   // intialize all configuration for android
@@ -51,13 +51,9 @@ class NotificationHandler {
     try {
       final notificationDetails = NotificationDetails(
           android: AndroidNotificationDetails(
-        "default_channel",
-        "Default Channel",
+        'default_channel',
+        'Default Channel',
         importance: Importance.max,
-        // priority: Priority.high,
-        // playSound: true,
-        // sound: RawResourceAndroidNotificationSound('pristine'),
-        // icon: "ic_launcher", //<-- Add this parameter
       ));
       var id = DateTime.now().millisecondsSinceEpoch % 2147483648;
       dev.log('${id}');
