@@ -1,29 +1,27 @@
 import 'dart:developer' as devtools show log;
 
-import 'package:etoet/constants/routes.dart';
+import 'package:etoet/services/auth/auth_user.dart';
+import 'package:etoet/services/database/firestore/firestore.dart';
+import 'package:etoet/services/database/firestore/firestore_emergency.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../main_view.dart';
 
-enum SosScreenState { SHOW_SOS_FORM, SHOW_USER_SIGNAL }
-
-enum SignalType { PUBLIC, PRIVATE }
-
 const int maxLines = 3;
 const int maxLength = 1000;
+const List<String> emergencyType = [
+  'Lost and Found',
+  'Accident',
+  'Thieves',
+  'Other',
+];
 
 class SOSView extends StatefulWidget {
-  final SosScreenState? sosScreenState;
-  final SignalType? signalType;
   const SOSView({
     Key? key,
-    this.sosScreenState,
-    this.signalType,
   }) : super(key: key);
-
-  // ignore: type_annotate_public_apis
-  get currentState => sosScreenState ?? SosScreenState.SHOW_SOS_FORM;
 
   @override
   // ignore: library_private_types_in_public_api
@@ -31,20 +29,28 @@ class SOSView extends StatefulWidget {
 }
 
 class _SOSViewState extends State<SOSView> {
-  bool showLoading = false;
+  TextEditingController locationDescriptionController = TextEditingController();
+  TextEditingController situationDetailController = TextEditingController();
+
+  bool isPublic = false;
+  bool isFilled = false;
+  bool lostAndFound = true;
+  bool accident = true;
+  bool thief = false;
+  bool other = false;
+
+  late AuthUser? user;
 
   @override
   Widget build(BuildContext context) {
-    return showLoading
-        ? const Scaffold(
-            body: SafeArea(
-                child: Center(
-              child: CircularProgressIndicator(),
-            )),
-          )
-        : widget.sosScreenState == SosScreenState.SHOW_USER_SIGNAL
-            ? showUserFormView(context)
-            : showSOSFormView(context);
+    user = context.watch<AuthUser?>();
+
+    locationDescriptionController.text =
+        user?.emergency.locationDescription ?? '';
+    situationDetailController.text = user?.emergency.situationDetail ?? '';
+    return user?.emergency.isFilled == true
+        ? showUserFormView(context)
+        : showSOSFormView(context);
   }
 
   Widget showUserFormView(BuildContext context) {
@@ -97,13 +103,16 @@ class _SOSViewState extends State<SOSView> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Center(child: buildSituationField()),
+                child: Center(
+                    child: buildSituationField(situationDetailController)),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Center(child: buildTextDescriptionField()),
+                child: Center(
+                    child: buildTextDescriptionField(
+                        locationDescriptionController)),
               ),
-              MultiSwitch(val: privateSignal),
+              MultiSwitch(val: isPublic),
               const ProblemSolvedButton(),
             ],
           ),
@@ -162,11 +171,14 @@ class _SOSViewState extends State<SOSView> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Center(child: buildSituationField()),
+                child: Center(
+                    child: buildSituationField(situationDetailController)),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Center(child: buildTextDescriptionField()),
+                child: Center(
+                    child: buildTextDescriptionField(
+                        locationDescriptionController)),
               ),
               RichText(
                   text: const TextSpan(
@@ -195,22 +207,144 @@ class _SOSViewState extends State<SOSView> {
               Row(
                 children: [
                   Expanded(
-                    child: Buttons(
-                      currentState: widget.currentState,
-                      check: privateSignal,
-                      color: Colors.green,
-                      text: 'PRIVATE SIGNAL',
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          user?.emergency.isFilled = true;
+                          user?.emergency.isPublic = false;
+                          user?.emergency.lostAndFound = lostAndFound;
+                          user?.emergency.accident = accident;
+                          user?.emergency.thief = thief;
+                          user?.emergency.other = other;
+                          user?.emergency.locationDescription =
+                              locationDescriptionController.text;
+                          user?.emergency.situationDetail =
+                              situationDetailController.text;
+                          FirestoreEmergency.setEmergencySignal(
+                              uid: user!.uid,
+                              lostAndFound: user!.emergency.lostAndFound,
+                              accident: user!.emergency.accident,
+                              thief: user!.emergency.thief,
+                              other: user!.emergency.other,
+                              isPublic: user!.emergency.isPublic,
+                              isFilled: user!.emergency.isFilled,
+                              locationDescription:
+                                  locationDescriptionController.text,
+                              situationDetail: situationDetailController.text);
+                          Firestore.updateUserInfo(user!);
+                          devtools.log(
+                              'PRIVATE SIGNAL SENT FROM: ${user.toString()}',
+                              name: 'EmergencySignal');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const MainView()),
+                          );
+                        },
+                        child: Container(
+                          alignment: Alignment.center,
+                          constraints: const BoxConstraints.tightForFinite(
+                            width: 300,
+                            height: 40,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.green,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Row(
+                            children: [
+                              const SizedBox(width: 5),
+                              Expanded(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: const [
+                                    Text(
+                                      'PRIVATE SIGNAL',
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 10),
+                                    ),
+                                    SizedBox(width: 15),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(
                     width: 10,
                   ),
                   Expanded(
-                    child: Buttons(
-                      currentState: widget.currentState,
-                      signalType: ,
-                      color: Colors.red,
-                      text: 'PUBLIC SIGNAL',
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          user?.emergency.isFilled = true;
+                          user?.emergency.isPublic = true;
+                          user?.emergency.lostAndFound = lostAndFound;
+                          user?.emergency.accident = accident;
+                          user?.emergency.thief = thief;
+                          user?.emergency.other = other;
+                          user?.emergency.locationDescription =
+                              locationDescriptionController.text;
+                          user?.emergency.situationDetail =
+                              situationDetailController.text;
+                          FirestoreEmergency.setEmergencySignal(
+                              uid: user!.uid,
+                              lostAndFound: user!.emergency.lostAndFound,
+                              accident: user!.emergency.accident,
+                              thief: user!.emergency.thief,
+                              other: user!.emergency.other,
+                              isPublic: user!.emergency.isPublic,
+                              isFilled: user!.emergency.isFilled,
+                              locationDescription:
+                                  locationDescriptionController.text,
+                              situationDetail: situationDetailController.text);
+                          Firestore.updateUserInfo(user!);
+                          devtools.log(
+                              'PUBLIC SIGNAL SENT FROM: ${user.toString()}',
+                              name: 'EmergencySignal');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const MainView()),
+                          );
+                        },
+                        child: Container(
+                          alignment: Alignment.center,
+                          constraints: const BoxConstraints.tightForFinite(
+                            width: 300,
+                            height: 40,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Row(
+                            children: [
+                              const SizedBox(width: 5),
+                              Expanded(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: const [
+                                    Text(
+                                      'PUBLIC SIGNAL',
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 10),
+                                    ),
+                                    SizedBox(width: 15),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -225,7 +359,7 @@ class _SOSViewState extends State<SOSView> {
     );
   }
 
-  Widget buildTextDescriptionField() => Column(
+  Widget buildTextDescriptionField(TextEditingController controller) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
@@ -234,6 +368,7 @@ class _SOSViewState extends State<SOSView> {
                 fontWeight: FontWeight.bold,
               )),
           TextField(
+            controller: controller,
             textInputAction: TextInputAction.newline,
             autofocus: false,
             maxLength: maxLength,
@@ -248,7 +383,7 @@ class _SOSViewState extends State<SOSView> {
         ],
       );
 
-  Widget buildSituationField() => Column(
+  Widget buildSituationField(TextEditingController controller) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text('Detailed about your situation',
@@ -256,6 +391,7 @@ class _SOSViewState extends State<SOSView> {
                 fontWeight: FontWeight.bold,
               )),
           TextField(
+            controller: controller,
             textInputAction: TextInputAction.newline,
             autofocus: false,
             maxLength: maxLength,
@@ -286,90 +422,15 @@ class _SOSViewState extends State<SOSView> {
   }
 }
 
-class Buttons extends StatefulWidget {
-  final Color color;
-  final String text;
-  SignalType signalType;
-  SosScreenState currentState;
-
-  Buttons(
-      {Key? key,
-      required this.color,
-      required this.text,
-      required this.signalType,
-      required this.currentState})
-      : super(key: key);
-
-  @override
-  _ButtonsState createState() => _ButtonsState();
-}
-
-class _ButtonsState extends State<Buttons> {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            widget.signalType = widget.signalType == SignalType.PUBLIC
-                ? SignalType.PRIVATE
-                : SignalType.PUBLIC;
-            devtools.log('Check: ${widget.signalType}', name: 'Buttons');
-          });
-          setState(() {
-            widget.currentState = SosScreenState.SHOW_USER_SIGNAL;
-            devtools.log('Current state: ${widget.currentState}',
-                name: 'Buttons');
-          });
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => MainView(
-                      sosScreenState: widget.currentState,
-                      signalType: widget.signalType,
-                    )),
-          );
-        },
-        child: Container(
-          alignment: Alignment.center,
-          constraints: const BoxConstraints.tightForFinite(
-            width: 300,
-            height: 40,
-          ),
-          decoration: BoxDecoration(
-            color: widget.color,
-            borderRadius: BorderRadius.circular(5),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            children: [
-              const SizedBox(width: 5),
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      widget.text,
-                      style: const TextStyle(color: Colors.white, fontSize: 10),
-                    ),
-                    const SizedBox(width: 15),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class CheckBoxList extends StatefulWidget {
-  CheckBoxList({super.key, required this.children}) {
+  CheckBoxList({
+    super.key,
+    required this.children,
+  }) {
     values = List.generate(children.length, (index) => false);
   }
   final List<String> children;
+
   // final int count;
   late final List<bool> values;
   @override
@@ -413,19 +474,7 @@ class MultiSwitch extends StatefulWidget {
 }
 
 class _MultiSwitchState extends State<MultiSwitch> {
-  bool val1 = false;
-  void toggleSwitch(bool value) {
-    if (widget.val) {
-      setState(() {
-        val1 = true;
-        showAlertDialog(context);
-      });
-    } else {
-      setState(() {
-        val1 = false;
-      });
-    }
-  }
+  late AuthUser user = context.watch<AuthUser>();
 
   void showAlertDialog(BuildContext context) {
     // set up the button
@@ -447,7 +496,12 @@ class _MultiSwitchState extends State<MultiSwitch> {
             primary: Colors.grey,
             onPrimary: Colors.white,
           ),
-          onPressed: () {},
+          onPressed: () {
+            FirestoreEmergency.clearEmergency(uid: user.uid);
+            user.emergency.clearEmergency();
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const MainView()));
+          },
           child: const Text('DELETE THIS SIGNAL'),
         ),
         ElevatedButton(
@@ -478,7 +532,7 @@ class _MultiSwitchState extends State<MultiSwitch> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [customeSwitch('PUBLIC SIGNAL', val1)],
+        children: [customeSwitch('PUBLIC SIGNAL', widget.val)],
       ),
     );
   }
@@ -498,11 +552,18 @@ class _MultiSwitchState extends State<MultiSwitch> {
             ),
           ),
           CupertinoSwitch(
-            activeColor: Colors.red,
-            trackColor: Colors.grey,
-            value: val,
-            onChanged: toggleSwitch,
-          )
+              activeColor: Colors.red,
+              trackColor: Colors.grey,
+              value: val,
+              onChanged: (value) async {
+                if (value) {
+                  setState(() {
+                    showAlertDialog(context);
+                  });
+                } else {
+                  setState(() {});
+                }
+              })
         ],
       ),
     );
@@ -511,7 +572,6 @@ class _MultiSwitchState extends State<MultiSwitch> {
 
 class ProblemSolvedButton extends StatelessWidget {
   const ProblemSolvedButton({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -564,7 +624,11 @@ class ProblemSolvedButton extends StatelessWidget {
             primary: Colors.blue,
             onPrimary: Colors.white,
           ),
-          onPressed: () {},
+          onPressed: () {
+            FirestoreEmergency.clearEmergency(
+                uid: context.watch<AuthUser>().uid);
+            context.watch<AuthUser>().emergency.clearEmergency();
+          },
           child: const Text('CONFIRM'),
         )
       ],

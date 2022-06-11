@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer' as devtools show log;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:etoet/services/auth/auth_user.dart';
@@ -31,6 +30,19 @@ class Firestore {
         'isHelping': false,
       },
     );
+
+    var userEmergencyRef = userRef.collection('emergency').doc('emergency');
+
+    userEmergencyRef.set({
+      'lostAndFound': false,
+      'accident': false,
+      'thief': false,
+      'other': false,
+      'isPublic': false,
+      'isFilled': false,
+      'situationDetail': '',
+      'locationDescription': '',
+    });
   }
 
   static void updateUserInfo(AuthUser authUser) async {
@@ -48,6 +60,19 @@ class Firestore {
         'helpRange': authUser.helpRange,
       },
     );
+
+    var userEmergencyRef = userRef.collection('emergency').doc('emergency');
+
+    userEmergencyRef.update({
+      'lostAndFound': authUser.emergency.lostAndFound,
+      'accident': authUser.emergency.accident,
+      'thief': authUser.emergency.thief,
+      'other': authUser.emergency.other,
+      'isPublic': authUser.emergency.isPublic,
+      'isFilled': authUser.emergency.isFilled,
+      'situationDetail': authUser.emergency.situationDetail,
+      'locationDescription': authUser.emergency.locationDescription,
+    });
   }
 
   static void setFcmTokenAndNotificationStatus(
@@ -62,23 +87,6 @@ class Firestore {
         'enable_notification': true,
         'fcm_token': token,
       },
-    );
-  }
-
-  static void setEmergencySignal({
-    required String uid,
-    required String locationDescription,
-    required String situationDetail,
-    bool isPublic = false,
-  }) {
-    firestoreReference.collection('emergencies').doc(uid).set(
-      {
-        'isPublic': isPublic,
-        'locationDescription': locationDescription,
-        'situationDetail': situationDetail,
-        'uid': uid,
-      },
-      SetOptions(merge: true),
     );
   }
 

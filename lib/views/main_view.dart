@@ -14,13 +14,9 @@ import 'package:provider/provider.dart';
 import '../services/auth/auth_user.dart';
 
 class MainView extends StatefulWidget {
-  final SosScreenState? sosScreenState;
-  final SignalType? signalType;
   @override
   const MainView({
     Key? key,
-    this.sosScreenState,
-    this.signalType,
   }) : super(key: key);
 
   @override
@@ -109,10 +105,7 @@ class MainViewState extends State<MainView> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SOSView(
-                              sosScreenState: widget.sosScreenState,
-                              signalType: widget.signalType,
-                            ),
+                            builder: (context) => const SOSView(),
                           ),
                         );
                       },

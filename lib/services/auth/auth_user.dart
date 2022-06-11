@@ -1,3 +1,4 @@
+import 'package:etoet/services/auth/emergency.dart';
 import 'package:etoet/services/auth/location.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,6 +8,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 class AuthUser extends etoet.UserInfo {
   //// provide current location of the user
   final Location location = Location();
+
+  final Emergency emergency = Emergency();
 
   final bool isEmailVerified;
 
@@ -38,15 +41,17 @@ class AuthUser extends etoet.UserInfo {
         phoneNumber: $phoneNumber,
         email: $email,
         displayName: $displayName,
+        emergency: ${emergency.toString()},
       }
     ''';
   }
 
   factory AuthUser.fromFirebase(User? user) => AuthUser(
-      uid: user!.uid,
-      isEmailVerified: user.emailVerified,
-      phoneNumber: user.phoneNumber,
-      email: user.email,
-      displayName: user.displayName,
-      photoURL: user.photoURL);
+        uid: user!.uid,
+        isEmailVerified: user.emailVerified,
+        phoneNumber: user.phoneNumber,
+        email: user.email,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
+      );
 }
