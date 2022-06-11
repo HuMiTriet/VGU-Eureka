@@ -186,8 +186,9 @@ class _SOSViewState extends State<SOSView> {
               color: Colors.red,
               text: 'PUBLIC SIGNAL',
               onTap: () {
-                var situationDetail = locationDescriptionTextController.text;
-                var locationDescription = situationDetailTextController.text;
+                var situationDetail = situationDetailTextController.text;
+                var locationDescription =
+                    locationDescriptionTextController.text;
                 FirestoreEmergency.setEmergencySignal(
                     uid: authUser!.uid,
                     situationDetail: situationDetail,
