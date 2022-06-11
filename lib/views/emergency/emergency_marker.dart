@@ -1,12 +1,10 @@
-import 'dart:ui' as ui;
-
 import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:etoet/services/map/geocoding.dart';
 import 'package:etoet/services/map/osrm/routing.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-import '../marker/marker.dart';
+import 'package:etoet/services/map/marker/marker.dart';
 
 /// This class is used to create a marker for an emergency signal.
 class EmergencyMarker {
