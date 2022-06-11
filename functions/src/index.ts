@@ -14,6 +14,7 @@ const fcm = admin.messaging();
 export const sendPrivateNotification = functions.region("asia-southeast1").
     firestore.document("/emergencies/{userId}")
     .onCreate(async (snapshot, context) => {
+<<<<<<< HEAD
       // immediately exit the function if it is public
       if (snapshot.data().isPublic) {
         return functions.logger
@@ -74,6 +75,17 @@ export const sendPrivateNotification = functions.region("asia-southeast1").
         };
         return fcm.sendToDevice(token, errorPayload);
       }
+=======
+      await (await import("./emergency/privateSignal"))
+          .default(snapshot, context);
+    });
+
+export const sendPublicNotification = functions.region("asia-southeast1")
+    .firestore.document("/emergencies/{userUID}")
+    .onUpdate(async (change, context) => {
+      await (await import("./emergency/publicSignal"))
+          .default(change, context);
+>>>>>>> 490fc234ea7bc815e996f5fbe0aa59e434e8ea1e
     });
 
 // Send a notification Annoucing new friend for Sender of that friend reques
@@ -207,4 +219,20 @@ export const notifyNewFriendReceiver = functions.region("asia-southeast1")
       }
     });
 
+<<<<<<< HEAD
 
+=======
+export const userUpdateProfileNotification = functions.region("asia-southeast1")
+    .firestore.document("/users/{userUID}")
+    .onUpdate(async (change, context) => {
+      await (await import("./friend/userUpdateProfileNotification"))
+          .default(change, context);
+    });
+
+// export
+// const autofillDefaultUserPhotoUrl = functions.region("asia-southeast1")
+//     .auth.user().onCreate(async (user) => {
+//       await (await import("./auth/autofillUserPhotoUrl"))
+//           .default(user);
+//     });
+>>>>>>> 490fc234ea7bc815e996f5fbe0aa59e434e8ea1e
