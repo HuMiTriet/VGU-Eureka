@@ -15,7 +15,7 @@ import 'package:flutter/material.dart';
    }
  }
 
- showAlertDialog(BuildContext context) {
+ void showAlertDialog(BuildContext context) {
 
    // set up the buttons
    Widget sendmessageButton = ElevatedButton(
@@ -40,7 +40,7 @@ import 'package:flutter/material.dart';
    );
 
    // set up the AlertDialog
-   AlertDialog alert = AlertDialog(
+   var alert = AlertDialog(
      title: Column(
        crossAxisAlignment: CrossAxisAlignment.stretch,
        children: <Widget>[
@@ -56,12 +56,12 @@ import 'package:flutter/material.dart';
              ),
            ],
          ),
-         const Text("Emergency"),
+         const Text('Emergency'),
        ],
      ),
-     content: const Text("I need help!!!!"
-         "\nI want my mom back."
-         " This app is so wonderful."),
+     content: const Text('I need help!!!!'
+         '\nI want my mom back.'
+         ' This app is so wonderful.'),
      actions: [
        sendmessageButton,
        helpButton,
@@ -71,7 +71,7 @@ import 'package:flutter/material.dart';
    // show the dialog
    showDialog(
      context: context,
-     builder: (BuildContext context) {
+     builder: (context) {
        return alert;
      },
    );

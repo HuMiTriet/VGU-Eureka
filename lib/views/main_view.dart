@@ -1,12 +1,12 @@
+import 'dart:developer' as developer show log;
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:etoet/services/database/firestore/firestore.dart';
 import 'package:etoet/services/database/firestore/firestore_friend.dart';
 import 'package:etoet/services/map/map_factory.dart' as etoet;
 import 'package:etoet/services/notification/notification.dart';
+import 'package:etoet/views/emergency/sos_dialog.dart';
 import 'package:etoet/views/friend/friend_view.dart';
-import 'package:etoet/views/modal_bottom_sheet/confirm_box.dart';
-import 'package:etoet/views/signal/SOS_view.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -150,27 +150,37 @@ class MainViewState extends State<MainView> {
             uid: authUser!.uid, token: token);
         FirebaseMessaging.onMessage.listen((event) {
           var dataType = event.data['type'];
-          if (dataType == 'emegency'){
-          showDialog(
-              context: context,
-              builder: (context) {
-                var content = event.notification!.body;
-                var title = event.notification!.title;
-                return AlertDialog(
-                  title: Text(title ?? 'Emergency alert'),
-                  content: Text(content ?? 'null'),
-                  actions: [
-                    ElevatedButton(
-                      onPressed: () {},
-                      child: const Text('Accpet'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {},
-                      child: const Text('Reject'),
-                    )
-                  ],
-                );
-              });
+          if (dataType == 'privateEmegency') {
+            showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                      title: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: <Widget>[
+                              IconButton(
+                                icon: const Icon(Icons.close),
+                                color: Colors.grey,
+                                iconSize: 25,
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ],
+                          ),
+                          const Text('Emergency'),
+                        ],
+                      ),
+                      content: const Text('I need help!!!!'
+                          '\nI want my mom back.'
+                          ' This app is so wonderful.'),
+                      /* actions: [ */
+                      /*   sendmessageButton, */
+                      /*   helpButton, */
+                      /* ], */
+                    ));
           }
         });
       }
