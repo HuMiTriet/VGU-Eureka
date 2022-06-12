@@ -95,13 +95,23 @@ class FirestoreChat extends Firestore {
     return ref.data()!['chatroomUID'];
   }
 
-  static void setMessage(
-      String chatroomUID, String message, String senderUID, String senderName) {
+  static void setMessage({
+    required String chatroomUID,
+    required String message,
+    required String senderUID,
+    required String senderEmail,
+    required String senderPhoneNumber,
+    required String senderDisplayName,
+    required String senderPhotoURL,
+  }) {
     var ts = Timestamp.now();
     final data = {
       'message': message,
       'senderUID': senderUID,
-      'senderName': senderName,
+      'senderEmail': senderEmail,
+      'senderPhoneNumber': senderPhoneNumber,
+      'senderDisplayName': senderDisplayName,
+      'senderPhotoURL': senderPhotoURL,
       'ts': ts
     };
     FirebaseFirestore.instance

@@ -189,8 +189,8 @@ class _ChatScreenState extends State<ChatRoomView> {
                       alignment: Alignment.bottomCenter,
                       child: Container(
                         color: Colors.black.withOpacity(0.8),
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
                         child: Row(
                           children: [
                             Expanded(
@@ -210,10 +210,14 @@ class _ChatScreenState extends State<ChatRoomView> {
                             GestureDetector(
                               onTap: () {
                                 FirestoreChat.setMessage(
-                                  chatroomUID,
-                                  messageTextEditingController.text,
-                                  user.uid,
-                                  user.displayName ?? 'Etoet user',
+                                  chatroomUID: chatroomUID,
+                                  message: messageTextEditingController.text,
+                                  senderUID: user.uid,
+                                  senderEmail: user.email ?? '',
+                                  senderPhoneNumber: user.phoneNumber ?? '',
+                                  senderPhotoURL: user.photoURL ??
+                                      'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977',
+                                  senderDisplayName: user.displayName ?? 'Etoet user',
                                 );
                                 messageTextEditingController.clear();
                               },
