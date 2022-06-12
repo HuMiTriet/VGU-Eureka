@@ -12,17 +12,26 @@ export default async (
 ) => {
   const chatroomId = context.params.chatroomId;
 
-  const senderName = String(snapshot.get("senderName"));
   const message = String(snapshot.get("message"));
   const senderUID = String(snapshot.get("senderUID"));
 
+  // getting all of the information about the sender
+  const senderEmail = String(snapshot.get("senderEmail"));
+  const senderDisplayName = String(snapshot.get("senderDisplayName"));
+  const senderPhoneNumber = String(snapshot.get("senderPhoneNumber"));
+  const senderPhotoURL = String(snapshot.get("senderPhotoURL"));
+
   const payload = {
     notification: {
-      title: senderName,
+      title: senderDisplayName,
       body: message,
     },
     data: {
       type: "newMessage",
+      senderUID: senderUID,
+      senderEmail: senderEmail,
+      senderPhoneNumber: senderPhoneNumber,
+      senderPhotoURL: senderPhotoURL,
     },
   };
   console.log(payload);
