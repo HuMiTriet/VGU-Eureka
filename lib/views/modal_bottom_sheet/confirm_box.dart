@@ -31,6 +31,8 @@ class Confirmbox extends StatefulWidget {
 }
 
 class _ConfirmboxState extends State<Confirmbox> {
+  bool confirmedToHelp = false;
+
   late AuthUser? needHelpUser;
   String? photoURL;
   String? displayName;
@@ -43,6 +45,162 @@ class _ConfirmboxState extends State<Confirmbox> {
     photoURL = needHelpUser.photoURL;
     displayName = needHelpUser.displayName;
     email = needHelpUser.email;
+
+    void showAbortDialog(BuildContext context) {
+      // set up the buttons
+      Widget cancelButton = Container(
+        height: 30,
+        width: 100,
+        child: TextButton(
+          child: Text(
+            'CANCEL',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                color: Color.fromRGBO(255, 255, 255, 0.9800000190734863),
+                fontFamily: 'Poppins',
+                fontSize: 12,
+                letterSpacing:
+                    0 /*percentages not used in flutter. defaulting to zero*/,
+                fontWeight: FontWeight.normal,
+                height: 1),
+          ),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+          color: Color.fromRGBO(66, 133, 244, 1),
+        ),
+      );
+      Widget confirmButton = Container(
+        height: 30,
+        width: 100,
+        child: TextButton(
+          child: Text(
+            'CONFIRM',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                color: Color.fromRGBO(255, 255, 255, 0.9800000190734863),
+                fontFamily: 'Poppins',
+                fontSize: 12,
+                letterSpacing:
+                    0 /*percentages not used in flutter. defaulting to zero*/,
+                fontWeight: FontWeight.normal,
+                height: 1),
+          ),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+          color: Color(0xff34a853),
+        ),
+      );
+
+      // set up the AlertDialog
+      AlertDialog alert = AlertDialog(
+        title: Text(
+          "ABORT",
+          style: TextStyle(
+              fontFamily: "Poppins",
+              fontWeight: FontWeight.w800,
+              color: Colors.red),
+        ),
+        content: Text("Abort helping this person ?"),
+        actions: [
+          cancelButton,
+          confirmButton,
+        ],
+      );
+
+      // show the dialog
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return alert;
+        },
+      );
+    }
+
+    void showDoneDialog(BuildContext context) {
+      // set up the buttons
+      Widget cancelButton = Container(
+        height: 30,
+        width: 100,
+        child: TextButton(
+          child: Text(
+            'CANCEL',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                color: Color.fromRGBO(255, 255, 255, 0.9800000190734863),
+                fontFamily: 'Poppins',
+                fontSize: 12,
+                letterSpacing:
+                    0 /*percentages not used in flutter. defaulting to zero*/,
+                fontWeight: FontWeight.normal,
+                height: 1),
+          ),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+          color: Color.fromRGBO(66, 133, 244, 1),
+        ),
+      );
+      Widget confirmButton = Container(
+        height: 30,
+        width: 100,
+        child: TextButton(
+          child: Text(
+            'CONFIRM',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                color: Color.fromRGBO(255, 255, 255, 0.9800000190734863),
+                fontFamily: 'Poppins',
+                fontSize: 12,
+                letterSpacing:
+                    0 /*percentages not used in flutter. defaulting to zero*/,
+                fontWeight: FontWeight.normal,
+                height: 1),
+          ),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+          color: Color(0xffadadad),
+        ),
+      );
+
+      // set up the AlertDialog
+      AlertDialog alert = AlertDialog(
+        title: Text(
+          "DONE",
+          style: TextStyle(
+              fontFamily: "Poppins",
+              fontWeight: FontWeight.w800,
+              color: Colors.red),
+        ),
+        content: Text("Did you help this person ?"),
+        actions: [
+          cancelButton,
+          confirmButton,
+        ],
+      );
+
+      // show the dialog
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return alert;
+        },
+      );
+    }
 
     // double width = MediaQuery.of(context).size.width;
     // double height = MediaQuery.of(context).size.height;
@@ -120,7 +278,10 @@ class _ConfirmboxState extends State<Confirmbox> {
                         IconButton(
                           icon: const Icon(Icons.message),
                           onPressed: () {},
-                        )
+                        ),
+                        if (confirmedToHelp)
+                          new IconButton(
+                              icon: const Icon(Icons.phone), onPressed: () {})
                       ],
                     )),
                 Container(
@@ -153,30 +314,110 @@ class _ConfirmboxState extends State<Confirmbox> {
               ],
             ),
           ),
-          Container(
-              width: 300,
-              height: 39,
-              margin: const EdgeInsets.only(top: 10),
-              child: TextButton(
-                style: TextButton.styleFrom(
-                  backgroundColor: FvColors.button6Background,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
-                    side: const BorderSide(
-                      width: 0,
-                      color: Colors.transparent,
+          //   Widget swapWidget = new Container();
+          if (!confirmedToHelp)
+            new Container(
+                width: 300,
+                height: 39,
+                margin: EdgeInsets.only(top: 10),
+                child: TextButton(
+                  child: Text('Confirm help ${displayName}',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: FvColors.imageview3Background,
+                        fontWeight: FontWeight.w700,
+                      )),
+                  style: TextButton.styleFrom(
+                    backgroundColor: FvColors.button6Background,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                      side: BorderSide(
+                        width: 0,
+                        color: Colors.transparent,
+                      ),
                     ),
                   ),
-                ),
-                onPressed: () {},
-                child: Text('Confirm help $displayName',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      color: FvColors.imageview3Background,
-                      fontWeight: FontWeight.w700,
-                    )),
-              )),
+                  onPressed: () {
+                    setState(() {
+                      confirmedToHelp = true;
+                    });
+                  },
+                ))
+          else
+            new Container(
+              width: 300,
+              height: 39,
+              margin: EdgeInsets.only(top: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                      width: 142,
+                      height: 33,
+                      child: TextButton(
+                        child: Text(
+                          'ABORT',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: Color.fromRGBO(
+                                  255, 255, 255, 0.9800000190734863),
+                              fontFamily: 'Poppins',
+                              fontSize: 20,
+                              letterSpacing:
+                                  0 /*percentages not used in flutter. defaulting to zero*/,
+                              fontWeight: FontWeight.normal,
+                              height: 1),
+                        ),
+                        onPressed: () {
+                          showAbortDialog(context);
+                        },
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(12)),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Color.fromRGBO(0, 0, 0, 0.25),
+                              offset: Offset(0, 4),
+                              blurRadius: 4)
+                        ],
+                        color: Color.fromRGBO(176, 176, 176, 1),
+                      )),
+                  Container(
+                      width: 142,
+                      height: 33,
+                      child: TextButton(
+                        child: Text(
+                          'DONE',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: Color.fromRGBO(
+                                  255, 255, 255, 0.9800000190734863),
+                              fontFamily: 'Poppins',
+                              fontSize: 20,
+                              letterSpacing:
+                                  0 /*percentages not used in flutter. defaulting to zero*/,
+                              fontWeight: FontWeight.normal,
+                              height: 1),
+                        ),
+                        onPressed: () {
+                          showDoneDialog(context);
+                        },
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(12)),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Color.fromRGBO(0, 0, 0, 0.25),
+                              offset: Offset(0, 4),
+                              blurRadius: 4)
+                        ],
+                        color: Color.fromRGBO(52, 168, 83, 1),
+                      ))
+                ],
+              ),
+            )
+          //swapWidget
         ],
       ),
     );
