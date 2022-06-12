@@ -17,6 +17,7 @@ class Confirmbox extends StatefulWidget {
   final UserInfo needHelpUser;
   final String locationDescription;
   final String situationDetail;
+  final String emergencyType;
 
   const Confirmbox({
     Key? key,
@@ -24,6 +25,7 @@ class Confirmbox extends StatefulWidget {
     required this.needHelpUser,
     required this.locationDescription,
     required this.situationDetail,
+    required this.emergencyType,
   }) : super(key: key);
 
   @override
@@ -289,13 +291,13 @@ class _ConfirmboxState extends State<Confirmbox> {
                     padding: const EdgeInsets.only(left: 10, right: 10),
                     height: 30,
                     child: Row(
-                      children: const <Widget>[
+                      children: <Widget>[
                         Text(
                           'Emergency! - ',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          'Lost and Found',
+                          widget.emergencyType,
                           style: TextStyle(color: Colors.grey),
                         )
                       ],

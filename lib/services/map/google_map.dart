@@ -244,15 +244,18 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
   void updateEmergencyMarker(
       {required String emergencyId,
       required String situationDetail,
-      required String locationDescription}) async {
+      required String locationDescription,
+      required String emergencyType}) async {
     var emergencyInfo = await Firestore.getUserInfo(emergencyId);
     var emergencyMarkerCreator = EmergencyMarker(
-        context: context,
-        emergencyInfo: emergencyInfo,
-        polylines: widget._polylines,
-        uid: emergencyId,
-        locationDescription: locationDescription,
-        situationDetail: situationDetail);
+      context: context,
+      emergencyInfo: emergencyInfo,
+      polylines: widget._polylines,
+      uid: emergencyId,
+      locationDescription: locationDescription,
+      situationDetail: situationDetail,
+      emergencyType: emergencyType,
+    );
     var location = mapEmergencyUidLocation[emergencyId];
     var latLng = LatLng(location!.latitude, location.longitude);
     var emergencyMarker = await emergencyMarkerCreator.createEmergencyMarker(
@@ -304,11 +307,13 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
           var emergencyId = doc['uid'] as String;
           var locationDescription = doc['locationDescription'] as String;
           var situationDetail = doc['situationDetail'] as String;
+          var emergencyType = 'emergency type on firestore';
           mapEmergencyUidLocation[emergencyId] = emergencyLocation;
           updateEmergencyMarker(
             emergencyId: emergencyId,
             locationDescription: locationDescription,
             situationDetail: situationDetail,
+            emergencyType: emergencyType,
           );
         }
       }

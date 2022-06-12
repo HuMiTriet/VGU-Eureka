@@ -16,6 +16,7 @@ class EmergencyMarker {
   late String uid;
   late String locationDescription;
   late String situationDetail;
+  late String emergencyType;
   EmergencyMarker({
     required this.emergencyInfo,
     required this.context,
@@ -23,6 +24,7 @@ class EmergencyMarker {
     required this.uid,
     required this.locationDescription,
     required this.situationDetail,
+    required this.emergencyType,
   });
   Future<Marker> createEmergencyMarker({
     required LatLng emergencyLatLng,
@@ -47,6 +49,7 @@ class EmergencyMarker {
                 situationDetail: situationDetail,
                 distance: distance,
                 needHelpUser: emergencyInfo,
+                emergencyType: emergencyType,
               );
             });
       },
