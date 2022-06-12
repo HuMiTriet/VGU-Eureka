@@ -43,7 +43,9 @@ void main() {
           friendRoute: (context) => const FriendView(),
           addFriendRoute: (context) => const AddFriendView(),
           pendingFriendRoute: (context) => const PendingFriendView(),
-          sosRoute: (context) => const SOSView(),
+          sosRoute: (context) => const SOSView(
+                uid: '',
+              ),
           // chat_friend_route: (context) => ChatRoomView(),
         },
       ),

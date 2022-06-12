@@ -9,7 +9,7 @@ class AuthUser extends etoet.UserInfo {
   //// provide current location of the user
   final Location location = Location();
 
-  final Emergency emergency = Emergency();
+  late Emergency emergency = Emergency();
 
   final bool isEmailVerified;
 

@@ -1,13 +1,13 @@
 /// Standalone class to change the user's Emergency.
 class Emergency {
-  bool lostAndFound;
-  bool accident;
-  bool thief;
-  bool other;
-  bool isPublic;
-  bool isFilled;
-  String situationDetail;
-  String locationDescription;
+  late bool lostAndFound;
+  late bool accident;
+  late bool thief;
+  late bool other;
+  late bool isPublic;
+  late bool isFilled;
+  late String situationDetail;
+  late String locationDescription;
 
   Emergency({
     this.lostAndFound = false,
@@ -19,6 +19,17 @@ class Emergency {
     this.situationDetail = '',
     this.locationDescription = '',
   });
+
+  Emergency.fromJson(Map<String, dynamic> json) {
+    lostAndFound = json['lostAndFound'];
+    accident = json['accident'];
+    thief = json['thief'];
+    other = json['other'];
+    isPublic = json['isPublic'];
+    isFilled = json['isFilled'];
+    situationDetail = json['situationDetail'];
+    locationDescription = json['locationDescription'];
+  }
 
   void updateEmergency({
     required String situationDetail,
@@ -44,10 +55,10 @@ class Emergency {
 
   Map<String, dynamic> toJson() {
     return {
-      'Lost and Found': lostAndFound,
-      'Accident': accident,
-      'Thieves': thief,
-      'Other': other,
+      'lostAndFound': lostAndFound,
+      'accident': accident,
+      'thief': thief,
+      'other': other,
       'situationDetail': situationDetail,
       'locationDescription': locationDescription,
     };

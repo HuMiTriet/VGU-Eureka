@@ -1,6 +1,8 @@
 import 'package:etoet/constants/routes.dart';
+import 'package:etoet/services/auth/emergency.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:etoet/services/database/firestore/firestore.dart';
+import 'package:etoet/services/database/firestore/firestore_emergency.dart';
 import 'package:etoet/services/database/firestore/firestore_friend.dart';
 import 'package:etoet/services/map/map_factory.dart' as etoet;
 import 'package:etoet/services/notification/notification.dart';
@@ -30,6 +32,9 @@ class MainViewState extends State<MainView> {
   @override
   Widget build(BuildContext context) {
     authUser = context.watch<AuthUser?>();
+    FirestoreEmergency.getEmergencySignal(uid: authUser!.uid).then((value) => {
+          authUser!.emergency = value,
+        });
 
     return FutureBuilder(
         future: FirestoreFriend.getFriendInfoList(authUser!.uid),
@@ -105,7 +110,9 @@ class MainViewState extends State<MainView> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const SOSView(),
+                            builder: (context) => SOSView(
+                              uid: authUser!.uid,
+                            ),
                           ),
                         );
                       },
@@ -166,7 +173,7 @@ class MainViewState extends State<MainView> {
                     actions: [
                       ElevatedButton(
                         onPressed: () {},
-                        child: const Text('Accpet'),
+                        child: const Text('Accept'),
                       ),
                       ElevatedButton(
                         onPressed: () {},

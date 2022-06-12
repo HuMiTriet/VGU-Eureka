@@ -11,35 +11,31 @@ import '../main_view.dart';
 
 const int maxLines = 3;
 const int maxLength = 1000;
-const List<String> emergencyType = [
-  'Lost and Found',
-  'Accident',
-  'Thieves',
-  'Other',
-];
 
 class SOSView extends StatefulWidget {
   const SOSView({
     Key? key,
+    required this.uid,
   }) : super(key: key);
-
+  final String uid;
   @override
   // ignore: library_private_types_in_public_api
   _SOSViewState createState() => _SOSViewState();
 }
 
 class _SOSViewState extends State<SOSView> {
-  TextEditingController locationDescriptionController = TextEditingController();
-  TextEditingController situationDetailController = TextEditingController();
+  late TextEditingController locationDescriptionController;
+  late TextEditingController situationDetailController;
 
-  bool isPublic = false;
-  bool isFilled = false;
-  bool lostAndFound = true;
-  bool accident = true;
-  bool thief = false;
-  bool other = false;
-
+  late bool isPublic;
+  late bool isFilled;
+  late bool lostAndFound;
+  late bool accident;
+  late bool thief;
+  late bool other;
   late AuthUser? user;
+
+  bool showLoading = true;
 
   @override
   Widget build(BuildContext context) {
@@ -48,9 +44,18 @@ class _SOSViewState extends State<SOSView> {
     locationDescriptionController.text =
         user?.emergency.locationDescription ?? '';
     situationDetailController.text = user?.emergency.situationDetail ?? '';
-    return user?.emergency.isFilled == true
-        ? showUserFormView(context)
-        : showSOSFormView(context);
+
+    return showLoading
+        ? const Scaffold(
+            body: SafeArea(
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          )
+        : user?.emergency.isFilled == true
+            ? showUserFormView(context)
+            : showSOSFormView(context);
   }
 
   Widget showUserFormView(BuildContext context) {
@@ -92,14 +97,112 @@ class _SOSViewState extends State<SOSView> {
               ),
               Theme(
                 data: ThemeData(unselectedWidgetColor: Colors.white),
-                child: CheckBoxList(
-                  children: const [
-                    'Lost and Found',
-                    'Accident',
-                    'Thieves',
-                    'Other'
-                  ],
-                ),
+                child: Column(children: [
+                  // Lost and Found box
+                  CheckboxListTile(
+                    controlAffinity: ListTileControlAffinity.leading,
+                    activeColor: Colors.teal,
+                    title: const Text(
+                      'Lost and Found',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    value: lostAndFound,
+                    onChanged: (value) {
+                      if (value!) {
+                        setState(() {
+                          lostAndFound = value;
+                          accident = false;
+                          thief = false;
+                          other = false;
+                        });
+                      } else {
+                        setState(() {
+                          lostAndFound = value;
+                        });
+                      }
+                    },
+                  ),
+                  // Accident box
+                  CheckboxListTile(
+                    controlAffinity: ListTileControlAffinity.leading,
+                    activeColor: Colors.teal,
+                    title: const Text(
+                      'Accident',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    value: accident,
+                    onChanged: (value) {
+                      if (value!) {
+                        setState(() {
+                          lostAndFound = false;
+                          accident = value;
+                          thief = false;
+                          other = false;
+                        });
+                      } else {
+                        setState(() {
+                          accident = value;
+                        });
+                      }
+                    },
+                  ),
+                  // Thief box
+                  CheckboxListTile(
+                    controlAffinity: ListTileControlAffinity.leading,
+                    activeColor: Colors.teal,
+                    title: const Text(
+                      'Thieves',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    value: thief,
+                    onChanged: (value) {
+                      if (value!) {
+                        setState(() {
+                          lostAndFound = false;
+                          accident = false;
+                          thief = value;
+                          other = false;
+                        });
+                      } else {
+                        setState(() {
+                          thief = value;
+                        });
+                      }
+                    },
+                  ),
+                  // Other box
+                  CheckboxListTile(
+                    controlAffinity: ListTileControlAffinity.leading,
+                    activeColor: Colors.teal,
+                    title: const Text(
+                      'Other',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    value: other,
+                    onChanged: (value) {
+                      if (value!) {
+                        setState(() {
+                          lostAndFound = false;
+                          accident = false;
+                          thief = false;
+                          other = value;
+                        });
+                      } else {
+                        setState(() {
+                          other = value;
+                        });
+                      }
+                    },
+                  ),
+                ]),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -112,8 +215,37 @@ class _SOSViewState extends State<SOSView> {
                     child: buildTextDescriptionField(
                         locationDescriptionController)),
               ),
-              MultiSwitch(val: isPublic),
-              const ProblemSolvedButton(),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    customeSwitch('PUBLIC SIGNAL', user!.emergency.isPublic)
+                  ],
+                ),
+              ),
+              Center(
+                child: Container(
+                  margin: const EdgeInsets.only(top: 10.0, bottom: 20.0),
+                  width: 280.0,
+                  height: 40.0,
+                  child: RaisedButton(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0)),
+                      color: Colors.green,
+                      elevation: 12.0,
+                      onPressed: () => solvedConfirmDialog(context),
+                      child: const Text(
+                        'MY SITUATION HAS BEEN SOLVED!',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15.0,
+                          color: Colors.white,
+                        ),
+                      )),
+                ),
+              ),
             ],
           ),
         ),
@@ -160,14 +292,112 @@ class _SOSViewState extends State<SOSView> {
               ),
               Theme(
                 data: ThemeData(unselectedWidgetColor: Colors.white),
-                child: CheckBoxList(
-                  children: const [
-                    'Lost and Found',
-                    'Accident',
-                    'Thieves',
-                    'Other'
-                  ],
-                ),
+                child: Column(children: [
+                  // Lost and Found box
+                  CheckboxListTile(
+                    controlAffinity: ListTileControlAffinity.leading,
+                    activeColor: Colors.teal,
+                    title: const Text(
+                      'Lost and Found',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    value: lostAndFound,
+                    onChanged: (value) {
+                      if (value!) {
+                        setState(() {
+                          lostAndFound = value;
+                          accident = false;
+                          thief = false;
+                          other = false;
+                        });
+                      } else {
+                        setState(() {
+                          lostAndFound = value;
+                        });
+                      }
+                    },
+                  ),
+                  // Accident box
+                  CheckboxListTile(
+                    controlAffinity: ListTileControlAffinity.leading,
+                    activeColor: Colors.teal,
+                    title: const Text(
+                      'Accident',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    value: accident,
+                    onChanged: (value) {
+                      if (value!) {
+                        setState(() {
+                          lostAndFound = false;
+                          accident = value;
+                          thief = false;
+                          other = false;
+                        });
+                      } else {
+                        setState(() {
+                          accident = value;
+                        });
+                      }
+                    },
+                  ),
+                  // Thief box
+                  CheckboxListTile(
+                    controlAffinity: ListTileControlAffinity.leading,
+                    activeColor: Colors.teal,
+                    title: const Text(
+                      'Thieves',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    value: thief,
+                    onChanged: (value) {
+                      if (value!) {
+                        setState(() {
+                          lostAndFound = false;
+                          accident = false;
+                          thief = value;
+                          other = false;
+                        });
+                      } else {
+                        setState(() {
+                          thief = value;
+                        });
+                      }
+                    },
+                  ),
+                  // Other box
+                  CheckboxListTile(
+                    controlAffinity: ListTileControlAffinity.leading,
+                    activeColor: Colors.teal,
+                    title: const Text(
+                      'Other',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    value: other,
+                    onChanged: (value) {
+                      if (value!) {
+                        setState(() {
+                          lostAndFound = false;
+                          accident = false;
+                          thief = false;
+                          other = value;
+                        });
+                      } else {
+                        setState(() {
+                          other = value;
+                        });
+                      }
+                    },
+                  ),
+                ]),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -221,6 +451,8 @@ class _SOSViewState extends State<SOSView> {
                               locationDescriptionController.text;
                           user?.emergency.situationDetail =
                               situationDetailController.text;
+                          user?.photoURL = user?.photoURL ??
+                              'https://firebasestorage.googleapis.com/v0/b/etoet-app.appspot.com/o/default_profile_pic.png?alt=media&token=f8f8f8f8-f8f8f8f8-f8f8f8f8-f8f8f8f8';
                           FirestoreEmergency.setEmergencySignal(
                               uid: user!.uid,
                               lostAndFound: user!.emergency.lostAndFound,
@@ -293,6 +525,8 @@ class _SOSViewState extends State<SOSView> {
                               locationDescriptionController.text;
                           user?.emergency.situationDetail =
                               situationDetailController.text;
+                          user?.photoURL = user?.photoURL ??
+                              'https://firebasestorage.googleapis.com/v0/b/etoet-app.appspot.com/o/default_profile_pic.png?alt=media&token=f8f8f8f8-f8f8f8f8-f8f8f8f8-f8f8f8f8';
                           FirestoreEmergency.setEmergencySignal(
                               uid: user!.uid,
                               lostAndFound: user!.emergency.lostAndFound,
@@ -386,7 +620,7 @@ class _SOSViewState extends State<SOSView> {
   Widget buildSituationField(TextEditingController controller) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Detailed about your situation',
+          const Text('Details about your situation',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
               )),
@@ -406,75 +640,46 @@ class _SOSViewState extends State<SOSView> {
         ],
       );
 
+  Widget customeSwitch(String text, bool val) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 22.0, left: 16.0, right: 16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            text,
+            style: const TextStyle(
+              fontSize: 20.0,
+              fontWeight: FontWeight.bold,
+              color: Colors.red,
+            ),
+          ),
+          CupertinoSwitch(
+              activeColor: Colors.red,
+              trackColor: Colors.grey,
+              value: val,
+              onChanged: (value) async {
+                if ((val == true) && (value == false)) {
+                  devtools.log('State: val = $val\nValue = $value',
+                      name: 'EmergencySignal');
+                  showAlertDialog(context);
+                } else if ((val == false) && (value == true)) {
+                  devtools.log('State: val = $val\nValue = $value',
+                      name: 'EmergencySignal');
+                  setState(() {
+                    val = value;
+                  });
+                }
+              })
+        ],
+      ),
+    );
+  }
+
   InputBorder border() => const OutlineInputBorder(
         borderRadius: BorderRadius.all(Radius.circular(2)),
         borderSide: BorderSide(color: Colors.black, width: 0.5),
       );
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-}
-
-class CheckBoxList extends StatefulWidget {
-  CheckBoxList({
-    super.key,
-    required this.children,
-  }) {
-    values = List.generate(children.length, (index) => false);
-  }
-  final List<String> children;
-
-  // final int count;
-  late final List<bool> values;
-  @override
-  CheckBoxListState createState() => CheckBoxListState();
-}
-
-class CheckBoxListState extends State<CheckBoxList> {
-  @override
-  Widget build(BuildContext context) {
-    var children = widget.children;
-    var values = widget.values;
-    return Column(
-        children: children.map((element) {
-      var index = children.indexOf(element);
-      return CheckboxListTile(
-        controlAffinity: ListTileControlAffinity.leading,
-        activeColor: Colors.teal,
-        title: Text(
-          element,
-          style: const TextStyle(
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-        value: values[index],
-        onChanged: (value) {
-          setState(() {
-            values[index] = value!;
-          });
-        },
-      );
-    }).toList());
-  }
-}
-
-class MultiSwitch extends StatefulWidget {
-  final bool val;
-
-  const MultiSwitch({Key? key, required this.val}) : super(key: key);
-  @override
-  _MultiSwitchState createState() => _MultiSwitchState();
-}
-
-class _MultiSwitchState extends State<MultiSwitch> {
-  late AuthUser user = context.watch<AuthUser>();
 
   void showAlertDialog(BuildContext context) {
     // set up the button
@@ -497,8 +702,8 @@ class _MultiSwitchState extends State<MultiSwitch> {
             onPrimary: Colors.white,
           ),
           onPressed: () {
-            FirestoreEmergency.clearEmergency(uid: user.uid);
-            user.emergency.clearEmergency();
+            FirestoreEmergency.clearEmergency(uid: user!.uid);
+            user!.emergency.clearEmergency();
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const MainView()));
           },
@@ -522,78 +727,6 @@ class _MultiSwitchState extends State<MultiSwitch> {
       builder: (context) {
         return alertDialog;
       },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [customeSwitch('PUBLIC SIGNAL', widget.val)],
-      ),
-    );
-  }
-
-  Widget customeSwitch(String text, bool val) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 22.0, left: 16.0, right: 16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            text,
-            style: const TextStyle(
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold,
-              color: Colors.red,
-            ),
-          ),
-          CupertinoSwitch(
-              activeColor: Colors.red,
-              trackColor: Colors.grey,
-              value: val,
-              onChanged: (value) async {
-                if (value) {
-                  setState(() {
-                    showAlertDialog(context);
-                  });
-                } else {
-                  setState(() {});
-                }
-              })
-        ],
-      ),
-    );
-  }
-}
-
-class ProblemSolvedButton extends StatelessWidget {
-  const ProblemSolvedButton({Key? key}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        margin: const EdgeInsets.only(top: 10.0, bottom: 20.0),
-        width: 280.0,
-        height: 40.0,
-        child: RaisedButton(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0)),
-            color: Colors.green,
-            elevation: 12.0,
-            onPressed: () => solvedConfirmDialog(context),
-            child: const Text(
-              'MY SITUATION HAS BEEN SOLLVED!',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 15.0,
-                color: Colors.white,
-              ),
-            )),
-      ),
     );
   }
 
@@ -625,9 +758,10 @@ class ProblemSolvedButton extends StatelessWidget {
             onPrimary: Colors.white,
           ),
           onPressed: () {
-            FirestoreEmergency.clearEmergency(
-                uid: context.watch<AuthUser>().uid);
-            context.watch<AuthUser>().emergency.clearEmergency();
+            FirestoreEmergency.clearEmergency(uid: user!.uid);
+            user!.emergency.clearEmergency();
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const MainView()));
           },
           child: const Text('CONFIRM'),
         )
@@ -638,5 +772,38 @@ class ProblemSolvedButton extends StatelessWidget {
         barrierDismissible: false,
         context: context,
         builder: (context) => alertDialog);
+  }
+
+  @override
+  void initState() {
+    locationDescriptionController = TextEditingController();
+    situationDetailController = TextEditingController();
+    super.initState();
+    FirestoreEmergency.getEmergencySignal(uid: widget.uid)
+        .then((value) => {
+              isFilled = value.isFilled,
+              isPublic = value.isPublic,
+              lostAndFound = value.lostAndFound,
+              accident = value.accident,
+              thief = value.thief,
+              other = value.other,
+              situationDetailController.text = value.situationDetail,
+              locationDescriptionController.text = value.locationDescription,
+              devtools.log(value.toString())
+            })
+        .whenComplete(
+          () => {
+            setState(() => {
+                  showLoading = false,
+                }),
+          },
+        );
+  }
+
+  @override
+  void dispose() {
+    locationDescriptionController.dispose();
+    situationDetailController.dispose();
+    super.dispose();
   }
 }
