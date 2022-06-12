@@ -13,10 +13,10 @@ export default async (
   const userUID: string = context.params.userUID;
   const friendUID: string = context.params.friendUID;
   // user here is the person who initialized the unfriend request
-  const userTokenPromise = getFcmToken(context, userUID);
+  const userTokenPromise = getFcmToken(userUID);
 
   // Friend is the person whom the user unfriended to (the victim so to speak)
-  const friendTokenPromise = getFcmToken(context, friendUID);
+  const friendTokenPromise = getFcmToken(friendUID);
 
   const userTokenSnap = await userTokenPromise;
   const userToken: string = userTokenSnap.data()?.fcm_token;
