@@ -81,24 +81,24 @@ class _ChatScreenState extends State<ChatRoomView> {
                 : CrossAxisAlignment.start,
             children: [
               Container(
-                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(24),
+                    topLeft: const Radius.circular(24),
                     bottomRight: (senderUID == user.uid)
-                        ? Radius.circular(0)
-                        : Radius.circular(24),
-                    topRight: Radius.circular(24),
+                        ? const Radius.circular(0)
+                        : const Radius.circular(24),
+                    topRight: const Radius.circular(24),
                     bottomLeft: (senderUID == user.uid)
-                        ? Radius.circular(24)
-                        : Radius.circular(0),
+                        ? const Radius.circular(24)
+                        : const Radius.circular(0),
                   ),
                   color: Colors.blue,
                 ),
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 child: Text(
                   message,
-                  style: TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.white),
                 ),
               ),
               avatarAndTime(senderUID, timestamp, isSameUserLastMessage)
@@ -190,7 +190,7 @@ class _ChatScreenState extends State<ChatRoomView> {
                       child: Container(
                         color: Colors.black.withOpacity(0.8),
                         padding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         child: Row(
                           children: [
                             Expanded(
@@ -200,22 +200,24 @@ class _ChatScreenState extends State<ChatRoomView> {
                               //border: InputBorder.none to get rid of underline things
                               decoration: InputDecoration(
                                 border: InputBorder.none,
-                                hintText: "Type a message!",
+                                hintText: 'Type a message!',
                                 hintStyle: TextStyle(
                                     fontWeight: FontWeight.w400,
                                     color: Colors.white.withOpacity(0.6)),
                               ),
-                              style: TextStyle(color: Colors.white),
+                              style: const TextStyle(color: Colors.white),
                             )),
                             GestureDetector(
                               onTap: () {
                                 FirestoreChat.setMessage(
-                                    chatroomUID,
-                                    messageTextEditingController.text,
-                                    user.uid);
+                                  chatroomUID,
+                                  messageTextEditingController.text,
+                                  user.uid,
+                                  user.displayName ?? 'Etoet user',
+                                );
                                 messageTextEditingController.clear();
                               },
-                              child: Icon(
+                              child: const Icon(
                                 Icons.send,
                                 color: Colors.white,
                               ),

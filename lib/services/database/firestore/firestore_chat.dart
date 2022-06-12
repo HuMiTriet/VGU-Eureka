@@ -33,11 +33,10 @@ class FirestoreChat extends Firestore {
 
     //Check if there is already a chatroom when two user unfriended
     var oldChatroomUID = await oldFriendChatroom(userUID1, userUID2);
-    if(oldChatroomUID.isNotEmpty)
-    {
+    if (oldChatroomUID.isNotEmpty) {
       user1Ref.set({'chatroomUID': oldChatroomUID}, SetOptions(merge: true));
       user2Ref.set({'chatroomUID': oldChatroomUID}, SetOptions(merge: true));
-      return ;
+      return;
     }
 
     if (data1.data()!['chatroomUID'] == null ||
@@ -47,7 +46,11 @@ class FirestoreChat extends Firestore {
       Firestore.firestoreReference
           .collection('chatrooms')
           .doc(chatroomUID)
-          .set({'user1UID': userUID1, 'user2UID': userUID2, 'chatroomUID' : chatroomUID});
+          .set({
+        'user1UID': userUID1,
+        'user2UID': userUID2,
+        'chatroomUID': chatroomUID
+      });
     }
   }
 
@@ -68,12 +71,11 @@ class FirestoreChat extends Firestore {
         .get();
 
     if (data1.docs.isNotEmpty) {
-
       String oldChatroomUID = data1.docs.elementAt(0).data()['chatroomUID'];
       print('old chatroom detected! chatroom UID:' + oldChatroomUID);
       return oldChatroomUID;
     }
-    if (data2.docs.isNotEmpty){
+    if (data2.docs.isNotEmpty) {
       String oldChatroomUID = data2.docs.elementAt(0).data()['chatroomUID'];
       print('old chatroom detected! chatroom UID:' + oldChatroomUID);
       return oldChatroomUID;
@@ -81,7 +83,6 @@ class FirestoreChat extends Firestore {
 
     return '';
   }
-
 
   static Future<String> getChatroomUID(String user1UID, String user2UID) async {
     var ref = await Firestore.firestoreReference
@@ -94,9 +95,15 @@ class FirestoreChat extends Firestore {
     return ref.data()!['chatroomUID'];
   }
 
-  static void setMessage(String chatroomUID, String message, String senderUID) {
+  static void setMessage(
+      String chatroomUID, String message, String senderUID, String senderName) {
     var ts = Timestamp.now();
-    final data = {'message': message, 'senderUID': senderUID, 'ts': ts};
+    final data = {
+      'message': message,
+      'senderUID': senderUID,
+      'senderName': senderName,
+      'ts': ts
+    };
     FirebaseFirestore.instance
         .collection('chatrooms')
         .doc(chatroomUID)
