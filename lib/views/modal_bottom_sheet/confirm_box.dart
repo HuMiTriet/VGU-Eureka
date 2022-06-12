@@ -217,7 +217,7 @@ class _ConfirmboxState extends State<Confirmbox> {
       child: Column(
         children: <Widget>[
           Container(
-            margin: const EdgeInsets.only(top: 30),
+            margin: const EdgeInsets.only(top: 5),
             height: 30,
             child: Text('$distance km away from you',
                 style: const TextStyle(
@@ -226,7 +226,7 @@ class _ConfirmboxState extends State<Confirmbox> {
                     fontWeight: FontWeight.bold)),
           ),
           Container(
-            height: 180,
+            height: 200,
             width: 370,
             decoration: const BoxDecoration(
                 color: Colors.white,
