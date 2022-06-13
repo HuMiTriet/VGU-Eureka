@@ -218,10 +218,12 @@ class _ChatScreenState extends State<ChatRoomView> {
                             )),
                             GestureDetector(
                               onTap: () {
-                                FirestoreChat.setMessage(
-                                    chatroomUID,
-                                    messageTextEditingController.text,
-                                    user.uid);
+                                messageTextEditingController.text.length != 0
+                                    ? FirestoreChat.setMessage(
+                                        chatroomUID,
+                                        messageTextEditingController.text,
+                                        user.uid)
+                                    : null;
                                 messageTextEditingController.clear();
                               },
                               child: Icon(
