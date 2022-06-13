@@ -13,6 +13,7 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 
 import '../services/auth/auth_user.dart';
+import 'emergency/sos_chat_hall_view.dart';
 
 class MainView extends StatefulWidget {
   @override
@@ -95,7 +96,10 @@ class MainViewState extends State<MainView> {
                           children: [
                             ElevatedButton(
                                 onPressed: () {
-                                  Navigator.of(context).pushNamed(profileRoute);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => SOSChatHallView()),
+                                  );
                                 },
                                 style: ElevatedButton.styleFrom(
                                   primary: Colors.red,
