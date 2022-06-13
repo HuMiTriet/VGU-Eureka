@@ -222,10 +222,6 @@ class MainViewState extends State<MainView> {
 
   void onClickNotificationRouting(data) {
     switch (data['type']) {
-      case 'emegency':
-        // go to emergency screen
-        break;
-
       case 'newFriend':
         showBarModalBottomSheet(
           //expand: true,
@@ -234,12 +230,12 @@ class MainViewState extends State<MainView> {
           builder: (context) => const FriendView(),
         );
         break;
-      case 'newChat':
+      case 'newMessage':
         // create user from payload data
         var sender = UserInfo(
             uid: data['uid'],
-            email: data['email'],
             photoURL: data['photoUrl'],
+            email: data['email'],
             displayName: data['displayName']);
 
         Navigator.push(
@@ -248,6 +244,17 @@ class MainViewState extends State<MainView> {
         );
         break;
       case 'sos_received':
+        showMaterialModalBottomSheet(
+            expand: false,
+            context: context,
+            backgroundColor: Colors.transparent,
+            builder: (context) => SoSReceivedBottomSheet());
+        break;
+
+      case 'publicEmergency':
+        break;
+
+      case 'privateEmergency':
         break;
     }
   }
