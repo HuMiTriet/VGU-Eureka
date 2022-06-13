@@ -47,38 +47,68 @@ class MainViewState extends State<MainView> {
                   map,
                   Padding(
                     padding: const EdgeInsets.fromLTRB(200.0, 30.0, 10.0, 0.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: <Widget>[
-                        ElevatedButton(
-                            onPressed: () {
-                              Navigator.of(context).pushNamed(profileRoute);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              primary: Colors.orange,
-                              shape: const CircleBorder(),
-                              fixedSize: const Size(50, 50),
-                            ),
-                            child: const Icon(
-                              Icons.account_box_rounded,
-                              size: 24.0,
-                            )),
-                        ElevatedButton(
-                            onPressed: () {
-                              Navigator.of(context).pushNamed(
-                                settingsRoute,
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              primary: Colors.orange,
-                              shape: const CircleBorder(),
-                              fixedSize: const Size(50, 50),
-                            ),
-                            child: const Icon(
-                              Icons.settings,
-                              size: 24.0,
-                            )),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      //crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          //crossAxisAlignment: CrossAxisAlignment.end,
+                          children: <Widget>[
+                            ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pushNamed(profileRoute);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors.orange,
+                                  shape: const CircleBorder(),
+                                  fixedSize: const Size(50, 50),
+                                ),
+                                child: const Icon(
+                                  Icons.account_box_rounded,
+                                  size: 24.0,
+                                )),
+                            ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pushNamed(
+                                    settingsRoute,
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors.orange,
+                                  shape: const CircleBorder(),
+                                  fixedSize: const Size(50, 50),
+                                ),
+                                child: const Icon(
+                                  Icons.settings,
+                                  size: 24.0,
+                                )),
+                          ],
+                        ),
+
+                        const SizedBox(
+                          height: 20,
+                        ),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pushNamed(profileRoute);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors.red,
+                                  shape: const CircleBorder(),
+                                  fixedSize: const Size(50, 50),
+                                ),
+                                child: const Icon(
+                                  Icons.message_outlined,
+                                  size: 24.0,
+                                )),
+                          ],
+                        ),
+
                       ],
                     ),
                   ),
