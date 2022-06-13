@@ -703,63 +703,6 @@ class _SOSViewState extends State<SOSView> {
         ],
       );
 
-  Widget customeSwitch(String text, bool val) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 22.0, left: 16.0, right: 16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            text,
-            style: const TextStyle(
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold,
-              color: Colors.red,
-            ),
-          ),
-          CupertinoSwitch(
-              activeColor: Colors.red,
-              trackColor: Colors.grey,
-              value: val,
-              onChanged: (value) async {
-                if (value) {
-                  setState(() {
-                    user?.emergency.emergencyType = lostAndFound
-                        ? 'lostAndFound'
-                        : accident
-                            ? 'accident'
-                            : thief
-                                ? 'thief'
-                                : other
-                                    ? 'other'
-                                    : '';
-                    user?.emergency.locationDescription =
-                        locationDescriptionController.text;
-                    user?.emergency.situationDetail =
-                        situationDetailController.text;
-                    user?.emergency.isPublic = true;
-                    FirestoreEmergency.setEmergencySignal(
-                        uid: user!.uid,
-                        emergencyType: user!.emergency.emergencyType,
-                        isPublic: user!.emergency.isPublic,
-                        locationDescription: locationDescriptionController.text,
-                        situationDetail: situationDetailController.text,
-                        lat: user!.location.latitude,
-                        lng: user!.location.longitude);
-                    Firestore.updateUserInfo(user!);
-                    val = true;
-                  });
-                  devtools.log('Update to public signal',
-                      name: 'EmergencySignal');
-                } else {
-                  showAlertDialog(context);
-                }
-              })
-        ],
-      ),
-    );
-  }
-
   InputBorder border() => const OutlineInputBorder(
         borderRadius: BorderRadius.all(Radius.circular(2)),
         borderSide: BorderSide(color: Colors.black, width: 0.5),
