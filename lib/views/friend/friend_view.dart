@@ -58,15 +58,14 @@ class _FriendViewState extends State<FriendView> {
 
           // Very scruffed fix when you got accepted but you have no friend
           //TODO: make for loop run at least once
-          if(user.friendInfoList.length == 0)
-            {
-              user.friendInfoList.add(newFriend);
-              print('Your are now friend with ' + data['displayName']);
-            }
+          if (user.friendInfoList.length == 0) {
+            user.friendInfoList.add(newFriend);
+            print('Your are now friend with ' + data['displayName']);
+          }
           for (var i = 0; i < user.friendInfoList.length; ++i) {
             if (i == (user.friendInfoList.length - 1) &&
                 newFriend.uid != user.friendInfoList.elementAt(i).uid) {
-                user.friendInfoList.add(newFriend);
+              user.friendInfoList.add(newFriend);
               print('Your are now friend with ' + data['displayName']);
             }
           }
@@ -77,7 +76,8 @@ class _FriendViewState extends State<FriendView> {
         if (unfriendFriendUID == user.uid) {
           print('Data of self received, skipping...');
         } else {
-          print('User friend list length: ' + user.friendInfoList.length.toString());
+          print('User friend list length: ' +
+              user.friendInfoList.length.toString());
           for (var i = 0; i < user.friendInfoList.length; ++i) {
             if (user.friendInfoList.elementAt(i).uid == unfriendFriendUID) {
               var unfriendFriend = user.friendInfoList.elementAt(i);
@@ -159,12 +159,12 @@ class _FriendViewState extends State<FriendView> {
     _pendingFriendStream = FirestoreFriend.getPendingFriendStream(user.uid);
 
     return StreamBuilder<QuerySnapshot>(
-      stream: _pendingFriendStream,
-      builder: (context, snapshot) {
-        pendingFriendRequestCount = (snapshot.data?.docs.length);
-        if (snapshot.hasError) {
-          return const Text('Something went wrong');
-        }
+        stream: _pendingFriendStream,
+        builder: (context, snapshot) {
+          pendingFriendRequestCount = (snapshot.data?.docs.length);
+          if (snapshot.hasError) {
+            return const Text('Something went wrong');
+          }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
             // return const Text('Loading');
@@ -415,10 +415,9 @@ class _FriendViewState extends State<FriendView> {
               )));
         });
   }
+
   @override
   void dispose() {
     super.dispose();
   }
-
-
 }

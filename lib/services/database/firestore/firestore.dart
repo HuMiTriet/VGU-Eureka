@@ -65,23 +65,6 @@ class Firestore {
     );
   }
 
-  static void setEmergencySignal({
-    required String uid,
-    required String locationDescription,
-    required String situationDetail,
-    bool isPublic = false,
-  }) {
-    firestoreReference.collection('emergencies').doc(uid).set(
-      {
-        'isPublic': isPublic,
-        'locationDescription': locationDescription,
-        'situationDetail': situationDetail,
-        'uid': uid,
-      },
-      SetOptions(merge: true),
-    );
-  }
-
   static Future<etoet.UserInfo> getUserInfo(String uid) async {
     const source = Source.serverAndCache;
     final userDocument = await firestoreReference

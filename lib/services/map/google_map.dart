@@ -1,19 +1,25 @@
 import 'dart:async';
 import 'dart:developer' as devtools show log;
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:etoet/services/auth/auth_user.dart';
 import 'package:etoet/services/auth/location.dart';
 import 'package:etoet/services/database/database.dart';
+import 'package:etoet/views/emergency/emergency_marker.dart';
+import 'package:etoet/views/emergency/sos_default_map.dart';
 import 'package:etoet/services/map/friend/friend_marker_location.dart';
+import 'package:etoet/services/map/geoflutterfire/geoflutterfire.dart';
 import 'package:etoet/services/map/map_factory.dart' as etoet;
 import 'package:etoet/services/map/marker/marker.dart';
 import 'package:etoet/services/map/osrm/routing.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
+import '../database/firestore/firestore.dart';
 import 'geocoding.dart';
 
 /// This is the implementation of the [Map] interface using [GoogleMap].
@@ -28,7 +34,8 @@ class GoogleMapImpl extends StatefulWidget implements etoet.Map {
   late StreamSubscription _locationSubscription;
   late StreamSubscription _databaseLocationSubscription;
   late Set<StreamSubscription> _friendsLocationSubscriptions;
-  final List<Marker> _markers = [];
+  final Set<Marker> _markers = {};
+  final Set<Marker> _friendsMarkers = {};
   final Set<Polyline> _polylines = {};
   Routing routing = Routing.getInstance();
   late num deviceWidth = MediaQuery.of(context).size.width *
@@ -57,10 +64,6 @@ class GoogleMapImpl extends StatefulWidget implements etoet.Map {
     address = await Geocoding.getAddress(await _mapController.getLatLng(
         ScreenCoordinate(
             x: (deviceWidth / 2).round(), y: (deviceHeight / 2).round())));
-  }
-
-  void updateMapAddress(LatLng location) async {
-    address = await Geocoding.getAddress(location);
   }
 
   Future<bool> _hasLocationPermission() async {
@@ -141,9 +144,10 @@ class GoogleMapImpl extends StatefulWidget implements etoet.Map {
 }
 
 class _GoogleMapImplState extends State<GoogleMapImpl> {
-  Timer? timer;
   late Future<LatLng> location = widget._getCurrentLocation();
   late BitmapDescriptor userIcon;
+  final mapEmergencyUidLocation = <String, LatLng>{};
+  late StreamSubscription emergencySubcription;
 
   void _initializeMap() async {
     devtools.log('_initializeMap', name: 'GoogleMap: _initializeMap');
@@ -158,7 +162,7 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
 
     // get user icon, draw marker
     var icon = await GoogleMapMarker.getIconFromUrl(widget.authUser!.photoURL ??
-        'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab297');
+        'https://icon-library.com/images/default-profile-icon/default-profile-icon-24.jpg');
     userIcon = icon;
     widget._locationSubscription = widget._getLocationStream((position) {
       var location = LatLng(position.latitude, position.longitude);
@@ -185,7 +189,7 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
       devtools.log(
           'update user location to database lat: ${position.latitude} lng: ${position.longitude}',
           name: 'GoogleMap: _getLocationStream');
-    }, 10);
+    }, 30);
 
     devtools.log('Finish _initializeMap', name: 'GoogleMap: _initializeMap');
   }
@@ -223,6 +227,9 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
             await friendMarkerCreator.createFriendMarker(friendLatLng: latLng);
         widget._markers.removeWhere(
             (marker) => marker.markerId == MarkerId(friendInfo.uid));
+        widget._friendsMarkers.removeWhere(
+            (marker) => marker.markerId == MarkerId(friendInfo.uid));
+        widget._friendsMarkers.add(friendMarker);
         setState(() {
           widget._markers.add(friendMarker);
         });
@@ -233,9 +240,110 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
     }
   }
 
+  /// Update markers of nearby emergency signal
+  void updateEmergencyMarker(
+      {required String emergencyId,
+      required String situationDetail,
+      required String locationDescription,
+      required String emergencyType}) async {
+    var emergencyInfo = await Firestore.getUserInfo(emergencyId);
+    var emergencyMarkerCreator = EmergencyMarker(
+      context: context,
+      emergencyInfo: emergencyInfo,
+      polylines: widget._polylines,
+      uid: emergencyId,
+      locationDescription: locationDescription,
+      situationDetail: situationDetail,
+      emergencyType: emergencyType,
+    );
+    var location = mapEmergencyUidLocation[emergencyId];
+    var latLng = LatLng(location!.latitude, location.longitude);
+    var emergencyMarker = await emergencyMarkerCreator.createEmergencyMarker(
+        emergencyLatLng: latLng,
+        helpButtonPressed: () {
+          // remove and add new marker
+          widget._markers.removeWhere(
+              (marker) => marker.markerId == MarkerId(emergencyId));
+
+          setState(() {});
+        });
+    widget._markers
+        .removeWhere((marker) => marker.markerId == MarkerId(emergencyId));
+    setState(() {
+      widget._markers.add(emergencyMarker);
+    });
+
+    devtools.log(
+        'marker list: ${widget._markers.length}, displayName: ${emergencyInfo.displayName}, location: $latLng',
+        name: 'GoogleMap: updateEmergencyMarker');
+  }
+
+  void toEmergencyState() {
+    // pause friend stream
+    for (var subscription in widget._friendsLocationSubscriptions) {
+      subscription.pause();
+    }
+
+    // remove friends markers
+    widget._markers.removeWhere(
+        (marker) => marker.markerId != MarkerId(widget.authUser!.uid));
+    widget._polylines.clear();
+
+    // subcription to listen to all public signal in radius
+    var emergencyRadius = 20.0;
+    emergencySubcription = GeoFlutterFire.querySignalInRadius(
+        lat: widget._location.latitude,
+        lng: widget._location.longitude,
+        radius: emergencyRadius);
+
+    // add emergency marker if there are nearby signal
+    emergencySubcription.onData((data) {
+      for (var doc in data) {
+        doc = doc as DocumentSnapshot;
+        // only get public emergency signal
+        if (doc['isPublic'] == true) {
+          var geoPoint = doc['position']['geopoint'] as GeoPoint;
+          var emergencyLocation = LatLng(geoPoint.latitude, geoPoint.longitude);
+          var emergencyId = doc['uid'] as String;
+          var locationDescription = doc['locationDescription'] as String;
+          var situationDetail = doc['situationDetail'] as String;
+          var emergencyType = 'emergency type on firestore';
+          mapEmergencyUidLocation[emergencyId] = emergencyLocation;
+          updateEmergencyMarker(
+            emergencyId: emergencyId,
+            locationDescription: locationDescription,
+            situationDetail: situationDetail,
+            emergencyType: emergencyType,
+          );
+        }
+      }
+    });
+    setState(() {});
+  }
+
+  void toDefaultState() {
+    // resume friends stream
+    for (var subscription in widget._friendsLocationSubscriptions) {
+      subscription.resume();
+    }
+    emergencySubcription.cancel();
+
+    // remove emergency markers
+    widget._markers.removeWhere(
+        (marker) => marker.markerId != MarkerId(widget.authUser!.uid));
+
+    // add friend markers
+    setState(() {
+      widget._markers.addAll(widget._friendsMarkers);
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      AndroidGoogleMapsFlutter.useAndroidViewSurface = true;
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeMap();
       syncFriendMarker();
@@ -276,16 +384,15 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
                       'Google map state build _mapController: ${widget._mapController}',
                       name: 'GoogleMapImplState');
                 },
-                markers: widget._markers.toSet(),
+                markers: widget._markers,
                 polylines: widget._polylines,
                 myLocationEnabled: true,
                 zoomControlsEnabled: false,
                 myLocationButtonEnabled: false,
                 mapToolbarEnabled: false,
                 onCameraMoveStarted: () {
-                  setState(() {
-                    widget.updateCurrentMapAddress();
-                  });
+                  setState(() {});
+                  widget.updateCurrentMapAddress();
                 },
               ),
               Positioned(
@@ -299,6 +406,13 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
                     backgroundColor: Color.fromARGB(104, 220, 155, 69),
                     decoration: TextDecoration.underline,
                   ),
+                ),
+              ),
+              Positioned(
+                bottom: 80,
+                child: EmergencyDefaultMap(
+                  toEmergencyState: toEmergencyState,
+                  toDefaultState: toDefaultState,
                 ),
               ),
             ],

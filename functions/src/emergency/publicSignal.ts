@@ -27,7 +27,7 @@ export default async (
     const emergencySnap = await emergencyRef.get();
 
     const geohash = emergencySnap.get("position.geohash");
-    console.log(geohash);
+    console.log("SOS sender's geohash: " + geohash);
 
     const geopoint: admin.firestore.GeoPoint = emergencySnap
         .get("position.geopoint");
@@ -35,6 +35,7 @@ export default async (
     const latitiude: number = geopoint.latitude;
     const longtitude: number = geopoint.longitude;
     const center = [latitiude, longtitude];
+    console.log("User's location: " + latitiude + " : " + longtitude);
 
     const radius = 20 * 1000;
 
@@ -43,6 +44,8 @@ export default async (
     const helperCandidatePromise: Promise<admin.database.DataSnapshot>[] = [];
     const rootRef = rt.ref("users");
 
+    console.log("------------------------------------------------------------");
+
     for (const b of bounds) {
       const query = rootRef
           .orderByChild("geohash")
@@ -50,6 +53,7 @@ export default async (
           .endAt(b[1]);
 
       helperCandidatePromise.push(query.get());
+      console.log("one candidate added");
     }
 
     const candidateSnap = await Promise.all(helperCandidatePromise);
@@ -60,7 +64,6 @@ export default async (
         const oneCandidateUID = childSnapshot.key;
         // check to see if it is null or undefined
         if (oneCandidateUID) {
-          console.log(oneCandidateUID);
           // Eliminate false positie because distance center can have similar
           // geohash if they are adjacent to each other
           const locationRef = childSnapshot.child("location");
@@ -73,7 +76,10 @@ export default async (
               uid: oneCandidateUID,
               distanceInKm: distanceInKm,
             };
-            candidatePool.push(candidate);
+            if (candidate.uid !== userUID) {
+              console.log(oneCandidateUID + " and distance: " + distanceInKm);
+              candidatePool.push(candidate);
+            }
           }
         }
       });
@@ -122,9 +128,10 @@ export default async (
         data: {
           type: "publicEmergency",
           locationDescription: locationDescription,
+          displayName: displayName,
         },
       };
-
+      console.log(payload);
       fcm.sendToDevice(helperFcmToken, payload);
     }
   } else {
