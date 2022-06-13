@@ -4,4 +4,6 @@
 // export default async (
 //     user: UserRecord,
 // ) => {
+//   // autofill the user photo url inside the firebase auth with a default url
+//   functions.auth.user.toString
 // }
