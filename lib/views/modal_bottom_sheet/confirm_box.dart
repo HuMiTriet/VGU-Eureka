@@ -1,5 +1,6 @@
 import 'package:etoet/services/auth/user_info.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../services/auth/auth_user.dart';
 
@@ -44,6 +45,7 @@ class _ConfirmboxState extends State<Confirmbox> {
   String? photoURL;
   String? displayName;
   String? email;
+  String? phoneNumber;
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +54,7 @@ class _ConfirmboxState extends State<Confirmbox> {
     photoURL = needHelpUser.photoURL;
     displayName = needHelpUser.displayName;
     email = needHelpUser.email;
+    phoneNumber = needHelpUser.phoneNumber;
 
     void showAbortDialog(BuildContext context) {
       // set up the buttons
@@ -290,7 +293,10 @@ class _ConfirmboxState extends State<Confirmbox> {
                         ),
                         if (widget.confirmedToHelp)
                           IconButton(
-                              icon: const Icon(Icons.phone), onPressed: () {})
+                              icon: const Icon(Icons.phone),
+                              onPressed: () {
+                                //launchUrlString('tel:${phoneNumber ?? '113'} ');                              })
+                                launchUrlString('tel:phoneNumber');                              })
                       ],
                     )),
                 Container(
