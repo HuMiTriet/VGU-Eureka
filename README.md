@@ -22,4 +22,6 @@
 
 # Table of content 
 1. [Authentication](./documentation/Authentication_architecture.md)
-2. [Backend]()
+2. [Databse](./documentation/backend/Overview.md)
+3. [Cloud messaging](./documentation/cloud_messaging/overview.md)
+4. [geohash](./documentation/geohash.md)

@@ -126,7 +126,9 @@ class _ChatScreenState extends State<ChatRoomView> {
   Widget build(BuildContext context) {
     user = context.watch<AuthUser>();
 
-    userImageUrl = (user.photoURL != null)? user.photoURL! : 'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977';
+    userImageUrl = (user.photoURL != null)
+        ? user.photoURL!
+        : 'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977';
 
     return FutureBuilder(
         future: FirestoreChat.getChatroomUID(user.uid, widget.selectedUser.uid),
@@ -203,8 +205,8 @@ class _ChatScreenState extends State<ChatRoomView> {
                       alignment: Alignment.bottomCenter,
                       child: Container(
                         color: Colors.black.withOpacity(0.8),
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
                         child: Row(
                           children: [
                             Expanded(
@@ -214,24 +216,25 @@ class _ChatScreenState extends State<ChatRoomView> {
                               //border: InputBorder.none to get rid of underline things
                               decoration: InputDecoration(
                                 border: InputBorder.none,
-                                hintText: "Type a message!",
+                                hintText: 'Type a message!',
                                 hintStyle: TextStyle(
                                     fontWeight: FontWeight.w400,
                                     color: Colors.white.withOpacity(0.6)),
                               ),
-                              style: TextStyle(color: Colors.white),
+                              style: const TextStyle(color: Colors.white),
                             )),
                             GestureDetector(
                               onTap: () {
                                 messageTextEditingController.text.length != 0
                                     ? FirestoreChat.setMessage(
-                                        chatroomUID,
-                                        messageTextEditingController.text,
-                                        user.uid)
+                                        message:
+                                            'messageTextEditingController.text',
+                                        chatroomUID: chatroomUID,
+                                        senderUID: user.uid)
                                     : null;
                                 messageTextEditingController.clear();
                               },
-                              child: Icon(
+                              child: const Icon(
                                 Icons.send,
                                 color: Colors.white,
                               ),

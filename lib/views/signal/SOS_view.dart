@@ -1,4 +1,7 @@
+import 'package:etoet/services/auth/auth_user.dart';
+import 'package:etoet/services/database/firestore/firestore_emergency.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SOSView extends StatefulWidget {
   const SOSView({Key? key}) : super(key: key);
@@ -8,8 +11,14 @@ class SOSView extends StatefulWidget {
 }
 
 class _SOSViewState extends State<SOSView> {
+  AuthUser? authUser;
+  late TextEditingController situationDetailTextController =
+      TextEditingController();
+  late TextEditingController locationDescriptionTextController =
+      TextEditingController();
   @override
   Widget build(BuildContext context) {
+    authUser = context.watch<AuthUser?>();
     return Scaffold(
       backgroundColor: const Color.fromRGBO(239, 172, 172, 2),
       body: SafeArea(
@@ -28,7 +37,9 @@ class _SOSViewState extends State<SOSView> {
                   ),
                   const Spacer(),
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
                     icon: const Icon(Icons.close),
                     color: Colors.white,
                   ),
@@ -43,7 +54,12 @@ class _SOSViewState extends State<SOSView> {
               Theme(
                 data: ThemeData(unselectedWidgetColor: Colors.white),
                 child: CheckBoxList(
-                  children: const ['Lost and Found', 'Accident', 'Thieves', 'Other'],
+                  children: const [
+                    'Lost and Found',
+                    'Accident',
+                    'Thieves',
+                    'Other'
+                  ],
                 ),
               ),
               Padding(
@@ -98,6 +114,7 @@ class _SOSViewState extends State<SOSView> {
                 fontWeight: FontWeight.bold,
               )),
           TextField(
+            controller: locationDescriptionTextController,
             textInputAction: TextInputAction.newline,
             autofocus: true,
             maxLength: maxLength,
@@ -120,6 +137,7 @@ class _SOSViewState extends State<SOSView> {
                 fontWeight: FontWeight.bold,
               )),
           TextField(
+            controller: situationDetailTextController,
             textInputAction: TextInputAction.newline,
             autofocus: true,
             maxLength: maxLength,
@@ -140,20 +158,46 @@ class _SOSViewState extends State<SOSView> {
       );
 
   Widget buildButtons() => Row(
-        children: const [
+        children: [
           Expanded(
             child: _Buttons(
               color: Colors.green,
               text: 'PRIVATE SIGNAL',
+              onTap: () {
+                var situationDetail = situationDetailTextController.text;
+                var locationDescription =
+                    locationDescriptionTextController.text;
+                FirestoreEmergency.setEmergencySignal(
+                    uid: authUser!.uid,
+                    situationDetail: situationDetail,
+                    locationDescription: locationDescription,
+                    lat: authUser!.location.latitude,
+                    lng: authUser!.location.longitude,
+                    isPublic: false);
+                Navigator.pop(context);
+              },
             ),
           ),
-          SizedBox(
+          const SizedBox(
             width: 10,
           ),
           Expanded(
             child: _Buttons(
               color: Colors.red,
               text: 'PUBLIC SIGNAL',
+              onTap: () {
+                var situationDetail = situationDetailTextController.text;
+                var locationDescription =
+                    locationDescriptionTextController.text;
+                FirestoreEmergency.setEmergencySignal(
+                    uid: authUser!.uid,
+                    situationDetail: situationDetail,
+                    locationDescription: locationDescription,
+                    lat: authUser!.location.latitude,
+                    lng: authUser!.location.longitude,
+                    isPublic: true);
+                Navigator.pop(context);
+              },
             ),
           ),
         ],
@@ -163,10 +207,12 @@ class _SOSViewState extends State<SOSView> {
 class _Buttons extends StatelessWidget {
   final Color color;
   final String text;
+  final void Function() onTap;
 
   const _Buttons({
     required this.color,
     required this.text,
+    required this.onTap,
   });
 
   @override
@@ -174,7 +220,7 @@ class _Buttons extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: GestureDetector(
-        onTap: () {},
+        onTap: onTap,
         child: Container(
           alignment: Alignment.center,
           constraints: const BoxConstraints.tightForFinite(
