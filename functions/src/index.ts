@@ -88,6 +88,14 @@ export const sendPublicNotification = functions.region("asia-southeast1")
 >>>>>>> 490fc234ea7bc815e996f5fbe0aa59e434e8ea1e
     });
 
+
+// export const sendPublicNotification = functions.region("asia-southeast1")
+//     .firestore.document("/emergencies/{userId}")
+//     .onUpdate(async (change, context) => {
+//       await (await import("./emergency/publicSignal"))
+//           .default(change, context);
+//     });
+
 // Send a notification Annoucing new friend for Sender of that friend reques
 export const notifyNewFriendSender = functions.region("asia-southeast1")
     .firestore.document("/users/{userUID}/friends/{friendUID}")
@@ -227,6 +235,13 @@ export const userUpdateProfileNotification = functions.region("asia-southeast1")
     .onUpdate(async (change, context) => {
       await (await import("./friend/userUpdateProfileNotification"))
           .default(change, context);
+    });
+
+export const newMessageNotification = functions.region("asia-southeast1")
+    .firestore.document("chatrooms/{chatroomId}/messages/{messageId}")
+    .onCreate(async (snapshot, context) => {
+      await (await import("./messaging/newMessage"))
+          .default(snapshot, context);
     });
 
 // export

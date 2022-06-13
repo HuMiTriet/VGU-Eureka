@@ -95,25 +95,60 @@ class _AddFriendViewState extends State<AddFriendView> {
                           searchedUserInfoList.elementAt(index).email!,
                         ),
                         trailing: IconButton(
-                          onPressed: () {
-                            Firestore.sendFriendRequest(user.uid,
-                                searchedUserInfoList.elementAt(index).uid);
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  title: const Text('Friend Request Sent!'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context, true);
-                                      },
-                                      child: const Text('Confirm'),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
+                          onPressed: () async {
+                            if (await FirestoreFriend
+                                .isOtherUserSentFriendRequest(
+                                    user.uid,
+                                    searchedUserInfoList
+                                        .elementAt(index)
+                                        .uid)) {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: const Center(
+                                        child: Text(
+                                            'This user has already sent you a friend request!'),
+                                      ),
+                                      content: const Text(
+                                          'Please check pending friend request menu to accept/reject request'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text('Confirm'),
+                                        ),
+                                      ],
+                                    );
+                                  });
+                            } else {
+                              FirestoreFriend.sendFriendRequest(user.uid,
+                                  searchedUserInfoList.elementAt(index).uid);
+
+                              searchedUserInfoList =
+                                  await FirestoreFriend.getUserInfoFromEmail(
+                                      _searchBarController.text, user.uid);
+
+                              //Clear list after sent a friend request
+                              setState(() {});
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: const Text('Friend Request Sent!'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context, true);
+                                        },
+                                        child: const Text('Confirm'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            }
                           },
                           icon: const Icon(Icons.add),
                         ));
@@ -125,4 +160,3 @@ class _AddFriendViewState extends State<AddFriendView> {
     );
   }
 }
-

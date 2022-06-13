@@ -1,9 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:etoet/services/database/firestore.dart';
-import 'package:etoet/views/friend/friend_view.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../services/auth/auth_user.dart';
@@ -14,7 +11,7 @@ class ChatRoomView extends StatefulWidget {
 
   final etoet.UserInfo selectedUser;
 
-  ChatRoomView(@required this.selectedUser);
+  const ChatRoomView(this.selectedUser, key) : super(key: key);
 
   @override
   State<ChatRoomView> createState() => _ChatScreenState();
@@ -37,7 +34,7 @@ class _ChatScreenState extends State<ChatRoomView> {
 
   Widget avatarAndTime(
       String senderUID, Timestamp timestamp, bool isSameUserLastMessage) {
-    DateTime myDateTime = timestamp.toDate();
+    var myDateTime = timestamp.toDate();
     var timestampString =
         myDateTime.hour.toString() + ':' + myDateTime.minute.toString();
     if (isSameUserLastMessage == true) {
@@ -80,24 +77,24 @@ class _ChatScreenState extends State<ChatRoomView> {
                 : CrossAxisAlignment.start,
             children: [
               Container(
-                margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(24),
+                    topLeft: const Radius.circular(24),
                     bottomRight: (senderUID == user.uid)
-                        ? Radius.circular(0)
-                        : Radius.circular(24),
-                    topRight: Radius.circular(24),
+                        ? const Radius.circular(0)
+                        : const Radius.circular(24),
+                    topRight: const Radius.circular(24),
                     bottomLeft: (senderUID == user.uid)
-                        ? Radius.circular(24)
-                        : Radius.circular(0),
+                        ? const Radius.circular(24)
+                        : const Radius.circular(0),
                   ),
                   color: Colors.blue,
                 ),
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 child: Text(
                   message,
-                  style: TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.white),
                 ),
               ),
               avatarAndTime(senderUID, timestamp, isSameUserLastMessage)
@@ -136,95 +133,95 @@ class _ChatScreenState extends State<ChatRoomView> {
                 ),
                 titleSpacing: 0,
               ),
-              body: Container(
-                child: Stack(
-                  children: [
-                    StreamBuilder<QuerySnapshot>(
-                      stream: messageStream,
-                      builder: (context, snapshot) {
-                        String? lastMessageUserUID = '';
-                        //return Container();
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-                        if (snapshot.hasData == false ||
-                            snapshot.data!.docs.isEmpty) {
-                          return Center(
-                            child: Text(
-                                'No messages yet, chat to ${widget.selectedUser.displayName}!'),
-                          );
-                        }
-                        messageLength = snapshot.data?.docs.length;
-                        return ListView.builder(
-                            padding: const EdgeInsets.only(bottom: 80, top: 16),
-                            itemCount: snapshot.data!.docs.length,
-                            reverse: true,
-                            itemBuilder: (context, index) {
-                              var messageInfo = snapshot.data!.docs
-                                  .elementAt(index)
-                                  .data() as Map<String, dynamic>;
-                              var message = messageInfo['message'];
-                              var senderUID = messageInfo['senderUID'];
-                              Timestamp timestamp = messageInfo['ts'];
-                              if (senderUID == lastMessageUserUID) {
-                                isSameUserLastMessage = true;
-                                lastMessageUserUID = senderUID;
-                              } else {
-                                isSameUserLastMessage = false;
-                                lastMessageUserUID = senderUID;
-                              }
-                              return chatMessageTile(message, senderUID,
-                                  timestamp, isSameUserLastMessage);
-                              // DocumentSnapshot ds = snapshot.data!.docs[index];
-                              // return chatMessageTile(
-                              //     ds['message'], user.uid == ds['senderUid']);
-                            });
-                      },
-                    ),
-                    Container(
-                      alignment: Alignment.bottomCenter,
-                      child: Container(
-                        color: Colors.black.withOpacity(0.8),
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        child: Row(
-                          children: [
-                            Expanded(
-                                child: TextField(
-                              controller: messageTextEditingController,
-                              onChanged: (value) {},
-                              //border: InputBorder.none to get rid of underline things
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                hintText: "Type a message!",
-                                hintStyle: TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.white.withOpacity(0.6)),
-                              ),
-                              style: TextStyle(color: Colors.white),
-                            )),
-                            GestureDetector(
-                              onTap: () {
-                                Firestore.setMessage(
-                                    chatroomUID,
-                                    messageTextEditingController.text,
-                                    user.uid);
-                                messageTextEditingController.clear();
-                              },
-                              child: Icon(
-                                Icons.send,
-                                color: Colors.white,
-                              ),
-                            )
-                          ],
-                        ),
+              body: Stack(
+                children: [
+                  StreamBuilder<QuerySnapshot>(
+                    stream: messageStream,
+                    builder: (context, snapshot) {
+                      String? lastMessageUserUID = '';
+                      //return Container();
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      if (snapshot.hasData == false ||
+                          snapshot.data!.docs.isEmpty) {
+                        return Center(
+                          child: Text(
+                              'No messages yet, chat to ${widget.selectedUser.displayName}!'),
+                        );
+                      }
+                      messageLength = snapshot.data?.docs.length;
+                      return ListView.builder(
+                          padding: const EdgeInsets.only(bottom: 80, top: 16),
+                          itemCount: snapshot.data!.docs.length,
+                          reverse: true,
+                          itemBuilder: (context, index) {
+                            var messageInfo = snapshot.data!.docs
+                                .elementAt(index)
+                                .data() as Map<String, dynamic>;
+                            var message = messageInfo['message'];
+                            var senderUID = messageInfo['senderUID'];
+                            Timestamp timestamp = messageInfo['ts'];
+                            if (senderUID == lastMessageUserUID) {
+                              isSameUserLastMessage = true;
+                              lastMessageUserUID = senderUID;
+                            } else {
+                              isSameUserLastMessage = false;
+                              lastMessageUserUID = senderUID;
+                            }
+                            return chatMessageTile(message, senderUID,
+                                timestamp, isSameUserLastMessage);
+                            // DocumentSnapshot ds = snapshot.data!.docs[index];
+                            // return chatMessageTile(
+                            //     ds['message'], user.uid == ds['senderUid']);
+                          });
+                    },
+                  ),
+                  Container(
+                    alignment: Alignment.bottomCenter,
+                    child: Container(
+                      color: Colors.black.withOpacity(0.8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      child: Row(
+                        children: [
+                          Expanded(
+                              child: TextField(
+                            controller: messageTextEditingController,
+                            onChanged: (value) {},
+                            //border: InputBorder.none to get rid of underline things
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Type a message!',
+                              hintStyle: TextStyle(
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.white.withOpacity(0.6)),
+                            ),
+                            style: const TextStyle(color: Colors.white),
+                          )),
+                          GestureDetector(
+                            onTap: () {
+                              FirestoreChat.setMessage(
+                                senderDisplayName:
+                                    user.displayName ?? 'Etoet user',
+                                chatroomUID: chatroomUID,
+                                message: messageTextEditingController.text,
+                                senderUID: user.uid,
+                              );
+                              messageTextEditingController.clear();
+                            },
+                            child: const Icon(
+                              Icons.send,
+                              color: Colors.white,
+                            ),
+                          )
+                        ],
                       ),
-                    )
-                  ],
-                ),
+                    ),
+                  )
+                ],
               ),
             );
           } else {

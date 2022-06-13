@@ -1,6 +1,5 @@
 import 'dart:convert';
-import 'dart:developer';
-
+import 'dart:developer' as developer show log;
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:etoet/services/auth/user_info.dart';
@@ -8,6 +7,7 @@ import 'package:etoet/services/database/firestore.dart';
 import 'package:etoet/services/map/map_factory.dart' as etoet;
 import 'package:etoet/services/notification/notification.dart';
 import 'package:etoet/views/friend/chat_room_view.dart';
+import 'package:etoet/views/emergency/sos_dialog.dart';
 import 'package:etoet/views/friend/friend_view.dart';
 import 'package:etoet/views/popup_sos_message/sos_received_bottom_bar.dart';
 import 'package:etoet/views/signal/SOS_view.dart';
@@ -164,9 +164,9 @@ class MainViewState extends State<MainView> {
 
     if (initialMessage != null) {
       _handleMessage(initialMessage);
-      log('resume message');
+      developer.log('resume message');
     } else {
-      log('message which opens app is null');
+      developer.log('message which opens app is null');
     }
 
     // app is in background but open
@@ -185,25 +185,25 @@ class MainViewState extends State<MainView> {
   void onClickNotification(String? payload) {
     if (payload != null) {
       var data = json.decode(payload);
-      log('payload in object: ${data}');
+      developer.log('payload in object: ${data}');
 
       onClickNotificationRouting(data);
     }
   }
 
   void _handleMessage(RemoteMessage message) {
-    log('message comming while app is in background');
+    developer.log('message comming while app is in background');
 
     onClickNotificationRouting(message.data);
   }
 
   void _handleForeGroundMessage(RemoteMessage message) {
     if (message.notification != null) {
-      log('received message: ${message.data}');
+      developer.log('received message: ${message.data}');
 
       switch (message.data['type']) {
         case 'sos_received':
-          log('show sos received message');
+          developer.log('show sos received message');
           showMaterialModalBottomSheet(
               expand: false,
               context: context,
@@ -216,7 +216,7 @@ class MainViewState extends State<MainView> {
           break;
       }
     } else {
-      log('message is null');
+      developer.log('message is null');
     }
   }
 

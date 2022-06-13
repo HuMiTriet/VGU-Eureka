@@ -56,10 +56,12 @@ dependencies:
   google_maps_flutter_web: ^0.3.3
   firebase_messaging: ^11.4.0
   flutter_local_notifications: ^9.5.3+1
+  geoflutterfire: ^3.0.2
   random_string: ^2.3.1
   uuid: 3.0.6
   rxdart: ^0.27.4
-
+  flutter_slidable:
+    ^1.3.0
     #dev dependencies will not be included in the final build
 dev_dependencies:
   flutter_test:

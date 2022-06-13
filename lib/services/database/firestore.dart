@@ -143,7 +143,28 @@ class Firestore {
     return searchedUserInfoList;
   }
 
-  static void sendFriendRequest(String senderUID, String receiverUID) {
+  static Future<bool> isOtherUserSentFriendRequest(
+      String senderUID, String receiverUID) async {
+    //Check if the other user has already sent a friend request
+    //Naming is not really correct, since it just check if there has been a document
+    //of that friend.
+    var snapshot = await Firestore.firestoreReference
+        .collection('users')
+        .doc(senderUID)
+        .collection('friends')
+        .doc(receiverUID)
+        .get();
+
+    var snapshotData = snapshot.data();
+    if (snapshotData != null) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  static Future<void> sendFriendRequest(
+      String senderUID, String receiverUID) async {
     var senderData = {
       'isSender': true,
       'requestConfirmed': false,
@@ -156,7 +177,7 @@ class Firestore {
       'friendUID': senderUID
     };
 
-    firestoreReference
+    Firestore.firestoreReference
         .collection('users')
         .doc(senderUID)
         .collection('friends')
@@ -351,41 +372,27 @@ class Firestore {
     var data1 = await user1Ref.get();
     var data2 = await user2Ref.get();
 
-
-    if(data1.data()!['chatroomUID'] == null || data2.data()!['chatroomUID'] == null)
-    {
-      user1Ref.set(
-          {
-            'chatroomUID': chatroomUID
-          },
-          SetOptions(merge: true)
-      );
-      user2Ref.set(
-          {
-            'chatroomUID': chatroomUID
-          },
-          SetOptions(merge: true)
-      );
+    if (data1.data()!['chatroomUID'] == null ||
+        data2.data()!['chatroomUID'] == null) {
+      user1Ref.set({'chatroomUID': chatroomUID}, SetOptions(merge: true));
+      user2Ref.set({'chatroomUID': chatroomUID}, SetOptions(merge: true));
       Firestore.firestoreReference
           .collection('chatrooms')
           .doc(chatroomUID)
           .set({'user1UID': userUID1, 'user2UID': userUID2});
     }
-
   }
 
-  static Future<String> getChatroomUID(String user1UID, String user2UID)
-  async {
-    var ref = await firestoreReference.
-    collection('users').
-    doc(user1UID).
-    collection('friends').
-    doc(user2UID).
-    get();
+  static Future<String> getChatroomUID(String user1UID, String user2UID) async {
+    var ref = await firestoreReference
+        .collection('users')
+        .doc(user1UID)
+        .collection('friends')
+        .doc(user2UID)
+        .get();
 
     return ref.data()!['chatroomUID'];
   }
-
 
   static void setMessage(String chatroomUID, String message, String senderUID) {
     var ts = Timestamp.now();
