@@ -152,35 +152,34 @@ class MainViewState extends State<MainView> {
           var dataType = event.data['type'];
           if (dataType == 'privateEmegency') {
             showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                      title: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: <Widget>[
-                              IconButton(
-                                icon: const Icon(Icons.close),
-                                color: Colors.grey,
-                                iconSize: 25,
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                              ),
-                            ],
-                          ),
-                          const Text('Emergency'),
-                        ],
-                      ),
-                      content: const Text('I need help!!!!'
-                          '\nI want my mom back.'
-                          ' This app is so wonderful.'),
-                      /* actions: [ */
-                      /*   sendmessageButton, */
-                      /*   helpButton, */
-                      /* ], */
-                    ));
+              context: context,
+              builder: (context) => AlertDialog(
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          color: Colors.grey,
+                          iconSize: 25,
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ),
+                    Text(event.data['title']),
+                  ],
+                ),
+                content: Text(event.data['body']),
+                /* actions: [ */
+                /*   sendmessageButton, */
+                /*   helpButton, */
+                /* ], */
+              ),
+            );
           }
         });
       }

@@ -169,6 +169,9 @@ class _SOSViewState extends State<SOSView> {
                     locationDescriptionTextController.text;
                 FirestoreEmergency.setEmergencySignal(
                     uid: authUser!.uid,
+                    displayName: authUser!.displayName ?? 'Etoet user',
+                    photoUrl: authUser!.photoURL ??
+                        'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977',
                     situationDetail: situationDetail,
                     locationDescription: locationDescription,
                     lat: authUser!.location.latitude,
@@ -191,6 +194,9 @@ class _SOSViewState extends State<SOSView> {
                     locationDescriptionTextController.text;
                 FirestoreEmergency.setEmergencySignal(
                     uid: authUser!.uid,
+                    displayName: authUser!.displayName ?? 'Etoet user',
+                    photoUrl: authUser!.photoURL ??
+                        'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977',
                     situationDetail: situationDetail,
                     locationDescription: locationDescription,
                     lat: authUser!.location.latitude,
