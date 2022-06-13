@@ -9,6 +9,7 @@ import 'package:etoet/services/map/map_factory.dart' as etoet;
 import 'package:etoet/services/notification/notification.dart';
 import 'package:etoet/views/friend/chat_room_view.dart';
 import 'package:etoet/views/friend/friend_view.dart';
+import 'package:etoet/views/popup_sos_message/sos_received_bottom_bar.dart';
 import 'package:etoet/views/signal/SOS_view.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -199,7 +200,21 @@ class MainViewState extends State<MainView> {
   void _handleForeGroundMessage(RemoteMessage message) {
     if (message.notification != null) {
       log('received message: ${message.data}');
-      NotificationHandler.display(message);
+
+      switch (message.data['type']) {
+        case 'sos_received':
+          log('show sos received message');
+          showMaterialModalBottomSheet(
+              expand: false,
+              context: context,
+              backgroundColor: Colors.transparent,
+              builder: (context) => SoSReceivedBottomSheet());
+          break;
+        default:
+          NotificationHandler.display(message);
+
+          break;
+      }
     } else {
       log('message is null');
     }
@@ -232,7 +247,7 @@ class MainViewState extends State<MainView> {
           MaterialPageRoute(builder: (context) => ChatRoomView(sender)),
         );
         break;
-      case 'sos':
+      case 'sos_received':
         break;
     }
   }
