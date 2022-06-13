@@ -5,6 +5,8 @@ import 'package:etoet/services/map/geoflutterfire/geoflutterfire.dart';
 class FirestoreEmergency extends Firestore {
   static void setEmergencySignal({
     required String uid,
+    required String displayName,
+    required String photoUrl,
     required String locationDescription,
     required String situationDetail,
     required double lat,
@@ -17,6 +19,8 @@ class FirestoreEmergency extends Firestore {
         'locationDescription': locationDescription,
         'situationDetail': situationDetail,
         'uid': uid,
+        'displayName': displayName,
+        'phtoUrl': photoUrl,
         'position': GeoFlutterFire.getGeoFirePointData(
           latitude: lat,
           longitude: lng,

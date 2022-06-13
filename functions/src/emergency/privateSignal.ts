@@ -46,13 +46,18 @@ export default async (
         console.log(oneFcmTokenSnapshot.data()?.fcm_token);
       }
     });
+    const displayName = String(snapshot.get("displayName"));
+    const phtoUrl = String(snapshot.get("photoUrl"));
+
     const payload = {
       notification: {
-        title: "Private emergency Alert",
+        title: displayName + "'s Private emergency Alert",
         body: String(snapshot.data()?.situationDetail),
       },
       data: {
         type: "privateEmegency",
+        displayName: displayName,
+        photoUrl: phtoUrl,
         locationDescription: String(snapshot.data()?.locationDescription),
       },
     };
