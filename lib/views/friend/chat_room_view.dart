@@ -126,7 +126,9 @@ class _ChatScreenState extends State<ChatRoomView> {
   Widget build(BuildContext context) {
     user = context.watch<AuthUser>();
 
-    userImageUrl = (user.photoURL != null)? user.photoURL! : 'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977';
+    userImageUrl = (user.photoURL != null)
+        ? user.photoURL!
+        : 'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977';
 
     return FutureBuilder(
         future: FirestoreChat.getChatroomUID(user.uid, widget.selectedUser.uid),
@@ -225,9 +227,10 @@ class _ChatScreenState extends State<ChatRoomView> {
                               onTap: () {
                                 messageTextEditingController.text.length != 0
                                     ? FirestoreChat.setMessage(
-                                        chatroomUID,
-                                        messageTextEditingController.text,
-                                        user.uid)
+                                        message:
+                                            'messageTextEditingController.text',
+                                        chatroomUID: chatroomUID,
+                                        senderUID: user.uid)
                                     : null;
                                 messageTextEditingController.clear();
                               },
