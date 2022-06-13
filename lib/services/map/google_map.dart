@@ -221,7 +221,9 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
             context: context,
             friendInfo: friendInfo,
             polylines: widget._polylines,
-            setState: () => setState(() {}));
+            setState: () => setState(() {}),
+            user: widget.authUser!,
+        );
         var location = widget.authUser?.mapFriendUidLocation[friendInfo.uid];
         var latLng = LatLng(location!.latitude, location.longitude);
         var friendMarker =

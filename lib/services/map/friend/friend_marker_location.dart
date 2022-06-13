@@ -1,11 +1,16 @@
 import 'dart:ui' as ui;
 
+import 'package:etoet/services/auth/auth_user.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:etoet/services/map/geocoding.dart';
 import 'package:etoet/services/map/osrm/routing.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 
+import '../../../views/friend/chat_room_view.dart';
+import '../../database/firestore/firestore_chat.dart';
 import '../marker/marker.dart';
 
 /// This class is used to create a marker for a friend
@@ -17,15 +22,33 @@ class FriendMarker {
   late Set<Polyline> polylines;
   late BuildContext context;
   late Function setState;
+
+  late AuthUser user;
+
+  Future<void> toFriendChatView() async {
+    var chatroomUID = const Uuid().v4().toString();
+    await FirestoreChat.createFriendChatroom(
+        user.uid, friendInfo.uid, chatroomUID);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ChatRoomView(friendInfo)),
+    );
+  }
+
+
+
   FriendMarker({
     required this.friendInfo,
     required this.context,
     required this.polylines,
     required this.setState,
+    required this.user,
   });
   Future<Marker> createFriendMarker({
     required LatLng friendLatLng,
   }) async {
+
     var location = await Geocoding.getAddress(friendLatLng);
     var isShowDirection = false;
     return Marker(
@@ -73,44 +96,71 @@ class FriendMarker {
                           color: Colors.black,
                         )),
                     const Spacer(),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: const Color(0xfff46135),
-                        shape: RoundedRectangleBorder(
-                          side: BorderSide.none,
-                          borderRadius: BorderRadius.circular(15),
+
+
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const Spacer(),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            primary: const Color(0xfff46135),
+                            shape: RoundedRectangleBorder(
+                              side: BorderSide.none,
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            // fixedSize: const Size(320, 50),
+                          ),
+                          child: Text(
+                            isShowDirection
+                                ? 'Hide direction to ${friendInfo.displayName}'
+                                : 'Show direction to ${friendInfo.displayName}',
+                            style: const TextStyle(
+                                fontWeight: ui.FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                          onPressed: () async {
+                            Navigator.pop(context);
+                            isShowDirection
+                                ? {
+                                    polylines.removeWhere((element) =>
+                                        element.polylineId ==
+                                        PolylineId(friendInfo.uid)),
+                                    setState(),
+                                  }
+                                : {
+                                    polylines.add(Polyline(
+                                        polylineId: PolylineId(friendInfo.uid),
+                                        visible: true,
+                                        points: await routing
+                                            .getPointsFromUser(friendLatLng),
+                                        width: 5,
+                                        color: Colors.blue)),
+                                    setState(),
+                                  };
+                            isShowDirection = !isShowDirection;
+                          },
                         ),
-                        // fixedSize: const Size(320, 50),
-                      ),
-                      child: Text(
-                        isShowDirection
-                            ? 'Hide direction to ${friendInfo.displayName}'
-                            : 'Show direction to ${friendInfo.displayName}',
-                        style: const TextStyle(
-                            fontWeight: ui.FontWeight.bold,
-                            color: Colors.white),
-                      ),
-                      onPressed: () async {
-                        Navigator.pop(context);
-                        isShowDirection
-                            ? {
-                                polylines.removeWhere((element) =>
-                                    element.polylineId ==
-                                    PolylineId(friendInfo.uid)),
-                                setState(),
-                              }
-                            : {
-                                polylines.add(Polyline(
-                                    polylineId: PolylineId(friendInfo.uid),
-                                    visible: true,
-                                    points: await routing
-                                        .getPointsFromUser(friendLatLng),
-                                    width: 5,
-                                    color: Colors.blue)),
-                                setState(),
-                              };
-                        isShowDirection = !isShowDirection;
-                      },
+                        const Spacer(),
+
+                        ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(Colors.lightBlue),
+                            ),
+                            onPressed: (){
+                              toFriendChatView();
+                            },
+                            child: const IconTheme(
+                              data: IconThemeData(
+                                color: Colors.white,
+                              ),
+                              child: Icon(
+                                Icons.message,
+                              ),
+                            )),
+                        const Spacer(),
+                      ],
                     ),
                     const Spacer(),
                   ],
