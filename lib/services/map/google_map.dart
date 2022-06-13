@@ -5,13 +5,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:etoet/services/auth/auth_user.dart';
 import 'package:etoet/services/auth/location.dart';
 import 'package:etoet/services/database/database.dart';
-import 'package:etoet/views/emergency/emergency_marker.dart';
-import 'package:etoet/views/emergency/sos_default_map.dart';
 import 'package:etoet/services/map/friend/friend_marker_location.dart';
 import 'package:etoet/services/map/geoflutterfire/geoflutterfire.dart';
 import 'package:etoet/services/map/map_factory.dart' as etoet;
 import 'package:etoet/services/map/marker/marker.dart';
 import 'package:etoet/services/map/osrm/routing.dart';
+import 'package:etoet/views/emergency/emergency_marker.dart';
+import 'package:etoet/views/emergency/sos_default_map.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -255,18 +255,15 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
       locationDescription: locationDescription,
       situationDetail: situationDetail,
       emergencyType: emergencyType,
+      removeMarker: () => widget._markers
+          .removeWhere((element) => element.markerId == MarkerId(emergencyId)),
+      setState: () => setState(() {}),
     );
     var location = mapEmergencyUidLocation[emergencyId];
     var latLng = LatLng(location!.latitude, location.longitude);
     var emergencyMarker = await emergencyMarkerCreator.createEmergencyMarker(
-        emergencyLatLng: latLng,
-        helpButtonPressed: () {
-          // remove and add new marker
-          widget._markers.removeWhere(
-              (marker) => marker.markerId == MarkerId(emergencyId));
-
-          setState(() {});
-        });
+      emergencyLatLng: latLng,
+    );
     widget._markers
         .removeWhere((marker) => marker.markerId == MarkerId(emergencyId));
     setState(() {
