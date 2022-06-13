@@ -12,7 +12,7 @@ class ChatRoomView extends StatefulWidget {
 
   final etoet.UserInfo selectedUser;
 
-  const ChatRoomView(this.selectedUser, key) : super(key: key);
+  const ChatRoomView(this.selectedUser);
 
   @override
   State<ChatRoomView> createState() => _ChatScreenState();
