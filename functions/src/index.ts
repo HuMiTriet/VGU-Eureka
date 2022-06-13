@@ -56,6 +56,13 @@ export const userUpdateProfileNotification = functions.region("asia-southeast1")
           .default(change, context);
     });
 
+export const newMessageNotification = functions.region("asia-southeast1")
+    .firestore.document("chatrooms/{chatroomId}/messages/{messageId}")
+    .onCreate(async (snapshot, context) => {
+      await (await import("./messaging/newMessage"))
+          .default(snapshot, context);
+    });
+
 // export
 // const autofillDefaultUserPhotoUrl = functions.region("asia-southeast1")
 //     .auth.user().onCreate(async (user) => {
