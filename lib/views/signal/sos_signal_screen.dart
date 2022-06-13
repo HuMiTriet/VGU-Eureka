@@ -53,7 +53,9 @@ class _SOSViewState extends State<SOSView> {
               ),
             ),
           )
-        : user?.emergency.isFilled == true
+        : (user?.emergency.emergencyType != '' ||
+                user?.emergency.situationDetail != '' ||
+                user?.emergency.locationDescription != '')
             ? showUserFormView(context)
             : showSOSFormView(context);
   }
@@ -221,7 +223,64 @@ class _SOSViewState extends State<SOSView> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    customeSwitch('PUBLIC SIGNAL', user!.emergency.isPublic)
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          top: 22.0, left: 16.0, right: 16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            'PUBLIC SIGNAL',
+                            style: TextStyle(
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.red,
+                            ),
+                          ),
+                          CupertinoSwitch(
+                              activeColor: Colors.red,
+                              trackColor: Colors.grey,
+                              value: isPublic,
+                              onChanged: (value) async {
+                                if (value) {
+                                  setState(() {
+                                    user?.emergency.emergencyType = lostAndFound
+                                        ? 'lostAndFound'
+                                        : accident
+                                            ? 'accident'
+                                            : thief
+                                                ? 'thief'
+                                                : other
+                                                    ? 'other'
+                                                    : '';
+                                    user?.emergency.locationDescription =
+                                        locationDescriptionController.text;
+                                    user?.emergency.situationDetail =
+                                        situationDetailController.text;
+                                    user?.emergency.isPublic = true;
+                                    FirestoreEmergency.setEmergencySignal(
+                                        uid: user!.uid,
+                                        emergencyType:
+                                            user!.emergency.emergencyType,
+                                        isPublic: user!.emergency.isPublic,
+                                        locationDescription:
+                                            locationDescriptionController.text,
+                                        situationDetail:
+                                            situationDetailController.text,
+                                        lat: user!.location.latitude,
+                                        lng: user!.location.longitude);
+                                    Firestore.updateUserInfo(user!);
+                                    isPublic = value;
+                                  });
+                                  devtools.log('Update to public signal',
+                                      name: 'EmergencySignal');
+                                } else {
+                                  showAlertDialog(context);
+                                }
+                              })
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -441,12 +500,16 @@ class _SOSViewState extends State<SOSView> {
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: GestureDetector(
                         onTap: () {
-                          user?.emergency.isFilled = true;
                           user?.emergency.isPublic = false;
-                          user?.emergency.lostAndFound = lostAndFound;
-                          user?.emergency.accident = accident;
-                          user?.emergency.thief = thief;
-                          user?.emergency.other = other;
+                          user?.emergency.emergencyType = lostAndFound
+                              ? 'lostAndFound'
+                              : accident
+                                  ? 'accident'
+                                  : thief
+                                      ? 'thief'
+                                      : other
+                                          ? 'other'
+                                          : '';
                           user?.emergency.locationDescription =
                               locationDescriptionController.text;
                           user?.emergency.situationDetail =
@@ -455,15 +518,13 @@ class _SOSViewState extends State<SOSView> {
                               'https://firebasestorage.googleapis.com/v0/b/etoet-app.appspot.com/o/default_profile_pic.png?alt=media&token=f8f8f8f8-f8f8f8f8-f8f8f8f8-f8f8f8f8';
                           FirestoreEmergency.setEmergencySignal(
                               uid: user!.uid,
-                              lostAndFound: user!.emergency.lostAndFound,
-                              accident: user!.emergency.accident,
-                              thief: user!.emergency.thief,
-                              other: user!.emergency.other,
+                              emergencyType: user!.emergency.emergencyType,
                               isPublic: user!.emergency.isPublic,
-                              isFilled: user!.emergency.isFilled,
                               locationDescription:
                                   locationDescriptionController.text,
-                              situationDetail: situationDetailController.text);
+                              situationDetail: situationDetailController.text,
+                              lat: user!.location.latitude,
+                              lng: user!.location.longitude);
                           Firestore.updateUserInfo(user!);
                           devtools.log(
                               'PRIVATE SIGNAL SENT FROM: ${user.toString()}',
@@ -515,12 +576,16 @@ class _SOSViewState extends State<SOSView> {
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: GestureDetector(
                         onTap: () {
-                          user?.emergency.isFilled = true;
                           user?.emergency.isPublic = true;
-                          user?.emergency.lostAndFound = lostAndFound;
-                          user?.emergency.accident = accident;
-                          user?.emergency.thief = thief;
-                          user?.emergency.other = other;
+                          user?.emergency.emergencyType = lostAndFound
+                              ? 'lostAndFound'
+                              : accident
+                                  ? 'accident'
+                                  : thief
+                                      ? 'thief'
+                                      : other
+                                          ? 'other'
+                                          : '';
                           user?.emergency.locationDescription =
                               locationDescriptionController.text;
                           user?.emergency.situationDetail =
@@ -529,15 +594,13 @@ class _SOSViewState extends State<SOSView> {
                               'https://firebasestorage.googleapis.com/v0/b/etoet-app.appspot.com/o/default_profile_pic.png?alt=media&token=f8f8f8f8-f8f8f8f8-f8f8f8f8-f8f8f8f8';
                           FirestoreEmergency.setEmergencySignal(
                               uid: user!.uid,
-                              lostAndFound: user!.emergency.lostAndFound,
-                              accident: user!.emergency.accident,
-                              thief: user!.emergency.thief,
-                              other: user!.emergency.other,
+                              emergencyType: user!.emergency.emergencyType,
                               isPublic: user!.emergency.isPublic,
-                              isFilled: user!.emergency.isFilled,
                               locationDescription:
                                   locationDescriptionController.text,
-                              situationDetail: situationDetailController.text);
+                              situationDetail: situationDetailController.text,
+                              lat: user!.location.latitude,
+                              lng: user!.location.longitude);
                           Firestore.updateUserInfo(user!);
                           devtools.log(
                               'PUBLIC SIGNAL SENT FROM: ${user.toString()}',
@@ -659,16 +722,37 @@ class _SOSViewState extends State<SOSView> {
               trackColor: Colors.grey,
               value: val,
               onChanged: (value) async {
-                if ((val == true) && (value == false)) {
-                  devtools.log('State: val = $val\nValue = $value',
-                      name: 'EmergencySignal');
-                  showAlertDialog(context);
-                } else if ((val == false) && (value == true)) {
-                  devtools.log('State: val = $val\nValue = $value',
-                      name: 'EmergencySignal');
+                if (value) {
                   setState(() {
-                    val = value;
+                    user?.emergency.emergencyType = lostAndFound
+                        ? 'lostAndFound'
+                        : accident
+                            ? 'accident'
+                            : thief
+                                ? 'thief'
+                                : other
+                                    ? 'other'
+                                    : '';
+                    user?.emergency.locationDescription =
+                        locationDescriptionController.text;
+                    user?.emergency.situationDetail =
+                        situationDetailController.text;
+                    user?.emergency.isPublic = true;
+                    FirestoreEmergency.setEmergencySignal(
+                        uid: user!.uid,
+                        emergencyType: user!.emergency.emergencyType,
+                        isPublic: user!.emergency.isPublic,
+                        locationDescription: locationDescriptionController.text,
+                        situationDetail: situationDetailController.text,
+                        lat: user!.location.latitude,
+                        lng: user!.location.longitude);
+                    Firestore.updateUserInfo(user!);
+                    val = true;
                   });
+                  devtools.log('Update to public signal',
+                      name: 'EmergencySignal');
+                } else {
+                  showAlertDialog(context);
                 }
               })
         ],
@@ -778,15 +862,16 @@ class _SOSViewState extends State<SOSView> {
   void initState() {
     locationDescriptionController = TextEditingController();
     situationDetailController = TextEditingController();
-    super.initState();
     FirestoreEmergency.getEmergencySignal(uid: widget.uid)
         .then((value) => {
-              isFilled = value.isFilled,
+              isFilled = value.situationDetail != '' &&
+                  value.locationDescription != '' &&
+                  value.emergencyType != '',
               isPublic = value.isPublic,
-              lostAndFound = value.lostAndFound,
-              accident = value.accident,
-              thief = value.thief,
-              other = value.other,
+              lostAndFound = value.emergencyType == 'lostAndFound',
+              accident = value.emergencyType == 'accident',
+              thief = value.emergencyType == 'thief',
+              other = value.emergencyType == 'other',
               situationDetailController.text = value.situationDetail,
               locationDescriptionController.text = value.locationDescription,
               devtools.log(value.toString())
@@ -798,6 +883,7 @@ class _SOSViewState extends State<SOSView> {
                 }),
           },
         );
+    super.initState();
   }
 
   @override

@@ -33,4 +33,10 @@ class GeoFlutterFire {
     var geoFirePoint = GeoFirePoint(latitude, longitude);
     return geoFirePoint.hash;
   }
+
+  static Map<String, dynamic> getGeoFirePointData(
+      {required double latitude, required double longitude}) {
+    var geoFirePoint = GeoFirePoint(latitude, longitude);
+    return geoFirePoint.data;
+  }
 }

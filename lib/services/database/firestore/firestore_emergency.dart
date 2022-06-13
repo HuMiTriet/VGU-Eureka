@@ -3,33 +3,28 @@ import 'dart:developer' as devtools show log;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:etoet/services/auth/emergency.dart';
 import 'package:etoet/services/database/firestore/firestore.dart';
+import 'package:etoet/services/map/geoflutterfire/geoflutterfire.dart';
 
-//Emergency class for emergency functions only
 class FirestoreEmergency extends Firestore {
-  //Constructor
-  FirestoreEmergency() : super();
-
   static void setEmergencySignal({
-    required String uid,
-    required bool lostAndFound,
-    required bool accident,
-    required bool thief,
-    required bool other,
     required bool isPublic,
-    required bool isFilled,
+    required String emergencyType,
     required String locationDescription,
     required String situationDetail,
+    required double lat,
+    required double lng,
+    required String uid,
   }) {
     Firestore.firestoreReference.collection('emergencies').doc(uid).set(
       {
         'isPublic': isPublic,
-        'isFilled': isFilled,
-        'lostAndFound': lostAndFound,
-        'accident': accident,
-        'thief': thief,
-        'other': other,
+        'emergencyType': emergencyType,
         'locationDescription': locationDescription,
         'situationDetail': situationDetail,
+        'position': GeoFlutterFire.getGeoFirePointData(
+          latitude: lat,
+          longitude: lng,
+        ),
         'uid': uid,
       },
       SetOptions(merge: true),
@@ -41,11 +36,7 @@ class FirestoreEmergency extends Firestore {
     Firestore.firestoreReference.collection('emergencies').doc(uid).update(
       {
         'isPublic': false,
-        'isFilled': false,
-        'lostAndFound': false,
-        'accident': false,
-        'thief': false,
-        'other': false,
+        'emergencyType': '',
         'locationDescription': '',
         'situationDetail': '',
       },
@@ -59,11 +50,7 @@ class FirestoreEmergency extends Firestore {
         .update(
       {
         'isPublic': false,
-        'isFilled': false,
-        'lostAndFound': false,
-        'accident': false,
-        'thief': false,
-        'other': false,
+        'emergencyType': '',
         'locationDescription': '',
         'situationDetail': '',
       },
