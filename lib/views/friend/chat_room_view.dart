@@ -30,6 +30,8 @@ class _ChatScreenState extends State<ChatRoomView> {
   TextEditingController messageTextEditingController = TextEditingController();
   late int? messageLength;
 
+  late String userImageUrl;
+
   @override
   void initState() {
     super.initState();
@@ -47,62 +49,71 @@ class _ChatScreenState extends State<ChatRoomView> {
         height: 0,
       );
     }
-    return Wrap(
-      direction: Axis.horizontal,
-      textDirection:
-          (senderUID == user.uid) ? TextDirection.rtl : TextDirection.ltr,
-      children: [
-        CircleAvatar(
-          backgroundImage: NetworkImage(
-            (senderUID == user.uid)
-                ? user.photoURL!
-                : widget.selectedUser.photoURL!,
-          ),
-          radius: 15,
+
+    return Wrap(direction: Axis.horizontal, children: [
+      Container(
+        margin: const EdgeInsets.only(left: 10, top: 5, bottom: 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          textDirection:
+              (senderUID == user.uid) ? TextDirection.rtl : TextDirection.ltr,
+          children: [
+            Row(children: [
+              CircleAvatar(
+                backgroundImage: NetworkImage(
+                  (senderUID == user.uid)
+                      ? userImageUrl
+                      : widget.selectedUser.photoURL!,
+                ),
+                radius: 15,
+              ),
+            ]),
+            const SizedBox(
+              width: 10,
+            ),
+            Text(timestampString),
+          ],
         ),
-        const SizedBox(
-          width: 1,
-        ),
-        Text(timestampString),
-      ],
-    );
+      ),
+    ]);
   }
 
   Widget chatMessageTile(String message, String senderUID, Timestamp timestamp,
       bool isSameUserLastMessage) {
-    return Row(
-      mainAxisAlignment: (senderUID == user.uid)
-          ? MainAxisAlignment.end
-          : MainAxisAlignment.start,
+    return Column(
+      crossAxisAlignment: (senderUID == user.uid)
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.start,
       children: [
         Column(
-            crossAxisAlignment: (senderUID == user.uid)
-                ? CrossAxisAlignment.end
-                : CrossAxisAlignment.start,
-            children: [
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                    topLeft: const Radius.circular(24),
-                    bottomRight: (senderUID == user.uid)
-                        ? const Radius.circular(0)
-                        : const Radius.circular(24),
-                    topRight: const Radius.circular(24),
-                    bottomLeft: (senderUID == user.uid)
-                        ? const Radius.circular(24)
-                        : const Radius.circular(0),
-                  ),
-                  color: Colors.blue,
+          crossAxisAlignment: (senderUID == user.uid)
+              ? CrossAxisAlignment.end
+              : CrossAxisAlignment.start,
+          children: [
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  bottomRight: (senderUID == user.uid)
+                      ? Radius.circular(0)
+                      : Radius.circular(24),
+                  topRight: Radius.circular(24),
+                  bottomLeft: (senderUID == user.uid)
+                      ? Radius.circular(24)
+                      : Radius.circular(0),
                 ),
-                padding: const EdgeInsets.all(16),
-                child: Text(
-                  message,
-                  style: const TextStyle(color: Colors.white),
-                ),
+                color: Colors.blue,
               ),
-              avatarAndTime(senderUID, timestamp, isSameUserLastMessage)
-            ]),
+              padding: EdgeInsets.all(16),
+              child: Text(
+                message,
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+            avatarAndTime(senderUID, timestamp, isSameUserLastMessage),
+          ],
+        ),
       ],
     );
   }
@@ -114,6 +125,11 @@ class _ChatScreenState extends State<ChatRoomView> {
   @override
   Widget build(BuildContext context) {
     user = context.watch<AuthUser>();
+
+    userImageUrl = (user.photoURL != null)
+        ? user.photoURL!
+        : 'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977';
+
     return FutureBuilder(
         future: FirestoreChat.getChatroomUID(user.uid, widget.selectedUser.uid),
         builder: (context, futureSnapshot) {
@@ -209,11 +225,13 @@ class _ChatScreenState extends State<ChatRoomView> {
                             )),
                             GestureDetector(
                               onTap: () {
-                                FirestoreChat.setMessage(
-                                  chatroomUID: chatroomUID,
-                                  message: messageTextEditingController.text,
-                                  senderUID: user.uid,
-                                );
+                                messageTextEditingController.text.length != 0
+                                    ? FirestoreChat.setMessage(
+                                        message:
+                                            'messageTextEditingController.text',
+                                        chatroomUID: chatroomUID,
+                                        senderUID: user.uid)
+                                    : null;
                                 messageTextEditingController.clear();
                               },
                               child: const Icon(
