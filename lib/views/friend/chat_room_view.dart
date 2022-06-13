@@ -213,11 +213,6 @@ class _ChatScreenState extends State<ChatRoomView> {
                                   chatroomUID: chatroomUID,
                                   message: messageTextEditingController.text,
                                   senderUID: user.uid,
-                                  senderEmail: user.email ?? '',
-                                  senderPhoneNumber: user.phoneNumber ?? '',
-                                  senderPhotoURL: user.photoURL ??
-                                      'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977',
-                                  senderDisplayName: user.displayName ?? 'Etoet user',
                                 );
                                 messageTextEditingController.clear();
                               },
