@@ -15,7 +15,7 @@ class FirestoreEmergency extends Firestore {
     required String situationDetail,
     required double lat,
     required double lng,
-    required String uid,
+    required bool isPublic,
   }) {
     Firestore.firestoreReference.collection('emergencies').doc(uid).set(
       {

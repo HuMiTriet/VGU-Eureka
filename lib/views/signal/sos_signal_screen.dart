@@ -1,6 +1,5 @@
 import 'dart:developer' as devtools show log;
 
-import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/auth_user.dart';
 import 'package:etoet/services/database/firestore/firestore.dart';
 import 'package:etoet/services/database/firestore/firestore_emergency.dart';
@@ -8,7 +7,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../main_view.dart';
 
 const int maxLines = 3;
 const int maxLength = 1000;
@@ -265,7 +263,8 @@ class _SOSViewState extends State<SOSView> {
                                         situationDetail:
                                             situationDetailController.text,
                                         lat: user!.location.latitude,
-                                        lng: user!.location.longitude);
+                                        lng: user!.location.longitude, displayName: user!.displayName?? 'Etoet user',
+                                        photoUrl: user!.photoURL ?? 'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977');
                                     Firestore.updateUserInfo(user!);
                                     isPublic = value;
                                   });
@@ -521,7 +520,8 @@ class _SOSViewState extends State<SOSView> {
                                     locationDescriptionController.text,
                                 situationDetail: situationDetailController.text,
                                 lat: user!.location.latitude,
-                                lng: user!.location.longitude);
+                                lng: user!.location.longitude, displayName: user!.displayName ?? 'Etoet user',
+                                photoUrl: user!.photoURL ?? 'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977');
                             Firestore.updateUserInfo(user!);
                             showSignalPostedDialog(context, 'private');
                           });
@@ -595,7 +595,8 @@ class _SOSViewState extends State<SOSView> {
                                     locationDescriptionController.text,
                                 situationDetail: situationDetailController.text,
                                 lat: user!.location.latitude,
-                                lng: user!.location.longitude);
+                                lng: user!.location.longitude, photoUrl: user!.photoURL ?? 'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977',
+                                displayName: user!.displayName ?? 'Etoet user');
                             Firestore.updateUserInfo(user!);
                             showSignalPostedDialog(context, 'public');
                           });

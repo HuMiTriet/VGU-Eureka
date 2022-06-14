@@ -162,8 +162,6 @@ class MainViewState extends State<MainView> {
         FirebaseMessaging.onMessage.listen((event) {
           var dataType = event.data['type'];
           if (dataType == 'privateEmegency') {
-            developer.log('PRIVATE emergency');
-            developer.log(event.notification.toString());
             showDialog(
               context: context,
               builder: (context) => PrivateDialog(),
