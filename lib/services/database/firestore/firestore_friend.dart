@@ -63,7 +63,30 @@ class FirestoreFriend extends Firestore {
     return searchedUserInfoList;
   }
 
-  static void sendFriendRequest(String senderUID, String receiverUID) {
+  static Future<bool> isOtherUserSentFriendRequest(String senderUID, String receiverUID) async{
+    //Check if the other user has already sent a friend request
+    //Naming is not really correct, since it just check if there has been a document
+    //of that friend.
+    var snapshot = await Firestore.firestoreReference
+        .collection('users')
+        .doc(senderUID)
+        .collection('friends')
+        .doc(receiverUID)
+        .get();
+
+    var snapshotData = snapshot.data();
+    if(snapshotData != null)
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+
+  static Future<void> sendFriendRequest(String senderUID, String receiverUID) async {
     var senderData = {
       'isSender': true,
       'requestConfirmed': false,
@@ -75,6 +98,7 @@ class FirestoreFriend extends Firestore {
       'requestConfirmed': false,
       'friendUID': senderUID
     };
+
 
     Firestore.firestoreReference
         .collection('users')
