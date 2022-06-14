@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
+import 'package:etoet/services/database/firestore/firestore_chat.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -11,7 +12,7 @@ class ChatRoomView extends StatefulWidget {
 
   final etoet.UserInfo selectedUser;
 
-  const ChatRoomView(this.selectedUser, key) : super(key: key);
+  const ChatRoomView(this.selectedUser);
 
   @override
   State<ChatRoomView> createState() => _ChatScreenState();
@@ -111,11 +112,11 @@ class _ChatScreenState extends State<ChatRoomView> {
   Widget build(BuildContext context) {
     user = context.watch<AuthUser>();
     return FutureBuilder(
-        future: Firestore.getChatroomUID(user.uid, widget.selectedUser.uid),
+        future: FirestoreChat.getChatroomUID(user.uid, widget.selectedUser.uid),
         builder: (context, futureSnapshot) {
           if (futureSnapshot.connectionState == ConnectionState.done) {
             chatroomUID = futureSnapshot.data as String;
-            messageStream = Firestore.getMessageStream(chatroomUID);
+            messageStream = FirestoreChat.getMessageStream(chatroomUID);
 
             return Scaffold(
               appBar: AppBar(
