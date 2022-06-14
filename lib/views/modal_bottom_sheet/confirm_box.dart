@@ -1,8 +1,11 @@
 import 'package:etoet/services/auth/user_info.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../services/auth/auth_user.dart';
+import '../../services/database/firestore/firestore_chat.dart';
 
 class Confirmbox extends StatefulWidget {
   final double distance;
@@ -47,6 +50,8 @@ class _ConfirmboxState extends State<Confirmbox> {
   String? email;
   String? phoneNumber;
 
+  late AuthUser user;
+
   @override
   Widget build(BuildContext context) {
     var distance = widget.distance;
@@ -55,6 +60,8 @@ class _ConfirmboxState extends State<Confirmbox> {
     displayName = needHelpUser.displayName;
     email = needHelpUser.email;
     phoneNumber = needHelpUser.phoneNumber;
+
+    user = context.watch<AuthUser>();
 
     void showAbortDialog(BuildContext context) {
       // set up the buttons
@@ -309,7 +316,15 @@ class _ConfirmboxState extends State<Confirmbox> {
                         )),
                         IconButton(
                           icon: const Icon(Icons.message),
-                          onPressed: () {},
+                          onPressed: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: Text('test'),
+                                  );
+                                });
+                          },
                         ),
                         if (widget.confirmedToHelp)
                           IconButton(
@@ -463,4 +478,16 @@ class _ConfirmboxState extends State<Confirmbox> {
       ),
     );
   }
+
+  Future<void> toPublicSOSChatView() async {
+    var chatroomUID = const Uuid().v4().toString();
+    await FirestoreChat.createFriendChatroom(
+        user.uid, needHelpUser!.uid, chatroomUID);
+
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(builder: (context) => ChatRoomView(selectedUser)),
+    // );
+  }
+
 }

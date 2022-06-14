@@ -1,12 +1,12 @@
-import 'dart:developer' as developer show log;
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:etoet/services/database/firestore/firestore.dart';
+import 'package:etoet/services/database/firestore/firestore_emergency.dart';
 import 'package:etoet/services/database/firestore/firestore_friend.dart';
 import 'package:etoet/services/map/map_factory.dart' as etoet;
 import 'package:etoet/services/notification/notification.dart';
-import 'package:etoet/views/emergency/sos_dialog.dart';
 import 'package:etoet/views/friend/friend_view.dart';
+import 'package:etoet/views/signal/sos_signal_screen.dart';
 import 'package:etoet/views/popup_sos_message/popupsos_message.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +32,9 @@ class MainViewState extends State<MainView> {
   @override
   Widget build(BuildContext context) {
     authUser = context.watch<AuthUser?>();
+    FirestoreEmergency.getEmergencySignal(uid: authUser!.uid).then((value) => {
+          authUser!.emergency = value,
+        });
 
     return FutureBuilder(
         future: FirestoreFriend.getFriendInfoList(authUser!.uid),
@@ -104,8 +107,14 @@ class MainViewState extends State<MainView> {
                   FloatingActionButton(
                       heroTag: 'goToSOSFromMain',
                       onPressed: () {
-                        /* Navigator.of(context).pushNamed(sosRoute); */
-                    showDialog(context: context, builder: (context) => PrivateDialog());
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SOSView(
+                              uid: authUser!.uid,
+                            ),
+                          ),
+                        );
                       },
                       child: const Icon(Icons.add_alert)),
                   FloatingActionButton(
@@ -153,8 +162,6 @@ class MainViewState extends State<MainView> {
         FirebaseMessaging.onMessage.listen((event) {
           var dataType = event.data['type'];
           if (dataType == 'privateEmegency') {
-            developer.log('PRIVATE emergency');
-            developer.log(event.notification.toString());
             showDialog(
               context: context,
               builder: (context) => PrivateDialog(),

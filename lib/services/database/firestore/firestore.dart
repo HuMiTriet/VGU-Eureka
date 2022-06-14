@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer' as devtools show log;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:etoet/services/auth/auth_user.dart';
@@ -31,6 +30,15 @@ class Firestore {
         'isHelping': false,
       },
     );
+
+    var userEmergencyRef = userRef.collection('emergency').doc('emergency');
+
+    userEmergencyRef.set({
+      'isPublic': false,
+      'problem': '',
+      'situationDetail': '',
+      'locationDescription': '',
+    });
   }
 
   static void updateUserInfo(AuthUser authUser) async {
@@ -48,6 +56,15 @@ class Firestore {
         'helpRange': authUser.helpRange,
       },
     );
+
+    var userEmergencyRef = userRef.collection('emergency').doc('emergency');
+
+    userEmergencyRef.update({
+      'isPublic': authUser.emergency.isPublic,
+      'emergencyType': authUser.emergency.emergencyType,
+      'situationDetail': authUser.emergency.situationDetail,
+      'locationDescription': authUser.emergency.locationDescription,
+    });
   }
 
   static void setFcmTokenAndNotificationStatus(
