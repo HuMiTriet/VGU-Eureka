@@ -7,6 +7,7 @@ import 'package:etoet/services/map/map_factory.dart' as etoet;
 import 'package:etoet/services/notification/notification.dart';
 import 'package:etoet/views/friend/friend_view.dart';
 import 'package:etoet/views/signal/sos_signal_screen.dart';
+import 'package:etoet/views/popup_sos_message/popupsos_message.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -160,27 +161,13 @@ class MainViewState extends State<MainView> {
             uid: authUser!.uid, token: token);
         FirebaseMessaging.onMessage.listen((event) {
           var dataType = event.data['type'];
-          if (dataType == 'emegency') {
+          if (dataType == 'privateEmegency') {
+            developer.log('PRIVATE emergency');
+            developer.log(event.notification.toString());
             showDialog(
-                context: context,
-                builder: (context) {
-                  var content = event.notification!.body;
-                  var title = event.notification!.title;
-                  return AlertDialog(
-                    title: Text(title ?? 'Emergency alert'),
-                    content: Text(content ?? 'null'),
-                    actions: [
-                      ElevatedButton(
-                        onPressed: () {},
-                        child: const Text('Accept'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {},
-                        child: const Text('Reject'),
-                      )
-                    ],
-                  );
-                });
+              context: context,
+              builder: (context) => PrivateDialog(),
+            );
           }
         });
       }
