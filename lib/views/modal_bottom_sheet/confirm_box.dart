@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../services/auth/auth_user.dart';
 import '../../services/database/firestore/firestore_chat.dart';
+import '../emergency/sos_chat_room_view.dart';
 
 // just put here for the color reference, the tool is not good enought to generate the working code but it's ok for getting the color
 class FvColors {
@@ -285,15 +286,13 @@ class _ConfirmboxState extends State<Confirmbox> {
                           ]),
                         )),
                         IconButton(
+                          // Send message to helpee
                           icon: const Icon(Icons.message),
                           onPressed: () {
-                            showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: Text('test'),
-                                  );
-                                });
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => SOSChatRoomView(needHelpUser)),
+                            );
                           },
                         ),
                         if (confirmedToHelp)

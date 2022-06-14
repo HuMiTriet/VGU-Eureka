@@ -228,7 +228,7 @@ class _ChatScreenState extends State<ChatRoomView> {
                                 messageTextEditingController.text.length != 0
                                     ? FirestoreChat.setMessage(
                                         message:
-                                            'messageTextEditingController.text',
+                                            messageTextEditingController.text,
                                         chatroomUID: chatroomUID,
                                         senderUID: user.uid)
                                     : null;
