@@ -60,7 +60,7 @@ class _LoginViewState extends State<LoginView> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Row(
+                  /*Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
@@ -85,11 +85,12 @@ class _LoginViewState extends State<LoginView> {
                         ),
                       ),
                     ],
-                  ),
+                  ),*/
+                  GradientText(),
                   Image.asset(
-                    'assets/images/helpinghands.png',
-                    height: 100,
-                    width: 100,
+                    'assets/images/ETOETlogo.png',
+                    height: 200,
+                    width: 200,
                   ),
 
                   //Email or phonenumber text field
@@ -500,7 +501,7 @@ class _Button extends StatelessWidget {
             height: 43,
           ),
           decoration: BoxDecoration(
-            color: Colors.grey[200],
+            color: Colors.white,
             borderRadius: BorderRadius.circular(8),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -509,8 +510,8 @@ class _Button extends StatelessWidget {
               const SizedBox(width: 5),
               Image(
                 image: image,
-                width: 25,
-                height: 30,
+                width: 40,
+                height: 40,
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -528,6 +529,64 @@ class _Button extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class GradientText extends StatefulWidget {
+  GradientText({Key? key}) : super(key: key);
+
+  @override
+  _GradientTextState createState() => _GradientTextState();
+}
+
+class _GradientTextState extends State<GradientText>
+    with SingleTickerProviderStateMixin {
+  AnimationController? _animationController;
+  Animation? _animation;
+
+  @override
+  void initState() {
+    _animationController = AnimationController(
+        vsync: this, duration: Duration(milliseconds: 3000));
+    _animationController?.repeat();
+    _animation = Tween(begin: 0.0, end: 1.0).animate(_animationController!)
+      ..addListener(() {
+        setState(() {});
+      });
+    _animationController?.forward();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        child: ShaderMask(
+            child: Text(
+              'WELCOME TO',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            shaderCallback: (rect) {
+              return LinearGradient(
+                stops: [
+                  _animation?.value - 0.5,
+                  _animation?.value,
+                  _animation?.value + 0.5,
+                ],
+                colors: [
+                  Color(int.parse('0xff5b0060')),
+                  Color(int.parse('0xffca485c')),
+                  Color(int.parse('0xFF0000')),
+                ],
+              ).createShader(rect);
+            }),
       ),
     );
   }
