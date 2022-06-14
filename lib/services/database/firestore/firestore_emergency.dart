@@ -1,0 +1,85 @@
+import 'dart:developer' as devtools show log;
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:etoet/services/auth/emergency.dart';
+import 'package:etoet/services/database/firestore/firestore.dart';
+import 'package:etoet/services/map/geoflutterfire/geoflutterfire.dart';
+
+class FirestoreEmergency extends Firestore {
+  static void setEmergencySignal({
+    required bool isPublic,
+    required String emergencyType,
+    required String locationDescription,
+    required String situationDetail,
+    required double lat,
+    required double lng,
+    required String uid,
+  }) {
+    Firestore.firestoreReference.collection('emergencies').doc(uid).set(
+      {
+        'isPublic': isPublic,
+        'emergencyType': emergencyType,
+        'locationDescription': locationDescription,
+        'situationDetail': situationDetail,
+        'position': GeoFlutterFire.getGeoFirePointData(
+          latitude: lat,
+          longitude: lng,
+        ),
+        'uid': uid,
+      },
+      SetOptions(merge: true),
+    );
+    devtools.log('Emergency signal set: $uid', name: 'FirestoreEmergency');
+  }
+
+  static void clearEmergency({required String uid}) {
+    Firestore.firestoreReference.collection('emergencies').doc(uid).update(
+      {
+        'isPublic': false,
+        'emergencyType': '',
+        'locationDescription': '',
+        'situationDetail': '',
+      },
+    );
+
+    Firestore.firestoreReference
+        .collection('users')
+        .doc(uid)
+        .collection('emergency')
+        .doc('emergency')
+        .update(
+      {
+        'isPublic': false,
+        'emergencyType': '',
+        'locationDescription': '',
+        'situationDetail': '',
+      },
+    );
+
+    devtools.log('Emergency signal clear: $uid', name: 'FirestoreEmergency');
+  }
+
+  static Future<Emergency> getEmergencySignal({required String uid}) async {
+    // ignore: prefer_typing_uninitialized_variables
+    var emergency = Emergency();
+    await Firestore.firestoreReference
+        .collection('users')
+        .doc(uid)
+        .collection('emergency')
+        .doc('emergency')
+        .get()
+        .then(
+      (snapshot) {
+        if (snapshot.exists) {
+          devtools.log('Emergency signal get: $uid',
+              name: 'FirestoreEmergency');
+          emergency = Emergency.fromJson(snapshot.data()!);
+        } else {
+          devtools.log('Emergency signal get: $uid not found',
+              name: 'FirestoreEmergency');
+        }
+      },
+    );
+    return emergency;
+  }
+}
