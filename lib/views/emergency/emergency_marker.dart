@@ -17,6 +17,9 @@ class EmergencyMarker {
   late String locationDescription;
   late String situationDetail;
   late String emergencyType;
+  late Function onHelpButtonPressed;
+  late Function removeMarker;
+  late Function setState;
   EmergencyMarker({
     required this.emergencyInfo,
     required this.context,
@@ -25,11 +28,12 @@ class EmergencyMarker {
     required this.locationDescription,
     required this.situationDetail,
     required this.emergencyType,
+    required this.removeMarker,
+    required this.setState,
   });
-  Future<Marker> createEmergencyMarker({
-    required LatLng emergencyLatLng,
-    required Function helpButtonPressed,
-  }) async {
+
+  Future<Marker> createEmergencyMarker(
+      {required LatLng emergencyLatLng}) async {
     var distance = await routing.getDistance(emergencyLatLng);
     return Marker(
       markerId: MarkerId(uid),
@@ -37,7 +41,7 @@ class EmergencyMarker {
       icon: await emergencyIcon,
       infoWindow: InfoWindow(
         title: emergencyInfo.displayName,
-        snippet: 'Tap to see user\'s location',
+        snippet: 'Tap to see user\'s emergency details',
       ),
       onTap: () {
         showModalBottomSheet(
@@ -50,6 +54,26 @@ class EmergencyMarker {
                 distance: distance,
                 needHelpUser: emergencyInfo,
                 emergencyType: emergencyType,
+                onHelpButtonPressed: () async {
+                  polylines.clear();
+                  polylines.add(Polyline(
+                      polylineId: PolylineId(uid),
+                      visible: true,
+                      points: await routing.getPointsFromUser(emergencyLatLng),
+                      width: 5,
+                      color: Colors.red));
+                  setState();
+                },
+                onAbortButtonPressed: () {
+                  polylines.clear();
+                  removeMarker();
+                  setState();
+                },
+                onDoneButtonPressed: () {
+                  polylines.clear();
+                  removeMarker();
+                  setState();
+                },
               );
             });
       },
