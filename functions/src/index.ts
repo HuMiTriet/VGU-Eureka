@@ -18,6 +18,14 @@ export const sendPublicNotification = functions.region("asia-southeast1")
           .default(change, context);
     });
 
+
+// export const sendPublicNotification = functions.region("asia-southeast1")
+//     .firestore.document("/emergencies/{userId}")
+//     .onUpdate(async (change, context) => {
+//       await (await import("./emergency/publicSignal"))
+//           .default(change, context);
+//     });
+
 // Send a notification Annoucing new friend for Sender of that friend reques
 export const notifyNewFriendSender = functions.region("asia-southeast1")
     .firestore.document("/users/{userUID}/friends/{friendUID}")

@@ -34,7 +34,7 @@ collapse_key in legacy protocols (all platforms)
 *Except for notification messages, all messages are non-collapsible by default.*
 
 ## Setting the priority of the message:
-- Normal priority: Delivered immediately when the app is in the foreground, 
+- Normal priority: Delivered immediately when the app is in the foreground,
 when the app is in the background delivery maybe delayed.
 
 - High priority: attempt to deliver the message immediately even if the app is 

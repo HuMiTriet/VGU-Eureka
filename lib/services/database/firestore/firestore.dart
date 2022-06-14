@@ -34,12 +34,8 @@ class Firestore {
     var userEmergencyRef = userRef.collection('emergency').doc('emergency');
 
     userEmergencyRef.set({
-      'lostAndFound': false,
-      'accident': false,
-      'thief': false,
-      'other': false,
       'isPublic': false,
-      'isFilled': false,
+      'problem': '',
       'situationDetail': '',
       'locationDescription': '',
     });
@@ -64,12 +60,8 @@ class Firestore {
     var userEmergencyRef = userRef.collection('emergency').doc('emergency');
 
     userEmergencyRef.update({
-      'lostAndFound': authUser.emergency.lostAndFound,
-      'accident': authUser.emergency.accident,
-      'thief': authUser.emergency.thief,
-      'other': authUser.emergency.other,
       'isPublic': authUser.emergency.isPublic,
-      'isFilled': authUser.emergency.isFilled,
+      'emergencyType': authUser.emergency.emergencyType,
       'situationDetail': authUser.emergency.situationDetail,
       'locationDescription': authUser.emergency.locationDescription,
     });

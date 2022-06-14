@@ -99,19 +99,13 @@ class FirestoreChat extends Firestore {
     required String chatroomUID,
     required String message,
     required String senderUID,
-    required String senderEmail,
-    required String senderPhoneNumber,
     required String senderDisplayName,
-    required String senderPhotoURL,
   }) {
     var ts = Timestamp.now();
     final data = {
       'message': message,
       'senderUID': senderUID,
-      'senderEmail': senderEmail,
-      'senderPhoneNumber': senderPhoneNumber,
       'senderDisplayName': senderDisplayName,
-      'senderPhotoURL': senderPhotoURL,
       'ts': ts
     };
     FirebaseFirestore.instance

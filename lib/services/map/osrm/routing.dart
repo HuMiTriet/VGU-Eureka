@@ -14,6 +14,19 @@ class Routing {
 
   Routing._();
 
+  Future<double> getDistance(LatLng to) async {
+    var road = await manager.getRoad(
+      waypoints: [
+        LngLat(lat: location.latitude, lng: location.longitude),
+        LngLat(lat: to.latitude, lng: to.longitude)
+      ],
+      geometrie: Geometries.geojson,
+      steps: true,
+      languageCode: 'en',
+    );
+    return road.distance;
+  }
+
   Future<List<LatLng>> getPointsFromUser(LatLng to) async {
     return _getPoints(location, to);
   }

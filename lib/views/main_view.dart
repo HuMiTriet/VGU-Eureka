@@ -1,5 +1,4 @@
 import 'package:etoet/constants/routes.dart';
-import 'package:etoet/services/auth/emergency.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:etoet/services/database/firestore/firestore.dart';
 import 'package:etoet/services/database/firestore/firestore_emergency.dart';
