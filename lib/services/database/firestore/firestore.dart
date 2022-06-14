@@ -34,12 +34,8 @@ class Firestore {
     var userEmergencyRef = userRef.collection('emergency').doc('emergency');
 
     userEmergencyRef.set({
-      'lostAndFound': false,
-      'accident': false,
-      'thief': false,
-      'other': false,
       'isPublic': false,
-      'isFilled': false,
+      'problem': '',
       'situationDetail': '',
       'locationDescription': '',
     });
