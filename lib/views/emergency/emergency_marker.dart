@@ -20,6 +20,8 @@ class EmergencyMarker {
   late Function onHelpButtonPressed;
   late Function removeMarker;
   late Function setState;
+  late Function(Marker helpMarker) addHelpMarker;
+
   EmergencyMarker({
     required this.emergencyInfo,
     required this.context,
@@ -30,11 +32,47 @@ class EmergencyMarker {
     required this.emergencyType,
     required this.removeMarker,
     required this.setState,
+    required this.addHelpMarker,
   });
 
   Future<Marker> createEmergencyMarker(
       {required LatLng emergencyLatLng}) async {
     var distance = await routing.getDistance(emergencyLatLng);
+    var helpMarker = Marker(
+      markerId: MarkerId(uid),
+      position: emergencyLatLng,
+      icon: await emergencyIcon,
+      infoWindow: InfoWindow(
+        title: emergencyInfo.displayName,
+        snippet: 'Tap to see user\'s emergency details',
+      ),
+      onTap: () {
+        showModalBottomSheet(
+            barrierColor: Colors.transparent,
+            context: context,
+            builder: (context) {
+              return Confirmbox(
+                locationDescription: locationDescription,
+                situationDetail: situationDetail,
+                distance: distance,
+                needHelpUser: emergencyInfo,
+                emergencyType: emergencyType,
+                onHelpButtonPressed: () async {},
+                onAbortButtonPressed: () {
+                  polylines.clear();
+                  removeMarker();
+                  setState();
+                },
+                onDoneButtonPressed: () {
+                  polylines.clear();
+                  removeMarker();
+                  setState();
+                },
+                confirmedToHelp: true,
+              );
+            });
+      },
+    );
     return Marker(
       markerId: MarkerId(uid),
       position: emergencyLatLng,
@@ -62,6 +100,8 @@ class EmergencyMarker {
                       points: await routing.getPointsFromUser(emergencyLatLng),
                       width: 5,
                       color: Colors.red));
+                  removeMarker();
+                  addHelpMarker(helpMarker);
                   setState();
                 },
                 onAbortButtonPressed: () {
