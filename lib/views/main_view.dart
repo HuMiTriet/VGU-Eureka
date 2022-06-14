@@ -2,12 +2,16 @@ import 'dart:convert';
 import 'dart:developer' as developer show log;
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
+import 'package:etoet/services/database/firestore/firestore.dart';
+import 'package:etoet/services/database/firestore/firestore_emergency.dart';
+import 'package:etoet/services/database/firestore/firestore_friend.dart';
 import 'package:etoet/services/auth/user_info.dart';
 import 'package:etoet/services/database/firestore.dart';
 import 'package:etoet/services/map/map_factory.dart' as etoet;
 import 'package:etoet/services/notification/notification.dart';
 import 'package:etoet/views/friend/chat_room_view.dart';
 import 'package:etoet/views/friend/friend_view.dart';
+import 'package:etoet/views/signal/sos_signal_screen.dart';
 import 'package:etoet/views/popup_sos_message/sos_received_bottom_bar.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +37,9 @@ class MainViewState extends State<MainView> {
   @override
   Widget build(BuildContext context) {
     authUser = context.watch<AuthUser?>();
+    FirestoreEmergency.getEmergencySignal(uid: authUser!.uid).then((value) => {
+          authUser!.emergency = value,
+        });
 
     return FutureBuilder(
         future: Firestore.getFriendInfoList(authUser!.uid),
@@ -105,7 +112,14 @@ class MainViewState extends State<MainView> {
                   FloatingActionButton(
                       heroTag: 'goToSOSFromMain',
                       onPressed: () {
-                        Navigator.of(context).pushNamed(sosRoute);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SOSView(
+                              uid: authUser!.uid,
+                            ),
+                          ),
+                        );
                       },
                       child: const Icon(Icons.add_alert)),
                   FloatingActionButton(
