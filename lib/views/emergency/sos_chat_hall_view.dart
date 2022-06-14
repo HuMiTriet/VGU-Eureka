@@ -25,6 +25,19 @@ class _SOSChatHallViewState extends State<SOSChatHallView> {
         title: const Text('SOS Chat Hall'),
         backgroundColor: const Color.fromARGB(255, 255, 0, 0),
       ),
+      body: ListView.builder(
+        itemCount: 20,
+          itemBuilder: (context, index)
+              {
+                return const ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage: NetworkImage('https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977'),
+                  ),
+                  title: Text('Username'),
+                  subtitle: Text('email'),
+                );
+              }
+      ),
     );
   }
   
