@@ -2,11 +2,11 @@
 import 'dart:developer' as devtools show log;
 
 import 'package:etoet/constants/routes.dart';
-import 'package:etoet/services/database/firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../../services/auth/auth_service.dart';
 import '../../services/auth/auth_user.dart';
+import '../../services/database/firestore/firestore.dart';
 
 class VerifyEmailView extends StatefulWidget {
   final AuthUser user;

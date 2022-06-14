@@ -6,7 +6,6 @@ import 'package:etoet/services/database/firestore/firestore.dart';
 import 'package:etoet/services/database/firestore/firestore_emergency.dart';
 import 'package:etoet/services/database/firestore/firestore_friend.dart';
 import 'package:etoet/services/auth/user_info.dart';
-import 'package:etoet/services/database/firestore.dart';
 import 'package:etoet/services/map/map_factory.dart' as etoet;
 import 'package:etoet/services/notification/notification.dart';
 import 'package:etoet/views/friend/chat_room_view.dart';
@@ -42,7 +41,7 @@ class MainViewState extends State<MainView> {
         });
 
     return FutureBuilder(
-        future: Firestore.getFriendInfoList(authUser!.uid),
+        future: FirestoreFriend.getFriendInfoList(authUser!.uid),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             var friendInfoList = snapshot.data as Set<etoet.UserInfo>;

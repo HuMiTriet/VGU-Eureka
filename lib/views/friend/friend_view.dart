@@ -6,7 +6,6 @@ import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
-import 'package:etoet/services/database/firestore.dart';
 import 'package:etoet/views/friend/chat_room_view.dart';
 import 'package:etoet/views/friend/pending_friend_view.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +14,9 @@ import 'package:provider/provider.dart';
 import 'package:random_string/random_string.dart';
 
 import '../../services/auth/auth_user.dart';
+import '../../services/database/firestore/firestore.dart';
+import '../../services/database/firestore/firestore_chat.dart';
+import '../../services/database/firestore/firestore_friend.dart';
 import 'add_friend_view.dart';
 
 class FriendView extends StatefulWidget {
@@ -141,7 +143,7 @@ class _FriendViewState extends State<FriendView> {
     late Stream<QuerySnapshot> _pendingFriendStream;
     int? pendingFriendRequestCount = 0;
 
-    _pendingFriendStream = Firestore.getPendingFriendStream(user.uid);
+    _pendingFriendStream = FirestoreFriend.getPendingFriendStream(user.uid);
 
     return StreamBuilder<QuerySnapshot>(
         stream: _pendingFriendStream,
@@ -290,7 +292,7 @@ class _FriendViewState extends State<FriendView> {
                                       ? userListOnSearch.elementAt(index)
                                       : user.friendInfoList.elementAt(index);
                               var chatroomUID = const Uuid().v4().toString();
-                              await Firestore.createFriendChatroom(
+                              await FirestoreChat.createFriendChatroom(
                                   user.uid, selectedUser.uid, chatroomUID);
                               // Navigator.pushNamedAndRemoveUntil(
                               //     context, chat_friend_route, (route) => false,
