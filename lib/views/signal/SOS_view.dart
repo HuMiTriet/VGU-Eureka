@@ -3,6 +3,8 @@ import 'package:etoet/services/database/firestore/firestore_emergency.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../services/database/firestore_emergency.dart';
+
 class SOSView extends StatefulWidget {
   const SOSView({Key? key}) : super(key: key);
 
