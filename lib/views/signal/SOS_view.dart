@@ -3,7 +3,6 @@ import 'package:etoet/services/database/firestore/firestore_emergency.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../services/database/firestore_emergency.dart';
 
 class SOSView extends StatefulWidget {
   const SOSView({Key? key}) : super(key: key);
@@ -174,7 +173,7 @@ class _SOSViewState extends State<SOSView> {
                     locationDescription: locationDescription,
                     lat: authUser!.location.latitude,
                     lng: authUser!.location.longitude,
-                    isPublic: false);
+                    isPublic: false, emergencyType: '');
                 Navigator.pop(context);
               },
             ),
@@ -196,7 +195,7 @@ class _SOSViewState extends State<SOSView> {
                     locationDescription: locationDescription,
                     lat: authUser!.location.latitude,
                     lng: authUser!.location.longitude,
-                    isPublic: true);
+                    isPublic: true, emergencyType: '');
                 Navigator.pop(context);
               },
             ),
