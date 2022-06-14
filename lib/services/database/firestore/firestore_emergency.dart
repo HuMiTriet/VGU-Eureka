@@ -7,6 +7,7 @@ import 'package:etoet/services/map/geoflutterfire/geoflutterfire.dart';
 
 class FirestoreEmergency extends Firestore {
   static void setEmergencySignal({
+    required String helpStatus,
     required String emergencyType,
     required String uid,
     required String displayName,
