@@ -1,11 +1,39 @@
 import 'package:etoet/services/auth/user_info.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../services/auth/auth_user.dart';
 import '../../services/database/firestore/firestore_chat.dart';
 import '../emergency/sos_chat_room_view.dart';
+
+class Confirmbox extends StatefulWidget {
+  final double distance;
+  final UserInfo needHelpUser;
+  final String locationDescription;
+  final String situationDetail;
+  final String emergencyType;
+  final Function onHelpButtonPressed;
+  final Function onAbortButtonPressed;
+  final Function onDoneButtonPressed;
+  bool confirmedToHelp;
+  Confirmbox({
+    Key? key,
+    required this.distance,
+    required this.needHelpUser,
+    required this.locationDescription,
+    required this.situationDetail,
+    required this.emergencyType,
+    required this.onHelpButtonPressed,
+    required this.onAbortButtonPressed,
+    required this.onDoneButtonPressed,
+    this.confirmedToHelp = false,
+  }) : super(key: key);
+
+  @override
+  State<Confirmbox> createState() => _ConfirmboxState();
+}
 
 // just put here for the color reference, the tool is not good enought to generate the working code but it's ok for getting the color
 class FvColors {
@@ -16,33 +44,12 @@ class FvColors {
   static const Color button6Background = Color.fromARGB(255, 132, 2, 2);
 }
 
-class Confirmbox extends StatefulWidget {
-  final double distance;
-  final UserInfo needHelpUser;
-  final String locationDescription;
-  final String situationDetail;
-  final String emergencyType;
-
-  const Confirmbox({
-    Key? key,
-    required this.distance,
-    required this.needHelpUser,
-    required this.locationDescription,
-    required this.situationDetail,
-    required this.emergencyType,
-  }) : super(key: key);
-
-  @override
-  State<Confirmbox> createState() => _ConfirmboxState();
-}
-
 class _ConfirmboxState extends State<Confirmbox> {
-  bool confirmedToHelp = false;
-
   late AuthUser? needHelpUser;
   String? photoURL;
   String? displayName;
   String? email;
+  String? phoneNumber;
 
   late AuthUser user;
 
@@ -53,6 +60,7 @@ class _ConfirmboxState extends State<Confirmbox> {
     photoURL = needHelpUser.photoURL;
     displayName = needHelpUser.displayName;
     email = needHelpUser.email;
+    phoneNumber = needHelpUser.phoneNumber;
 
     user = context.watch<AuthUser>();
 
@@ -61,8 +69,12 @@ class _ConfirmboxState extends State<Confirmbox> {
       Widget cancelButton = Container(
         height: 30,
         width: 100,
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+          color: Color.fromRGBO(66, 133, 244, 1),
+        ),
         child: TextButton(
-          child: Text(
+          child: const Text(
             'CANCEL',
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -78,16 +90,16 @@ class _ConfirmboxState extends State<Confirmbox> {
             Navigator.of(context).pop();
           },
         ),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(12)),
-          color: Color.fromRGBO(66, 133, 244, 1),
-        ),
       );
       Widget confirmButton = Container(
         height: 30,
         width: 100,
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+          color: Color(0xff34a853),
+        ),
         child: TextButton(
-          child: Text(
+          child: const Text(
             'CONFIRM',
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -100,25 +112,22 @@ class _ConfirmboxState extends State<Confirmbox> {
                 height: 1),
           ),
           onPressed: () {
+            widget.onAbortButtonPressed();
             Navigator.of(context).pop();
           },
-        ),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(12)),
-          color: Color(0xff34a853),
         ),
       );
 
       // set up the AlertDialog
-      AlertDialog alert = AlertDialog(
-        title: Text(
-          "ABORT",
+      var alert = AlertDialog(
+        title: const Text(
+          'ABORT',
           style: TextStyle(
-              fontFamily: "Poppins",
+              fontFamily: 'Poppins',
               fontWeight: FontWeight.w800,
               color: Colors.red),
         ),
-        content: Text("Abort helping this person ?"),
+        content: const Text('Abort helping this person ?'),
         actions: [
           cancelButton,
           confirmButton,
@@ -128,7 +137,7 @@ class _ConfirmboxState extends State<Confirmbox> {
       // show the dialog
       showDialog(
         context: context,
-        builder: (BuildContext context) {
+        builder: (context) {
           return alert;
         },
       );
@@ -139,8 +148,12 @@ class _ConfirmboxState extends State<Confirmbox> {
       Widget cancelButton = Container(
         height: 30,
         width: 100,
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+          color: Color.fromRGBO(66, 133, 244, 1),
+        ),
         child: TextButton(
-          child: Text(
+          child: const Text(
             'CANCEL',
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -156,16 +169,16 @@ class _ConfirmboxState extends State<Confirmbox> {
             Navigator.of(context).pop();
           },
         ),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(12)),
-          color: Color.fromRGBO(66, 133, 244, 1),
-        ),
       );
       Widget confirmButton = Container(
         height: 30,
         width: 100,
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+          color: Color(0xffadadad),
+        ),
         child: TextButton(
-          child: Text(
+          child: const Text(
             'CONFIRM',
             textAlign: TextAlign.center,
             style: TextStyle(
@@ -178,25 +191,22 @@ class _ConfirmboxState extends State<Confirmbox> {
                 height: 1),
           ),
           onPressed: () {
+            widget.onDoneButtonPressed();
             Navigator.of(context).pop();
           },
-        ),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(12)),
-          color: Color(0xffadadad),
         ),
       );
 
       // set up the AlertDialog
-      AlertDialog alert = AlertDialog(
-        title: Text(
-          "DONE",
+      var alert = AlertDialog(
+        title: const Text(
+          'DONE',
           style: TextStyle(
-              fontFamily: "Poppins",
+              fontFamily: 'Poppins',
               fontWeight: FontWeight.w800,
               color: Colors.red),
         ),
-        content: Text("Did you help this person ?"),
+        content: const Text('Did you help this person ?'),
         actions: [
           cancelButton,
           confirmButton,
@@ -206,7 +216,7 @@ class _ConfirmboxState extends State<Confirmbox> {
       // show the dialog
       showDialog(
         context: context,
-        builder: (BuildContext context) {
+        builder: (context) {
           return alert;
         },
       );
@@ -248,16 +258,17 @@ class _ConfirmboxState extends State<Confirmbox> {
                     child: Row(
                       children: <Widget>[
                         Container(
-                            width: 40.0,
-                            height: 40.0,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                image: NetworkImage(photoURL ??
-                                    'https://www.pavilionweb.com/wp-content/uploads/2017/03/man-300x300.png'),
-                                fit: BoxFit.cover,
-                              ),
-                            )),
+                          width: 40.0,
+                          height: 40.0,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                              image: NetworkImage(photoURL ??
+                                  'https://www.pavilionweb.com/wp-content/uploads/2017/03/man-300x300.png'),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
                         Expanded(
                             child: Container(
                           alignment: Alignment.centerLeft,
@@ -295,9 +306,12 @@ class _ConfirmboxState extends State<Confirmbox> {
                             );
                           },
                         ),
-                        if (confirmedToHelp)
-                          new IconButton(
-                              icon: const Icon(Icons.phone), onPressed: () {})
+                        if (widget.confirmedToHelp)
+                          IconButton(
+                              icon: const Icon(Icons.phone),
+                              onPressed: () {
+                                //launchUrlString('tel:${phoneNumber ?? '113'} ');                              })
+                                launchUrlString('tel:phoneNumber');                              })
                       ],
                     )),
                 Container(
@@ -306,13 +320,13 @@ class _ConfirmboxState extends State<Confirmbox> {
                     height: 30,
                     child: Row(
                       children: <Widget>[
-                        Text(
+                        const Text(
                           'Emergency! - ',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         Text(
                           widget.emergencyType,
-                          style: TextStyle(color: Colors.grey),
+                          style: const TextStyle(color: Colors.grey),
                         )
                       ],
                     )),
@@ -331,48 +345,59 @@ class _ConfirmboxState extends State<Confirmbox> {
             ),
           ),
           //   Widget swapWidget = new Container();
-          if (!confirmedToHelp)
-            new Container(
+          if (!widget.confirmedToHelp)
+            Container(
                 width: 300,
                 height: 39,
-                margin: EdgeInsets.only(top: 10),
+                margin: const EdgeInsets.only(top: 10),
                 child: TextButton(
-                  child: Text('Confirm help ${displayName}',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: FvColors.imageview3Background,
-                        fontWeight: FontWeight.w700,
-                      )),
                   style: TextButton.styleFrom(
                     backgroundColor: FvColors.button6Background,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24),
-                      side: BorderSide(
+                      side: const BorderSide(
                         width: 0,
                         color: Colors.transparent,
                       ),
                     ),
                   ),
                   onPressed: () {
+                    widget.onHelpButtonPressed();
                     setState(() {
-                      confirmedToHelp = true;
+                      widget.confirmedToHelp = true;
                     });
                   },
+                  child: Text('Confirm help $displayName',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        color: FvColors.imageview3Background,
+                        fontWeight: FontWeight.w700,
+                      )),
                 ))
           else
-            new Container(
+            Container(
               width: 300,
               height: 39,
-              margin: EdgeInsets.only(top: 10),
+              margin: const EdgeInsets.only(top: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
                       width: 142,
                       height: 33,
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(12)),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Color.fromRGBO(0, 0, 0, 0.25),
+                              offset: Offset(0, 4),
+                              blurRadius: 4)
+                        ],
+                        color: Color.fromRGBO(176, 176, 176, 1),
+                      ),
                       child: TextButton(
-                        child: Text(
+                        child: const Text(
                           'ABORT',
                           textAlign: TextAlign.center,
                           style: TextStyle(
@@ -388,8 +413,11 @@ class _ConfirmboxState extends State<Confirmbox> {
                         onPressed: () {
                           showAbortDialog(context);
                         },
-                      ),
-                      decoration: BoxDecoration(
+                      )),
+                  Container(
+                      width: 142,
+                      height: 33,
+                      decoration: const BoxDecoration(
                         borderRadius: BorderRadius.all(Radius.circular(12)),
                         boxShadow: [
                           BoxShadow(
@@ -397,13 +425,10 @@ class _ConfirmboxState extends State<Confirmbox> {
                               offset: Offset(0, 4),
                               blurRadius: 4)
                         ],
-                        color: Color.fromRGBO(176, 176, 176, 1),
-                      )),
-                  Container(
-                      width: 142,
-                      height: 33,
+                        color: Color.fromRGBO(52, 168, 83, 1),
+                      ),
                       child: TextButton(
-                        child: Text(
+                        child: const Text(
                           'DONE',
                           textAlign: TextAlign.center,
                           style: TextStyle(
@@ -419,16 +444,6 @@ class _ConfirmboxState extends State<Confirmbox> {
                         onPressed: () {
                           showDoneDialog(context);
                         },
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(12)),
-                        boxShadow: [
-                          BoxShadow(
-                              color: Color.fromRGBO(0, 0, 0, 0.25),
-                              offset: Offset(0, 4),
-                              blurRadius: 4)
-                        ],
-                        color: Color.fromRGBO(52, 168, 83, 1),
                       ))
                 ],
               ),

@@ -1,12 +1,13 @@
-import 'dart:developer' as developer show log;
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:etoet/services/database/firestore/firestore.dart';
+import 'package:etoet/services/database/firestore/firestore_emergency.dart';
 import 'package:etoet/services/database/firestore/firestore_friend.dart';
 import 'package:etoet/services/map/map_factory.dart' as etoet;
 import 'package:etoet/services/notification/notification.dart';
-import 'package:etoet/views/emergency/sos_dialog.dart';
 import 'package:etoet/views/friend/friend_view.dart';
+import 'package:etoet/views/signal/sos_signal_screen.dart';
+import 'package:etoet/views/popup_sos_message/popupsos_message.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -32,6 +33,9 @@ class MainViewState extends State<MainView> {
   @override
   Widget build(BuildContext context) {
     authUser = context.watch<AuthUser?>();
+    FirestoreEmergency.getEmergencySignal(uid: authUser!.uid).then((value) => {
+          authUser!.emergency = value,
+        });
 
     return FutureBuilder(
         future: FirestoreFriend.getFriendInfoList(authUser!.uid),
@@ -137,7 +141,14 @@ class MainViewState extends State<MainView> {
                   FloatingActionButton(
                       heroTag: 'goToSOSFromMain',
                       onPressed: () {
-                        Navigator.of(context).pushNamed(sosRoute);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SOSView(
+                              uid: authUser!.uid,
+                            ),
+                          ),
+                        );
                       },
                       child: const Icon(Icons.add_alert)),
                   FloatingActionButton(
@@ -186,35 +197,9 @@ class MainViewState extends State<MainView> {
           var dataType = event.data['type'];
           if (dataType == 'privateEmegency') {
             showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                      title: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: <Widget>[
-                              IconButton(
-                                icon: const Icon(Icons.close),
-                                color: Colors.grey,
-                                iconSize: 25,
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                              ),
-                            ],
-                          ),
-                          const Text('Emergency'),
-                        ],
-                      ),
-                      content: const Text('I need help!!!!'
-                          '\nI want my mom back.'
-                          ' This app is so wonderful.'),
-                      /* actions: [ */
-                      /*   sendmessageButton, */
-                      /*   helpButton, */
-                      /* ], */
-                    ));
+              context: context,
+              builder: (context) => PrivateDialog(),
+            );
           }
         });
       }
