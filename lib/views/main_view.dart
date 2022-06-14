@@ -214,7 +214,7 @@ class MainViewState extends State<MainView> {
       developer.log('received message: ${message.data}');
 
       switch (message.data['type']) {
-        case 'sos_received':
+        case 'publicAccepted':
           developer.log('show sos received message');
           showMaterialModalBottomSheet(
               expand: false,
@@ -232,7 +232,7 @@ class MainViewState extends State<MainView> {
     }
   }
 
-  void onClickNotificationRouting(data) {
+  void onClickNotificationRouting(data) async {
     switch (data['type']) {
       case 'newFriend':
         showBarModalBottomSheet(
@@ -244,29 +244,23 @@ class MainViewState extends State<MainView> {
         break;
       case 'newMessage':
         // create user from payload data
-        var sender = UserInfo(
-            uid: data['uid'],
-            photoURL: data['photoUrl'],
-            email: data['email'],
-            displayName: data['displayName']);
+        var sender = await Firestore.getUserInfo(data['senderUID']);
 
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => ChatRoomView(sender)),
         );
         break;
-      case 'sos_received':
+      case 'publicAccepted':
         showMaterialModalBottomSheet(
             expand: false,
             context: context,
             backgroundColor: Colors.transparent,
-            builder: (context) => SoSReceivedBottomSheet());
-        break;
-
-      case 'publicEmergency':
+            builder: (context) => const SoSReceivedBottomSheet());
         break;
 
       case 'privateEmergency':
+        /// TODO: bring over TA stuff from etoet_signal
         break;
     }
   }
