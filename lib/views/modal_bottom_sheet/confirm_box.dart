@@ -4,15 +4,6 @@ import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../services/auth/auth_user.dart';
 
-// just put here for the color reference, the tool is not good enought to generate the working code but it's ok for getting the color
-class FvColors {
-  static const Color screen1Background = Color.fromARGB(0, 0, 0, 0);
-  static const Color container2Background = Color.fromARGB(255, 199, 9, 9);
-  static const Color imageview3Background = Color.fromARGB(255, 255, 255, 255);
-  static const Color textview4FontColor = Color.fromARGB(255, 0, 0, 0);
-  static const Color button6Background = Color.fromARGB(255, 132, 2, 2);
-}
-
 class Confirmbox extends StatefulWidget {
   final double distance;
   final UserInfo needHelpUser;
@@ -38,6 +29,15 @@ class Confirmbox extends StatefulWidget {
 
   @override
   State<Confirmbox> createState() => _ConfirmboxState();
+}
+
+// just put here for the color reference, the tool is not good enought to generate the working code but it's ok for getting the color
+class FvColors {
+  static const Color screen1Background = Color.fromARGB(0, 0, 0, 0);
+  static const Color container2Background = Color.fromARGB(255, 199, 9, 9);
+  static const Color imageview3Background = Color.fromARGB(255, 255, 255, 255);
+  static const Color textview4FontColor = Color.fromARGB(255, 0, 0, 0);
+  static const Color button6Background = Color.fromARGB(255, 132, 2, 2);
 }
 
 class _ConfirmboxState extends State<Confirmbox> {
@@ -115,7 +115,7 @@ class _ConfirmboxState extends State<Confirmbox> {
         title: const Text(
           'ABORT',
           style: TextStyle(
-              fontFamily: "Poppins",
+              fontFamily: 'Poppins',
               fontWeight: FontWeight.w800,
               color: Colors.red),
         ),
@@ -250,16 +250,17 @@ class _ConfirmboxState extends State<Confirmbox> {
                     child: Row(
                       children: <Widget>[
                         Container(
-                            width: 40.0,
-                            height: 40.0,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                image: NetworkImage(photoURL ??
-                                    'https://www.pavilionweb.com/wp-content/uploads/2017/03/man-300x300.png'),
-                                fit: BoxFit.cover,
-                              ),
-                            )),
+                          width: 40.0,
+                          height: 40.0,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                              image: NetworkImage(photoURL ??
+                                  'https://www.pavilionweb.com/wp-content/uploads/2017/03/man-300x300.png'),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
                         Expanded(
                             child: Container(
                           alignment: Alignment.centerLeft,

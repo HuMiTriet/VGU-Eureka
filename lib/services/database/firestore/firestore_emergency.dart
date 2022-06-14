@@ -29,4 +29,22 @@ class FirestoreEmergency extends Firestore {
       SetOptions(merge: true),
     );
   }
+
+  static void acceptEmergencySignal({
+    required String uid,
+    required String email,
+    required String phoneNumber,
+    required String displayName,
+    required String photoUrl,
+  }) {
+    /* Firestore.firestoreReference.collection('emergencies').doc(uid).get */
+
+    Firestore.firestoreReference.collection('emergencies').doc(uid).update({
+      'helperUID': uid,
+      'helperEmail': email,
+      'helperPhoneNumber': phoneNumber,
+      'helperDisplayName': displayName,
+      'helperPhotoUrl': photoUrl,
+    });
+  }
 }

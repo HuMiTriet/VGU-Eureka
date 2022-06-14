@@ -7,6 +7,7 @@ import 'package:etoet/services/map/map_factory.dart' as etoet;
 import 'package:etoet/services/notification/notification.dart';
 import 'package:etoet/views/emergency/sos_dialog.dart';
 import 'package:etoet/views/friend/friend_view.dart';
+import 'package:etoet/views/popup_sos_message/popupsos_message.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -103,7 +104,8 @@ class MainViewState extends State<MainView> {
                   FloatingActionButton(
                       heroTag: 'goToSOSFromMain',
                       onPressed: () {
-                        Navigator.of(context).pushNamed(sosRoute);
+                        /* Navigator.of(context).pushNamed(sosRoute); */
+                    showDialog(context: context, builder: (context) => PrivateDialog());
                       },
                       child: const Icon(Icons.add_alert)),
                   FloatingActionButton(
@@ -151,34 +153,11 @@ class MainViewState extends State<MainView> {
         FirebaseMessaging.onMessage.listen((event) {
           var dataType = event.data['type'];
           if (dataType == 'privateEmegency') {
+            developer.log('PRIVATE emergency');
+            developer.log(event.notification.toString());
             showDialog(
               context: context,
-              builder: (context) => AlertDialog(
-                title: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        IconButton(
-                          icon: const Icon(Icons.close),
-                          color: Colors.grey,
-                          iconSize: 25,
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                        ),
-                      ],
-                    ),
-                    Text(event.data['title']),
-                  ],
-                ),
-                content: Text(event.data['body']),
-                /* actions: [ */
-                /*   sendmessageButton, */
-                /*   helpButton, */
-                /* ], */
-              ),
+              builder: (context) => PrivateDialog(),
             );
           }
         });

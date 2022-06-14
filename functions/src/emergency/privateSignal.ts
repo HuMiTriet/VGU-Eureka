@@ -51,7 +51,7 @@ export default async (
 
     const payload = {
       notification: {
-        title: displayName + "'s Private emergency Alert",
+        title: displayName + "'s Private Alert",
         body: String(snapshot.data()?.situationDetail),
       },
       data: {
