@@ -274,6 +274,7 @@ class _SOSViewState extends State<SOSView> {
                                   });
                                   devtools.log('Update to public signal',
                                       name: 'EmergencySignal');
+                                  successPublicSignalDialog(context);
                                 } else {
                                   showAlertDialog(context);
                                 }
@@ -799,6 +800,42 @@ class _SOSViewState extends State<SOSView> {
         barrierDismissible: false,
         context: context,
         builder: (context) => alertDialog);
+  }
+
+  void successPublicSignalDialog(BuildContext context) {
+    var alertDialog = AlertDialog(
+      title: const Text(
+        'Your signal has been changed!',
+        style: TextStyle(
+          color: Colors.red,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      content: const Text(
+        'Your signal is public now\n '
+        '\nYou can now navigate to main view',
+      ),
+      actions: [
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            primary: Colors.blue,
+            onPrimary: Colors.white,
+          ),
+          onPressed: () => Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const MainView())),
+          child: const Text('BACK TO MAIN VIEW'),
+        )
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return alertDialog;
+      },
+    );
   }
 
   @override
