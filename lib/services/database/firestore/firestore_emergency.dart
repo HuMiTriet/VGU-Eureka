@@ -31,7 +31,6 @@ class FirestoreEmergency extends Firestore {
           latitude: lat,
           longitude: lng,
         ),
-        'uid': uid,
       },
       SetOptions(merge: true),
     );
@@ -39,28 +38,13 @@ class FirestoreEmergency extends Firestore {
   }
 
   static void clearEmergency({required String uid}) {
-    Firestore.firestoreReference.collection('emergencies').doc(uid).update(
-      {
-        'isPublic': false,
-        'emergencyType': '',
-        'locationDescription': '',
-        'situationDetail': '',
-      },
-    );
-
+    Firestore.firestoreReference.collection('emergencies').doc(uid).delete();
     Firestore.firestoreReference
         .collection('users')
         .doc(uid)
         .collection('emergency')
         .doc('emergency')
-        .update(
-      {
-        'isPublic': false,
-        'emergencyType': '',
-        'locationDescription': '',
-        'situationDetail': '',
-      },
-    );
+        .delete();
 
     devtools.log('Emergency signal clear: $uid', name: 'FirestoreEmergency');
   }
