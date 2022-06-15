@@ -331,15 +331,15 @@ class MainViewState extends State<MainView> {
         });
         break;
 
-      case 'privateEmergency':
-        showDialog(
-          context: context,
-          builder: (context) => PrivateDialog(
-            title: data['displayName'] + "'s Private Alert",
-            body: data['locationDescription'],
-          ),
-        );
-        break;
+      /* case 'privateEmergency': */
+      /*   showDialog( */
+      /*     context: context, */
+      /*     builder: (context) => PrivateDialog( */
+      /*       title: data['displayName'] + "'s Private Alert", */
+      /*       body: data['locationDescription'], */
+      /*     ), */
+      /*   ); */
+      /*   break; */
     }
   }
 }
