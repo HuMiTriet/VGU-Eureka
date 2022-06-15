@@ -2,15 +2,16 @@ import 'package:etoet/services/auth/user_info.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:provider/provider.dart';
+import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:uuid/uuid.dart';
 
 import '../../services/auth/auth_user.dart';
-import '../../services/database/firestore/firestore_chat.dart';
+import '../../services/database/firestore/firestore_SOS_chat.dart';
 import '../emergency/sos_chat_room_view.dart';
 
 class Confirmbox extends StatefulWidget {
   final double distance;
-  final UserInfo needHelpUser;
+  final etoet.UserInfo needHelpUser;
   final String locationDescription;
   final String situationDetail;
   final String emergencyType;
@@ -45,22 +46,13 @@ class FvColors {
 }
 
 class _ConfirmboxState extends State<Confirmbox> {
-  late AuthUser? needHelpUser;
-  String? photoURL;
-  String? displayName;
-  String? email;
-  String? phoneNumber;
+
 
   late AuthUser user;
 
   @override
   Widget build(BuildContext context) {
     var distance = widget.distance;
-    var needHelpUser = widget.needHelpUser;
-    photoURL = needHelpUser.photoURL;
-    displayName = needHelpUser.displayName;
-    email = needHelpUser.email;
-    phoneNumber = needHelpUser.phoneNumber;
 
     user = context.watch<AuthUser>();
 
@@ -263,7 +255,7 @@ class _ConfirmboxState extends State<Confirmbox> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             image: DecorationImage(
-                              image: NetworkImage(photoURL ??
+                              image: NetworkImage(widget.needHelpUser.photoURL ??
                                   'https://www.pavilionweb.com/wp-content/uploads/2017/03/man-300x300.png'),
                               fit: BoxFit.cover,
                             ),
@@ -276,7 +268,7 @@ class _ConfirmboxState extends State<Confirmbox> {
                           child: Column(children: <Widget>[
                             Padding(
                               padding: const EdgeInsets.only(top: 3.0),
-                              child: Text('$displayName',
+                              child: Text('${widget.needHelpUser.displayName}',
                                   textAlign: TextAlign.left,
                                   style: const TextStyle(
                                     fontSize: 20,
@@ -287,7 +279,7 @@ class _ConfirmboxState extends State<Confirmbox> {
                             Padding(
                               padding:
                                   const EdgeInsets.only(left: 15.0, top: 3.0),
-                              child: Text('$email',
+                              child: Text('${widget.needHelpUser.email}',
                                   textAlign: TextAlign.left,
                                   style: const TextStyle(
                                       fontSize: 15,
@@ -299,11 +291,8 @@ class _ConfirmboxState extends State<Confirmbox> {
                         IconButton(
                           // Send message to helpee
                           icon: const Icon(Icons.message),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => SOSChatRoomView(needHelpUser)),
-                            );
+                          onPressed: () async {
+                            toPublicSOSChatView();
                           },
                         ),
                         if (widget.confirmedToHelp)
@@ -367,7 +356,7 @@ class _ConfirmboxState extends State<Confirmbox> {
                       widget.confirmedToHelp = true;
                     });
                   },
-                  child: Text('Confirm help $displayName',
+                  child: Text('Confirm help ${widget.needHelpUser.displayName}',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontSize: 20,
@@ -454,15 +443,17 @@ class _ConfirmboxState extends State<Confirmbox> {
     );
   }
 
-  Future<void> toPublicSOSChatView() async {
+  void toPublicSOSChatView() async {
     var chatroomUID = const Uuid().v4().toString();
-    await FirestoreChat.createFriendChatroom(
-        user.uid, needHelpUser!.uid, chatroomUID);
+    print(chatroomUID);
+    await FirestoreSOSChat.createSOSChatroom(
+        user.uid, widget.needHelpUser.uid, chatroomUID);
+    print('create chatroom complete');
 
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(builder: (context) => ChatRoomView(selectedUser)),
-    // );
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => SOSChatRoomView(widget.needHelpUser)),
+    );
   }
 
 }
