@@ -75,8 +75,6 @@ class _FriendViewState extends State<FriendView> {
         if (unfriendFriendUID == user.uid) {
           print('Data of self received, skipping...');
         } else {
-          print('User friend list length: ' +
-              user.friendInfoList.length.toString());
           for (var i = 0; i < user.friendInfoList.length; ++i) {
             if (user.friendInfoList.elementAt(i).uid == unfriendFriendUID) {
               var unfriendFriend = user.friendInfoList.elementAt(i);
@@ -87,6 +85,24 @@ class _FriendViewState extends State<FriendView> {
           }
         }
       }
+      else if(data['type'] == 'friendDataChanged')
+        {
+          var changedFriendUID = data['uid'];
+          print('friend info changed notification');
+
+          for(var i = 0; i < user.friendInfoList.length; ++i)
+            {
+              var friend = user.friendInfoList.elementAt(i);
+              if(friend.uid == changedFriendUID)
+                {
+                  friend.displayName = data['displayName'];
+                  friend.email = data['email'];
+                  friend.photoURL = data['photoUrl'];
+                  break;
+                }
+            }
+
+        }
     });
   }
 
