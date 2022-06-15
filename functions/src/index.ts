@@ -68,3 +68,10 @@ export const helperAbortEmergency = functions.region("asia-southeast1")
       await (await import("./emergency/helperAbortEmergency"))
           .default(change, context);
     });
+
+export const helperDoneEmergency = functions.region("asia-southeast1")
+    .firestore.document("/emergencies/{userUID}")
+    .onUpdate(async (change, context) => {
+      await (await import("./emergency/helperDoneEmergency"))
+          .default(change, context);
+    });
