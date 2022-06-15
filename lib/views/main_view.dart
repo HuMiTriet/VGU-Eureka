@@ -59,7 +59,7 @@ class MainViewState extends State<MainView> {
                               Navigator.of(context).pushNamed(profileRoute);
                             },
                             style: ElevatedButton.styleFrom(
-                              primary: Colors.orange,
+                              primary: Colors.white,
                               shape: const CircleBorder(),
                               fixedSize: const Size(50, 50),
                             ),
@@ -74,13 +74,14 @@ class MainViewState extends State<MainView> {
                               );
                             },
                             style: ElevatedButton.styleFrom(
-                              primary: Colors.orange,
+                              primary: Colors.white,
                               shape: const CircleBorder(),
                               fixedSize: const Size(50, 50),
                             ),
-                            child: const Icon(
-                              Icons.settings,
-                              size: 24.0,
+                            child: Image.asset(
+                              'assets/images/SettingButton.png',
+                              width: 100,
+                              height: 70,
                             )),
                       ],
                     ),
@@ -102,26 +103,41 @@ class MainViewState extends State<MainView> {
                           builder: (context) => const FriendView(),
                         );
                       },
-                      child: const Icon(Icons.group)),
-                  FloatingActionButton(
-                      heroTag: 'goToSOSFromMain',
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SOSView(
-                              uid: authUser!.uid,
-                            ),
+                      backgroundColor: Colors.white,
+                      child: Image.asset(
+                          'assets/images/ShowListFriendButton.png')),
+                  SizedBox(
+                    height: 90.0,
+                    width: 80.0,
+                    child: FittedBox(
+                      child: FloatingActionButton(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
                           ),
-                        );
-                      },
-                      child: const Icon(Icons.add_alert)),
+                          backgroundColor: Colors.red,
+                          heroTag: 'goToSOSFromMain',
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => SOSView(
+                                  uid: authUser!.uid,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Image.asset(
+                            'assets/images/SOSButton.png',
+                          )),
+                    ),
+                  ),
                   FloatingActionButton(
                     heroTag: 'getCurrentLocationFromMain',
                     onPressed: () {
                       map.moveToCurrentLocation();
                     },
-                    child: const Icon(Icons.location_on),
+                    backgroundColor: Colors.white,
+                    child: Image.asset('assets/images/Re-locateButton.png'),
                   ),
                 ],
               ),

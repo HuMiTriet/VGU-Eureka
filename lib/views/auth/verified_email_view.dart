@@ -91,7 +91,7 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
                 child: Container(
                   alignment: Alignment.center,
                   constraints: const BoxConstraints.tightForFinite(
-                    width: 100,
+                    width: 150,
                     height: 40,
                   ),
                   decoration: BoxDecoration(
