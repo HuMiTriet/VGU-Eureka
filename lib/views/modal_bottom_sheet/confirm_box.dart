@@ -319,8 +319,8 @@ class _ConfirmboxState extends State<Confirmbox> {
                               icon: const Icon(Icons.phone),
                               onPressed: () {
                                 //launchUrlString('tel:${phoneNumber ?? '113'} ');                              })
-                                if (phoneNumber != null)
-                                  launchUrlString('tel:${phoneNumber}');
+                                if (widget.needHelpUser.phoneNumber != null)
+                                  launchUrlString('tel:${widget.needHelpUser.phoneNumber}');
                                 else
                                   showNoPhoneNumberDialog(context);
                               },
