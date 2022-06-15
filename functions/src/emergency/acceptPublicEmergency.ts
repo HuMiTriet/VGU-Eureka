@@ -11,21 +11,22 @@ export default async (
     context: functions.EventContext,
 ) => {
   if (change.before.data().isPublic === true &&
-    change.after.data().senderUID != undefined) {
+    change.after.data().helpStatus === "helperIsHelping") {
     const helpeeUID = context.params.userUID;
+    console.log("helpee UID" + helpeeUID);
     const helpeeFcmTokenSnap = await getFcmToken(helpeeUID);
     const helpeeFcmToken: string = helpeeFcmTokenSnap.get("fcm_token");
 
-    const helperUID = change.after.data().helperUID;
-    const helperEmail = change.after.data().helperEmail;
-    const helperPhoneNumber = change.after.data().helperPhoneNumber;
-    const helperDisplayName = change.after.data().helperDisplayName;
-    const helperPhotoUrl = change.after.data().helperPhotoUrl;
+    const helperUID = String(change.after.data().helperUID);
+    const helperEmail = String(change.after.data().helperEmail);
+    const helperPhoneNumber = String(change.after.data().helperPhoneNumber);
+    const helperDisplayName = String(change.after.data().helperDisplayName);
+    const helperPhotoUrl = String(change.after.data().helperPhotoUrl);
 
     const payload = {
       notification: {
-        title: "No one available nearby",
-        body: "Seems like there is nobody nearby that can help you right now",
+        title: "Your public signal has been accepted by " + helperDisplayName,
+        body: helperEmail,
       },
       data: {
         type: "publicAccepted",
@@ -36,6 +37,8 @@ export default async (
         helperPhotoUrl: helperPhotoUrl,
       },
     };
+    console.log(payload);
+    console.log("helpee token" + helpeeFcmToken);
 
     fcm.sendToDevice(helpeeFcmToken, payload);
   } else {
