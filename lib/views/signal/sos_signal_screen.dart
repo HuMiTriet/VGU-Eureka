@@ -7,8 +7,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../main_view.dart';
-
 const int maxLines = 3;
 const int maxLength = 1000;
 
@@ -80,11 +78,7 @@ class _SOSViewState extends State<SOSView> {
                   const Spacer(),
                   IconButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const MainView()),
-                      );
+                      Navigator.pop(context);
                     },
                     icon: const Icon(Icons.close),
                     color: Colors.white,
@@ -259,6 +253,7 @@ class _SOSViewState extends State<SOSView> {
                                         situationDetailController.text;
                                     user?.emergency.isPublic = true;
                                     FirestoreEmergency.setEmergencySignal(
+                                        helpStatus: 'notHelp',
                                         uid: user!.uid,
                                         emergencyType:
                                             user!.emergency.emergencyType,
@@ -268,12 +263,17 @@ class _SOSViewState extends State<SOSView> {
                                         situationDetail:
                                             situationDetailController.text,
                                         lat: user!.location.latitude,
-                                        lng: user!.location.longitude);
+                                        lng: user!.location.longitude,
+                                        displayName:
+                                            user!.displayName ?? 'Etoet user',
+                                        photoUrl: user!.photoURL ??
+                                            'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977');
                                     Firestore.updateUserInfo(user!);
                                     isPublic = value;
                                   });
                                   devtools.log('Update to public signal',
                                       name: 'EmergencySignal');
+                                  successPublicSignalDialog(context);
                                 } else {
                                   showAlertDialog(context);
                                 }
@@ -294,7 +294,9 @@ class _SOSViewState extends State<SOSView> {
                           borderRadius: BorderRadius.circular(10.0)),
                       color: Colors.green,
                       elevation: 12.0,
-                      onPressed: () => solvedConfirmDialog(context),
+                      onPressed: () => {
+                            solvedConfirmDialog(context),
+                          },
                       child: const Text(
                         'MY SITUATION HAS BEEN SOLVED!',
                         style: TextStyle(
@@ -332,11 +334,7 @@ class _SOSViewState extends State<SOSView> {
                   const Spacer(),
                   IconButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const MainView()),
-                      );
+                      Navigator.pop(context);
                     },
                     icon: const Icon(Icons.close),
                     color: Colors.white,
@@ -500,40 +498,42 @@ class _SOSViewState extends State<SOSView> {
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: GestureDetector(
                         onTap: () {
-                          user?.emergency.isPublic = false;
-                          user?.emergency.emergencyType = lostAndFound
-                              ? 'lostAndFound'
-                              : accident
-                                  ? 'accident'
-                                  : thief
-                                      ? 'thief'
-                                      : other
-                                          ? 'other'
-                                          : '';
-                          user?.emergency.locationDescription =
-                              locationDescriptionController.text;
-                          user?.emergency.situationDetail =
-                              situationDetailController.text;
-                          user?.photoURL = user?.photoURL ??
-                              'https://firebasestorage.googleapis.com/v0/b/etoet-app.appspot.com/o/default_profile_pic.png?alt=media&token=f8f8f8f8-f8f8f8f8-f8f8f8f8-f8f8f8f8';
-                          FirestoreEmergency.setEmergencySignal(
-                              uid: user!.uid,
-                              emergencyType: user!.emergency.emergencyType,
-                              isPublic: user!.emergency.isPublic,
-                              locationDescription:
-                                  locationDescriptionController.text,
-                              situationDetail: situationDetailController.text,
-                              lat: user!.location.latitude,
-                              lng: user!.location.longitude);
-                          Firestore.updateUserInfo(user!);
+                          setState(() {
+                            user?.emergency.isPublic = false;
+                            user?.emergency.emergencyType = lostAndFound
+                                ? 'lostAndFound'
+                                : accident
+                                    ? 'accident'
+                                    : thief
+                                        ? 'thief'
+                                        : other
+                                            ? 'other'
+                                            : '';
+                            user?.emergency.locationDescription =
+                                locationDescriptionController.text;
+                            user?.emergency.situationDetail =
+                                situationDetailController.text;
+                            user?.photoURL = user?.photoURL ??
+                                'https://firebasestorage.googleapis.com/v0/b/etoet-app.appspot.com/o/default_profile_pic.png?alt=media&token=f8f8f8f8-f8f8f8f8-f8f8f8f8-f8f8f8f8';
+                            FirestoreEmergency.setEmergencySignal(
+                                helpStatus: 'notHelp',
+                                uid: user!.uid,
+                                emergencyType: user!.emergency.emergencyType,
+                                isPublic: user!.emergency.isPublic,
+                                locationDescription:
+                                    locationDescriptionController.text,
+                                situationDetail: situationDetailController.text,
+                                lat: user!.location.latitude,
+                                lng: user!.location.longitude,
+                                displayName: user!.displayName ?? 'Etoet user',
+                                photoUrl: user!.photoURL ??
+                                    'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977');
+                            Firestore.updateUserInfo(user!);
+                            showSignalPostedDialog(context, 'private');
+                          });
                           devtools.log(
                               'PRIVATE SIGNAL SENT FROM: ${user.toString()}',
                               name: 'EmergencySignal');
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const MainView()),
-                          );
                         },
                         child: Container(
                           alignment: Alignment.center,
@@ -576,40 +576,42 @@ class _SOSViewState extends State<SOSView> {
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: GestureDetector(
                         onTap: () {
-                          user?.emergency.isPublic = true;
-                          user?.emergency.emergencyType = lostAndFound
-                              ? 'lostAndFound'
-                              : accident
-                                  ? 'accident'
-                                  : thief
-                                      ? 'thief'
-                                      : other
-                                          ? 'other'
-                                          : '';
-                          user?.emergency.locationDescription =
-                              locationDescriptionController.text;
-                          user?.emergency.situationDetail =
-                              situationDetailController.text;
-                          user?.photoURL = user?.photoURL ??
-                              'https://firebasestorage.googleapis.com/v0/b/etoet-app.appspot.com/o/default_profile_pic.png?alt=media&token=f8f8f8f8-f8f8f8f8-f8f8f8f8-f8f8f8f8';
-                          FirestoreEmergency.setEmergencySignal(
-                              uid: user!.uid,
-                              emergencyType: user!.emergency.emergencyType,
-                              isPublic: user!.emergency.isPublic,
-                              locationDescription:
-                                  locationDescriptionController.text,
-                              situationDetail: situationDetailController.text,
-                              lat: user!.location.latitude,
-                              lng: user!.location.longitude);
-                          Firestore.updateUserInfo(user!);
+                          setState(() {
+                            user?.emergency.isPublic = true;
+                            user?.emergency.emergencyType = lostAndFound
+                                ? 'lostAndFound'
+                                : accident
+                                    ? 'accident'
+                                    : thief
+                                        ? 'thief'
+                                        : other
+                                            ? 'other'
+                                            : '';
+                            user?.emergency.locationDescription =
+                                locationDescriptionController.text;
+                            user?.emergency.situationDetail =
+                                situationDetailController.text;
+                            user?.photoURL = user?.photoURL ??
+                                'https://firebasestorage.googleapis.com/v0/b/etoet-app.appspot.com/o/default_profile_pic.png?alt=media&token=f8f8f8f8-f8f8f8f8-f8f8f8f8-f8f8f8f8';
+                            FirestoreEmergency.setEmergencySignal(
+                                helpStatus: 'notHelp',
+                                uid: user!.uid,
+                                emergencyType: user!.emergency.emergencyType,
+                                isPublic: user!.emergency.isPublic,
+                                locationDescription:
+                                    locationDescriptionController.text,
+                                situationDetail: situationDetailController.text,
+                                lat: user!.location.latitude,
+                                lng: user!.location.longitude,
+                                photoUrl: user!.photoURL ??
+                                    'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977',
+                                displayName: user!.displayName ?? 'Etoet user');
+                            Firestore.updateUserInfo(user!);
+                            showSignalPostedDialog(context, 'public');
+                          });
                           devtools.log(
                               'PUBLIC SIGNAL SENT FROM: ${user.toString()}',
                               name: 'EmergencySignal');
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const MainView()),
-                          );
                         },
                         child: Container(
                           alignment: Alignment.center,
@@ -729,10 +731,11 @@ class _SOSViewState extends State<SOSView> {
             onPrimary: Colors.white,
           ),
           onPressed: () {
-            FirestoreEmergency.clearEmergency(uid: user!.uid);
-            user!.emergency.clearEmergency();
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const MainView()));
+            setState(() {
+              FirestoreEmergency.clearEmergency(uid: user!.uid);
+              user!.emergency.clearEmergency();
+            });
+            Navigator.pop(context);
           },
           child: const Text('DELETE THIS SIGNAL'),
         ),
@@ -785,10 +788,11 @@ class _SOSViewState extends State<SOSView> {
             onPrimary: Colors.white,
           ),
           onPressed: () {
-            FirestoreEmergency.clearEmergency(uid: user!.uid);
-            user!.emergency.clearEmergency();
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const MainView()));
+            setState(() {
+              FirestoreEmergency.clearEmergency(uid: user!.uid);
+              user!.emergency.clearEmergency();
+            });
+            Navigator.pop(context);
           },
           child: const Text('CONFIRM'),
         )
@@ -799,6 +803,76 @@ class _SOSViewState extends State<SOSView> {
         barrierDismissible: false,
         context: context,
         builder: (context) => alertDialog);
+  }
+
+  void successPublicSignalDialog(BuildContext context) {
+    var alertDialog = AlertDialog(
+      title: const Text(
+        'Your signal has been changed!',
+        style: TextStyle(
+          color: Colors.red,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      content: const Text(
+        'Your signal is public now\n '
+        '\nYou can now navigate to main view',
+      ),
+      actions: [
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            primary: Colors.blue,
+            onPrimary: Colors.white,
+          ),
+          onPressed: () => Navigator.pop(context),
+          child: const Text('BACK TO SOS SCREEN'),
+        )
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return alertDialog;
+      },
+    );
+  }
+
+  void showSignalPostedDialog(BuildContext context, String type) {
+    var alertDialog = AlertDialog(
+      title: Text(
+        'Your $type signal has been posted!',
+        style: const TextStyle(
+          color: Colors.red,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      content: const Text(
+        'Be patient! You will get help soon. Until then, make sure that you are safe\n'
+        '\nWish you all the best!',
+      ),
+      actions: [
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            primary: Colors.blue,
+            onPrimary: Colors.white,
+          ),
+          onPressed: () => Navigator.pop(context),
+          child: const Text('BACK TO SOS SCREEN'),
+        )
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return alertDialog;
+      },
+    );
   }
 
   @override

@@ -7,12 +7,14 @@ import 'package:etoet/services/map/map_factory.dart' as etoet;
 import 'package:etoet/services/notification/notification.dart';
 import 'package:etoet/views/friend/friend_view.dart';
 import 'package:etoet/views/signal/sos_signal_screen.dart';
+import 'package:etoet/views/popup_sos_message/popupsos_message.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 
 import '../services/auth/auth_user.dart';
+import 'emergency/sos_chat_hall_view.dart';
 
 class MainView extends StatefulWidget {
   @override
@@ -50,38 +52,71 @@ class MainViewState extends State<MainView> {
                   map,
                   Padding(
                     padding: const EdgeInsets.fromLTRB(200.0, 30.0, 10.0, 0.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: <Widget>[
-                        ElevatedButton(
-                            onPressed: () {
-                              Navigator.of(context).pushNamed(profileRoute);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              primary: Colors.orange,
-                              shape: const CircleBorder(),
-                              fixedSize: const Size(50, 50),
-                            ),
-                            child: const Icon(
-                              Icons.account_box_rounded,
-                              size: 24.0,
-                            )),
-                        ElevatedButton(
-                            onPressed: () {
-                              Navigator.of(context).pushNamed(
-                                settingsRoute,
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              primary: Colors.orange,
-                              shape: const CircleBorder(),
-                              fixedSize: const Size(50, 50),
-                            ),
-                            child: const Icon(
-                              Icons.settings,
-                              size: 24.0,
-                            )),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      //crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          //crossAxisAlignment: CrossAxisAlignment.end,
+                          children: <Widget>[
+                            ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pushNamed(profileRoute);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors.orange,
+                                  shape: const CircleBorder(),
+                                  fixedSize: const Size(50, 50),
+                                ),
+                                child: const Icon(
+                                  Icons.account_box_rounded,
+                                  size: 24.0,
+                                )),
+                            ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pushNamed(
+                                    settingsRoute,
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors.orange,
+                                  shape: const CircleBorder(),
+                                  fixedSize: const Size(50, 50),
+                                ),
+                                child: const Icon(
+                                  Icons.settings,
+                                  size: 24.0,
+                                )),
+                          ],
+                        ),
+
+                        const SizedBox(
+                          height: 20,
+                        ),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            ElevatedButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => SOSChatHallView()),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors.red,
+                                  shape: const CircleBorder(),
+                                  fixedSize: const Size(50, 50),
+                                ),
+                                child: const Icon(
+                                  Icons.message_outlined,
+                                  size: 24.0,
+                                )),
+                          ],
+                        ),
+
                       ],
                     ),
                   ),
@@ -160,27 +195,11 @@ class MainViewState extends State<MainView> {
             uid: authUser!.uid, token: token);
         FirebaseMessaging.onMessage.listen((event) {
           var dataType = event.data['type'];
-          if (dataType == 'emegency') {
+          if (dataType == 'privateEmegency') {
             showDialog(
-                context: context,
-                builder: (context) {
-                  var content = event.notification!.body;
-                  var title = event.notification!.title;
-                  return AlertDialog(
-                    title: Text(title ?? 'Emergency alert'),
-                    content: Text(content ?? 'null'),
-                    actions: [
-                      ElevatedButton(
-                        onPressed: () {},
-                        child: const Text('Accept'),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {},
-                        child: const Text('Reject'),
-                      )
-                    ],
-                  );
-                });
+              context: context,
+              builder: (context) => PrivateDialog(),
+            );
           }
         });
       }

@@ -7,54 +7,46 @@ import 'package:etoet/services/map/geoflutterfire/geoflutterfire.dart';
 
 class FirestoreEmergency extends Firestore {
   static void setEmergencySignal({
-    required bool isPublic,
+    required String helpStatus,
     required String emergencyType,
+    required String uid,
+    required String displayName,
+    required String photoUrl,
     required String locationDescription,
     required String situationDetail,
     required double lat,
     required double lng,
-    required String uid,
+    required bool isPublic,
   }) {
     Firestore.firestoreReference.collection('emergencies').doc(uid).set(
       {
+        'helpStatus': helpStatus,
         'isPublic': isPublic,
         'emergencyType': emergencyType,
         'locationDescription': locationDescription,
         'situationDetail': situationDetail,
+        'uid': uid,
+        'displayName': displayName,
+        'phtoUrl': photoUrl,
         'position': GeoFlutterFire.getGeoFirePointData(
           latitude: lat,
           longitude: lng,
         ),
-        'uid': uid,
       },
       SetOptions(merge: true),
     );
     devtools.log('Emergency signal set: $uid', name: 'FirestoreEmergency');
   }
 
+  /// used by the helpee (the person needing help)
   static void clearEmergency({required String uid}) {
-    Firestore.firestoreReference.collection('emergencies').doc(uid).update(
-      {
-        'isPublic': false,
-        'emergencyType': '',
-        'locationDescription': '',
-        'situationDetail': '',
-      },
-    );
-
+    Firestore.firestoreReference.collection('emergencies').doc(uid).delete();
     Firestore.firestoreReference
         .collection('users')
         .doc(uid)
         .collection('emergency')
         .doc('emergency')
-        .update(
-      {
-        'isPublic': false,
-        'emergencyType': '',
-        'locationDescription': '',
-        'situationDetail': '',
-      },
-    );
+        .delete();
 
     devtools.log('Emergency signal clear: $uid', name: 'FirestoreEmergency');
   }
@@ -81,5 +73,23 @@ class FirestoreEmergency extends Firestore {
       },
     );
     return emergency;
+  }
+
+  static void acceptEmergencySignal({
+    required String uid,
+    required String email,
+    required String phoneNumber,
+    required String displayName,
+    required String photoUrl,
+  }) {
+    /* Firestore.firestoreReference.collection('emergencies').doc(uid).get */
+
+    Firestore.firestoreReference.collection('emergencies').doc(uid).update({
+      'helperUID': uid,
+      'helperEmail': email,
+      'helperPhoneNumber': phoneNumber,
+      'helperDisplayName': displayName,
+      'helperPhotoUrl': photoUrl,
+    });
   }
 }
