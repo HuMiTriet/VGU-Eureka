@@ -21,7 +21,7 @@ class SettingsView extends StatefulWidget {
   _SettingsViewState createState() => _SettingsViewState();
 }
 
-class SettingsViewState extends State<SettingsView> {
+class _SettingsViewState extends State<SettingsView> {
   late bool notificationsEnabled ;
   late double _receivedRange;
   late AuthUser? user;
