@@ -311,7 +311,7 @@ class _ConfirmboxState extends State<Confirmbox> {
                           // Send message to helpee
                           icon: const Icon(Icons.message),
                           onPressed: () async {
-                            toPublicSOSChatView();
+                            toSOSChatView();
                           },
                         ),
                         if (widget.confirmedToHelp)
@@ -467,7 +467,7 @@ class _ConfirmboxState extends State<Confirmbox> {
     );
   }
 
-  void toPublicSOSChatView() async {
+  void toSOSChatView() async {
     var chatroomUID = const Uuid().v4().toString();
     print(chatroomUID);
     await FirestoreSOSChat.createSOSChatroom(
