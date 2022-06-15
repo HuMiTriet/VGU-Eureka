@@ -31,7 +31,6 @@ class FirestoreEmergency extends Firestore {
           latitude: lat,
           longitude: lng,
         ),
-        'uid': uid,
       },
       SetOptions(merge: true),
     );
@@ -90,20 +89,56 @@ class FirestoreEmergency extends Firestore {
   }
 
   static void acceptEmergencySignal({
+    required String helpStatus,
+    required String helpeeUID,
     required String uid,
     required String email,
     required String phoneNumber,
     required String displayName,
     required String photoUrl,
   }) {
-    /* Firestore.firestoreReference.collection('emergencies').doc(uid).get */
-
-    Firestore.firestoreReference.collection('emergencies').doc(uid).update({
+    Firestore.firestoreReference
+        .collection('emergencies')
+        .doc(helpeeUID)
+        .update({
+      'helpStatus': helpStatus,
       'helperUID': uid,
       'helperEmail': email,
       'helperPhoneNumber': phoneNumber,
       'helperDisplayName': displayName,
       'helperPhotoUrl': photoUrl,
+    });
+  }
+
+  static void abortEmergencySignal({
+    required String helpeeUID,
+  }) {
+    Firestore.firestoreReference
+        .collection('emergencies')
+        .doc(helpeeUID)
+        .update({
+      'helpStatus': 'helperAbort',
+      'helperUID': FieldValue.delete(),
+      'helperEmail': FieldValue.delete(),
+      'helperPhoneNumber': FieldValue.delete(),
+      'helperDisplayName': FieldValue.delete(),
+      'helperPhotoUrl': FieldValue.delete(),
+    });
+  }
+
+  static void doneEmergencySignal({
+    required String helpeeUID,
+  }) {
+    Firestore.firestoreReference
+        .collection('emergencies')
+        .doc(helpeeUID)
+        .update({
+      'helpStatus': 'helperDone',
+      'helperUID': FieldValue.delete(),
+      'helperEmail': FieldValue.delete(),
+      'helperPhoneNumber': FieldValue.delete(),
+      'helperDisplayName': FieldValue.delete(),
+      'helperPhotoUrl': FieldValue.delete(),
     });
   }
 }
