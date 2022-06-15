@@ -30,6 +30,7 @@ class _SOSViewState extends State<SOSView> {
   late bool accident;
   late bool thief;
   late bool other;
+  late bool isPushed;
   late AuthUser? user;
 
   late String photoURL;
@@ -50,7 +51,8 @@ class _SOSViewState extends State<SOSView> {
           )
         : ((lostAndFound || accident || thief || other) &&
                 locationDescriptionController.text.isNotEmpty &&
-                situationDetailController.text.isNotEmpty)
+                situationDetailController.text.isNotEmpty &&
+                isPushed)
             ? showUserFormView(context)
             : showSOSFormView(context);
   }
@@ -101,6 +103,10 @@ class _SOSViewState extends State<SOSView> {
                               photoUrl: user!.photoURL ??
                                   'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977');
                         });
+                        FirestoreEmergency.signalExists(uid: widget.uid)
+                            .then((value) => {
+                                  isPushed = value,
+                                });
                         Navigator.pop(context);
                       } else {
                         warningUnfilledFieldsDialog(context);
@@ -538,6 +544,7 @@ class _SOSViewState extends State<SOSView> {
                                 displayName: user!.displayName ?? 'Etoet user',
                                 photoUrl: user!.photoURL ??
                                     'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977');
+                            isPushed = true;
                             showSignalPostedDialog(context, 'private');
                           });
                           devtools.log('PRIVATE SIGNAL SENT FROM: ${user!.uid}',
@@ -607,6 +614,7 @@ class _SOSViewState extends State<SOSView> {
                                 photoUrl: user!.photoURL ??
                                     'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977',
                                 displayName: user!.displayName ?? 'Etoet user');
+                            isPushed = true;
                             showSignalPostedDialog(context, 'public');
                           });
                           devtools.log('PUBLIC SIGNAL SENT FROM: ${user!.uid}',
@@ -738,6 +746,7 @@ class _SOSViewState extends State<SOSView> {
               isPublic = false;
               locationDescriptionController.text = '';
               situationDetailController.text = '';
+              isPushed = false;
               FirestoreEmergency.clearEmergency(uid: user!.uid);
               user!.emergency.clearEmergency();
             });
@@ -802,6 +811,7 @@ class _SOSViewState extends State<SOSView> {
               isPublic = false;
               locationDescriptionController.text = '';
               situationDetailController.text = '';
+              isPushed = false;
               FirestoreEmergency.clearEmergency(uid: user!.uid);
               user!.emergency.clearEmergency();
             });
@@ -926,6 +936,9 @@ class _SOSViewState extends State<SOSView> {
   void initState() {
     locationDescriptionController = TextEditingController();
     situationDetailController = TextEditingController();
+    FirestoreEmergency.signalExists(uid: widget.uid).then((value) => {
+          isPushed = value,
+        });
     FirestoreEmergency.getEmergencySignal(uid: widget.uid)
         .then((value) => {
               isFilled = value.situationDetail != '' &&

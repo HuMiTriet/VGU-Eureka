@@ -67,6 +67,15 @@ class FirestoreEmergency extends Firestore {
     return emergency;
   }
 
+  static Future<bool> signalExists({required String uid}) async {
+    final signalDocument = await Firestore.firestoreReference
+        .collection('emergencies')
+        .where('uid', isEqualTo: uid)
+        .get(const GetOptions(source: Source.serverAndCache));
+
+    return signalDocument.docs.isNotEmpty;
+  }
+
   static void acceptEmergencySignal({
     required String helpStatus,
     required String helpeeUID,
