@@ -3,7 +3,19 @@
 import 'package:flutter/material.dart';
 
 class SoSReceivedBottomSheet extends StatefulWidget {
-  const SoSReceivedBottomSheet({Key? key}) : super(key: key);
+  final String helperDisplayName;
+  final String helperUID;
+  final String helperEmail;
+  final String helperPhoneNumber;
+  final String helperPhotoURL;
+  SoSReceivedBottomSheet({
+    required this.helperDisplayName,
+    required this.helperUID,
+    required this.helperEmail,
+    required this.helperPhoneNumber,
+    required this.helperPhotoURL,
+    Key? key,
+  }) : super(key: key);
   @override
   State<SoSReceivedBottomSheet> createState() => _PrivateSoSBottomSheetState();
 }
@@ -38,16 +50,12 @@ class _PrivateSoSBottomSheetState extends State<SoSReceivedBottomSheet> {
                           child: Column(children: <Widget>[
                             Flexible(
                                 flex: 1,
-                                child: Text('Display Name',
+                                child: Text(widget.helperDisplayName,
                                     style: TextStyle(
                                         fontSize: 17,
                                         fontWeight: FontWeight.bold))),
                             SizedBox(height: 5),
-                            Flexible(
-                                flex: 1,
-                                child: Text(
-                                  'helper@gmail.com',
-                                )),
+                            Flexible(flex: 1, child: Text(widget.helperEmail)),
                           ]),
                         )),
                     Flexible(
@@ -86,7 +94,8 @@ class _PrivateSoSBottomSheetState extends State<SoSReceivedBottomSheet> {
                                         width: 3, color: Colors.red),
                                     borderRadius: BorderRadius.circular(15),
                                   ),
-                                  hintText: 'Text to name',
+                                  hintText:
+                                      'Text to ${widget.helperDisplayName}',
                                   suffixIcon: Icon(Icons.phone_rounded,
                                       color: Colors.green),
                                   filled: true,

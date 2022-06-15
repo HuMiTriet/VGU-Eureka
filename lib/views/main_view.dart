@@ -95,11 +95,9 @@ class MainViewState extends State<MainView> {
                                 )),
                           ],
                         ),
-
                         const SizedBox(
                           height: 20,
                         ),
-
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -107,7 +105,9 @@ class MainViewState extends State<MainView> {
                                 onPressed: () {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => SOSChatHallView()),
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            SOSChatHallView()),
                                   );
                                 },
                                 style: ElevatedButton.styleFrom(
@@ -121,7 +121,6 @@ class MainViewState extends State<MainView> {
                                 )),
                           ],
                         ),
-
                       ],
                     ),
                   ),
@@ -250,11 +249,17 @@ class MainViewState extends State<MainView> {
       switch (message.data['type']) {
         case 'publicAccepted':
           developer.log('show sos received message');
-          showMaterialModalBottomSheet(
-              expand: false,
+          showModalBottomSheet(
+              barrierColor: Colors.transparent,
               context: context,
               backgroundColor: Colors.transparent,
-              builder: (context) => const SoSReceivedBottomSheet());
+              builder: (context) => SoSReceivedBottomSheet(
+                    helperUID: message.data['helperUID'],
+                    helperDisplayName: message.data['helperDisplayName'],
+                    helperEmail: message.data['helperEmail'],
+                    helperPhoneNumber: message.data['helperPhoneNumber'],
+                    helperPhotoURL: message.data['helperPhotoUrl'],
+                  ));
           break;
         default:
           NotificationHandler.display(message);
@@ -286,20 +291,27 @@ class MainViewState extends State<MainView> {
         );
         break;
       case 'publicAccepted':
-        showMaterialModalBottomSheet(
-            expand: false,
+        showModalBottomSheet(
+            // expand: false
+            barrierColor: Colors.transparent,
             context: context,
             backgroundColor: Colors.transparent,
-            builder: (context) => const SoSReceivedBottomSheet());
+            builder: (context) => SoSReceivedBottomSheet(
+                  helperUID: data['helperUID'],
+                  helperDisplayName: data['helperDisplayName'],
+                  helperEmail: data['helperEmail'],
+                  helperPhoneNumber: data['helperPhoneNumber'],
+                  helperPhotoURL: data['helperPhotoUrl'],
+                ));
         break;
 
       case 'privateEmergency':
         showDialog(
           context: context,
           builder: (context) => PrivateDialog(
-          title: data['displayName'] + "'s Private Alert",
-          body: data['locationDescription'],
-        ),
+            title: data['displayName'] + "'s Private Alert",
+            body: data['locationDescription'],
+          ),
         );
         break;
     }
