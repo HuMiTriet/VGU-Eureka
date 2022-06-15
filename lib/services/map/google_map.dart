@@ -4,6 +4,7 @@ import 'dart:developer' as devtools show log;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:etoet/services/auth/auth_user.dart';
 import 'package:etoet/services/auth/location.dart';
+import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:etoet/services/database/database.dart';
 import 'package:etoet/services/map/friend/friend_marker_location.dart';
 import 'package:etoet/services/map/geoflutterfire/geoflutterfire.dart';
@@ -11,6 +12,7 @@ import 'package:etoet/services/map/map_factory.dart' as etoet;
 import 'package:etoet/services/map/marker/marker.dart';
 import 'package:etoet/services/map/osrm/routing.dart';
 import 'package:etoet/views/emergency/emergency_marker.dart';
+import 'package:etoet/views/emergency/helper_marker.dart';
 import 'package:etoet/views/emergency/sos_default_map.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
@@ -137,6 +139,19 @@ class GoogleMapImpl extends StatefulWidget implements etoet.Map {
       ),
     ));
     devtools.log('_moveMap to $location', name: 'GoogleMap: _moveMap');
+  }
+
+  @override
+  void addHelperMarker({required etoet.UserInfo helperInfo}) async {
+    var helperLatLng = await Realtime.getUserLocation(helperInfo.uid);
+    var helperMarker = await HelperMarker(
+      context: context,
+      helperInfo: helperInfo,
+      polylines: _polylines,
+    ).createEmergencyMarker(helperLatLng: helperLatLng);
+    _markers
+        .removeWhere((element) => element.markerId == helperMarker.markerId);
+    _markers.add(helperMarker);
   }
 
   @override
@@ -303,7 +318,7 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
       for (var doc in data) {
         doc = doc as DocumentSnapshot;
         // only get public emergency signal
-        if (doc['isPublic'] == true) {
+        if (doc['isPublic'] == true && doc['uid'] != widget.authUser!.uid) {
           var geoPoint = doc['position']['geopoint'] as GeoPoint;
           var emergencyLocation = LatLng(geoPoint.latitude, geoPoint.longitude);
           var emergencyId = doc['uid'] as String;

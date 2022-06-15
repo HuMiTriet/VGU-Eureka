@@ -1,9 +1,16 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
 
+import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:flutter/material.dart';
 
 class SoSReceivedBottomSheet extends StatefulWidget {
-  const SoSReceivedBottomSheet({Key? key}) : super(key: key);
+  etoet.UserInfo helperInfo;
+  late double distance;
+  SoSReceivedBottomSheet({
+    required this.helperInfo,
+    this.distance = 5,
+    Key? key,
+  }) : super(key: key);
   @override
   State<SoSReceivedBottomSheet> createState() => _PrivateSoSBottomSheetState();
 }
@@ -38,16 +45,19 @@ class _PrivateSoSBottomSheetState extends State<SoSReceivedBottomSheet> {
                           child: Column(children: <Widget>[
                             Flexible(
                                 flex: 1,
-                                child: Text('Display Name',
+                                child: Text(
+                                    widget.helperInfo.displayName ??
+                                        'Etoet user',
                                     style: TextStyle(
                                         fontSize: 17,
                                         fontWeight: FontWeight.bold))),
                             SizedBox(height: 5),
                             Flexible(
                                 flex: 1,
-                                child: Text(
-                                  'helper@gmail.com',
-                                )),
+                                child: Text(widget.helperInfo.email!,
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold))),
                           ]),
                         )),
                     Flexible(
@@ -63,7 +73,8 @@ class _PrivateSoSBottomSheetState extends State<SoSReceivedBottomSheet> {
                                         fontSize: 17,
                                         fontWeight: FontWeight.bold))),
                             SizedBox(height: 5),
-                            Flexible(flex: 1, child: Text('5.0 km')),
+                            Flexible(
+                                flex: 1, child: Text('${widget.distance} km')),
                           ]),
                         )),
                   ],
@@ -86,7 +97,8 @@ class _PrivateSoSBottomSheetState extends State<SoSReceivedBottomSheet> {
                                         width: 3, color: Colors.red),
                                     borderRadius: BorderRadius.circular(15),
                                   ),
-                                  hintText: 'Text to name',
+                                  hintText:
+                                      'Text to ${widget.helperInfo.displayName}',
                                   suffixIcon: Icon(Icons.phone_rounded,
                                       color: Colors.green),
                                   filled: true,
