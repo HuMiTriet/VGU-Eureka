@@ -18,14 +18,6 @@ export const sendPublicNotification = functions.region("asia-southeast1")
           .default(change, context);
     });
 
-
-// export const sendPublicNotification = functions.region("asia-southeast1")
-//     .firestore.document("/emergencies/{userId}")
-//     .onUpdate(async (change, context) => {
-//       await (await import("./emergency/publicSignal"))
-//           .default(change, context);
-//     });
-
 // Send a notification Annoucing new friend for Sender of that friend reques
 export const notifyNewFriendSender = functions.region("asia-southeast1")
     .firestore.document("/users/{userUID}/friends/{friendUID}")
@@ -63,9 +55,23 @@ export const newMessageNotification = functions.region("asia-southeast1")
           .default(snapshot, context);
     });
 
-// export
-// const autofillDefaultUserPhotoUrl = functions.region("asia-southeast1")
-//     .auth.user().onCreate(async (user) => {
-//       await (await import("./auth/autofillUserPhotoUrl"))
-//           .default(user);
-//     });
+export const acceptPublicEmergency = functions.region("asia-southeast1")
+    .firestore.document("/emergencies/{userUID}")
+    .onUpdate(async (change, context) => {
+      await (await import("./emergency/acceptPublicEmergency"))
+          .default(change, context);
+    });
+
+export const helperAbortEmergency = functions.region("asia-southeast1")
+    .firestore.document("/emergencies/{userUID}")
+    .onUpdate(async (change, context) => {
+      await (await import("./emergency/helperAbortEmergency"))
+          .default(change, context);
+    });
+
+export const helperDoneEmergency = functions.region("asia-southeast1")
+    .firestore.document("/emergencies/{userUID}")
+    .onUpdate(async (change, context) => {
+      await (await import("./emergency/helperDoneEmergency"))
+          .default(change, context);
+    });

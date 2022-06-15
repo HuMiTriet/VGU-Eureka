@@ -10,8 +10,9 @@ export default async (
     change: functions.Change<functions.firestore.QueryDocumentSnapshot>,
     context: functions.EventContext,
 ) => {
+  const helpStatus = change.after.data().helpStatus;
   if (change.before.data().isPublic === true &&
-    change.after.data().helpStatus === "helperIsHelping") {
+    helpStatus === "helperDone") {
     const helpeeUID = context.params.userUID;
     console.log("helpee UID" + helpeeUID);
     const helpeeFcmTokenSnap = await getFcmToken(helpeeUID);
@@ -25,11 +26,11 @@ export default async (
 
     const payload = {
       notification: {
-        title: "Your public signal has been accepted by " + helperDisplayName,
+        title: helperDisplayName + " has done helping you",
         body: helperEmail,
       },
       data: {
-        type: "publicAccepted",
+        type: "helperDone",
         helperUID: helperUID,
         helperEmail: helperEmail,
         helperPhoneNumber: helperPhoneNumber,
@@ -44,7 +45,8 @@ export default async (
     fcm.sendToDevice(helpeeFcmToken, payload);
   } else {
     return functions
-        .logger.log("acceptPublicMessage: Public signal not accepted");
+        .logger.log("helperDoneEmergency not executed: emergency " +
+        helpStatus);
   }
 };
 

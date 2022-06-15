@@ -20,6 +20,7 @@ class FirestoreEmergency extends Firestore {
   }) {
     Firestore.firestoreReference.collection('emergencies').doc(uid).set(
       {
+        'helpStatus': helpStatus,
         'isPublic': isPublic,
         'emergencyType': emergencyType,
         'locationDescription': locationDescription,
@@ -37,29 +38,15 @@ class FirestoreEmergency extends Firestore {
     devtools.log('Emergency signal set: $uid', name: 'FirestoreEmergency');
   }
 
+  /// used by the helpee (the person needing help)
   static void clearEmergency({required String uid}) {
-    Firestore.firestoreReference.collection('emergencies').doc(uid).update(
-      {
-        'isPublic': false,
-        'emergencyType': '',
-        'locationDescription': '',
-        'situationDetail': '',
-      },
-    );
-
+    Firestore.firestoreReference.collection('emergencies').doc(uid).delete();
     Firestore.firestoreReference
         .collection('users')
         .doc(uid)
         .collection('emergency')
         .doc('emergency')
-        .update(
-      {
-        'isPublic': false,
-        'emergencyType': '',
-        'locationDescription': '',
-        'situationDetail': '',
-      },
-    );
+        .delete();
 
     devtools.log('Emergency signal clear: $uid', name: 'FirestoreEmergency');
   }
