@@ -10,6 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart'
         FirebaseAuth,
         FirebaseAuthException,
         PhoneAuthCredential,
+        PhoneAuthProvider,
         UserCredential;
 import 'package:firebase_auth_platform_interface/src/auth_credential.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -220,6 +221,17 @@ class FirebaseAuthProvider implements AuthProvider {
   }
 
   @override
+  Future<void> unlinkFromProvider({required String providerId}) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      await user.unlink(providerId);
+    } else {
+      //triggered when user not logged in
+      throw UserNotLoggedInAuthException();
+    }
+  }
+
+  @override
   Future<void> updatePhotoURL(String url) async {
     final user = FirebaseAuth.instance.currentUser;
 
@@ -241,4 +253,7 @@ class FirebaseAuthProvider implements AuthProvider {
       throw UserNotLoggedInAuthException();
     }
   }
+
+  @override
+  String get phoneProviderId => PhoneAuthProvider.PROVIDER_ID;
 }

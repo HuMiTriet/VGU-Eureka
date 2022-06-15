@@ -94,6 +94,12 @@ class _ChangePhoneNumberPageState extends State<ChangePhoneNumberPage> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () async {
+                  if (widget.user.phoneNumber != null) {
+                    await AuthService.firebase().unlinkFromProvider(
+                        providerId: AuthService.firebase().phoneProviderId);
+                    devtools.log('Unlinked from phone provider',
+                        name: 'change phone number page');
+                  }
                   setState(() {
                     showLoading = true;
                   });
