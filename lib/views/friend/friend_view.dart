@@ -1,22 +1,19 @@
 import 'dart:async';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:pinput/pinput.dart';
-import 'package:uuid/uuid.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
+import 'package:etoet/services/database/firestore/firestore_friend.dart';
 import 'package:etoet/views/friend/chat_room_view.dart';
 import 'package:etoet/views/friend/pending_friend_view.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
-import 'package:random_string/random_string.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../services/auth/auth_user.dart';
-import '../../services/database/firestore/firestore.dart';
 import '../../services/database/firestore/firestore_chat.dart';
-import '../../services/database/firestore/firestore_friend.dart';
 import 'add_friend_view.dart';
 
 class FriendView extends StatefulWidget {
@@ -28,8 +25,12 @@ class FriendView extends StatefulWidget {
 }
 
 class _FriendViewState extends State<FriendView> {
-  late AuthUser user;
   static late etoet.UserInfo selectedUser;
+  static const IconData addFriendIcon = Icons.add;
+  static const IconData pendingFriendRequestIcon = Icons.group_add;
+
+  late AuthUser user;
+
   Set<etoet.UserInfo> userListOnSearch = {};
 
   //Used to implements some of the search bar's function
@@ -39,8 +40,8 @@ class _FriendViewState extends State<FriendView> {
   void initState() {
     super.initState();
     FirebaseMessaging.onMessage.listen((event) {
-      print('Listened Bitch!');
-      var notification = event.notification;
+      print('Listened from Friend View!');
+
       var data = event.data;
 
       if (data['type'] == 'newFriend') {
@@ -134,18 +135,30 @@ class _FriendViewState extends State<FriendView> {
     return filteredList;
   }
 
+  Future<void> toFriendChatView(int index) async {
+    selectedUser = (_searchBarController.text.isNotEmpty)
+        ? userListOnSearch.elementAt(index)
+        : user.friendInfoList.elementAt(index);
+    var chatroomUID = const Uuid().v4().toString();
+    await FirestoreChat.createFriendChatroom(
+        user.uid, selectedUser.uid, chatroomUID);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ChatRoomView(selectedUser)),
+    );
+  }
+
   //Variables for easier config:
 
   final double friendViewHeight = 0.9; // Should be between 0.7 - 1.0
+
   final Color backgroundColor = const Color.fromARGB(200, 255, 210, 177);
   final Color topListViewColor = const Color.fromARGB(200, 255, 210,
       177); // The background color of search and add friend part.
   final Color bottomListViewColor = const Color.fromARGB(
       200, 255, 210, 177); // The background color of friend list.
   final Color spacingColor = Colors.orange;
-  static const IconData addFriendIcon = Icons.add;
-  static const IconData pendingFriendRequestIcon = Icons.group_add;
-
   // The relative height of topListView and bottomListView
   // No longer used since widget Flexible is used.
   // final int topListViewFlex = 39;
@@ -180,9 +193,7 @@ class _FriendViewState extends State<FriendView> {
                 child: Column(
                   children: [
                     // Search, Add Friend and Pending Friend Request.
-                    Flexible(
-                        //flex: topListViewFlex,
-                        child: Container(
+                    Container(
                       color: topListViewColor,
                       child: ListView(
                         shrinkWrap: true,
@@ -263,7 +274,7 @@ class _FriendViewState extends State<FriendView> {
                           ),
                         ],
                       ),
-                    )),
+                    ),
 
                     const SizedBox(
                       height: 5,
@@ -288,62 +299,133 @@ class _FriendViewState extends State<FriendView> {
                     const SizedBox(
                       height: 5,
                     ),
+
                     // Friend List
-                    Flexible(
-                        //flex: bottomListViewFlex,
-                        child: Container(
-                      color: bottomListViewColor,
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: (_searchBarController.text.isNotEmpty)
-                            ? userListOnSearch.length
-                            : user.friendInfoList.length,
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                            onTap: () async {
-                              // selectedUser =
-                              //     user.friendInfoList.elementAt(index);
-                              selectedUser =
-                                  (_searchBarController.text.isNotEmpty)
-                                      ? userListOnSearch.elementAt(index)
-                                      : user.friendInfoList.elementAt(index);
-                              var chatroomUID = const Uuid().v4().toString();
-                              await FirestoreChat.createFriendChatroom(
-                                  user.uid, selectedUser.uid, chatroomUID);
-                              // Navigator.pushNamedAndRemoveUntil(
-                              //     context, chat_friend_route, (route) => false,
-                              //     arguments: selectedUser);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        ChatRoomView(selectedUser)),
-                              );
-                            },
-                            leading: CircleAvatar(
-                              backgroundImage: NetworkImage(userListOnSearch
-                                      .isNotEmpty
-                                  ? userListOnSearch.elementAt(index).photoURL!
-                                  : user.friendInfoList
-                                      .elementAt(index)
-                                      .photoURL!),
-                            ),
-                            title: Text((_searchBarController.text.isNotEmpty)
-                                ? userListOnSearch.elementAt(index).displayName!
-                                : user.friendInfoList
-                                    .elementAt(index)
-                                    .displayName!),
-                            subtitle: Text((_searchBarController
-                                    .text.isNotEmpty)
-                                ? userListOnSearch.elementAt(index).email!
-                                : user.friendInfoList.elementAt(index).email!),
-                            shape: RoundedRectangleBorder(
-                                side: BorderSide(color: Colors.black, width: 1),
-                                borderRadius: BorderRadius.circular(15)),
-                          );
-                        },
+                    Expanded(
+                      child: Container(
+                        color: bottomListViewColor,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: (_searchBarController.text.isNotEmpty)
+                              ? userListOnSearch.length
+                              : user.friendInfoList.length,
+                          itemBuilder: (context, index) {
+                            return Slidable(
+                              endActionPane: ActionPane(
+                                motion: ScrollMotion(),
+                                children: [
+                                  SlidableAction(
+                                    flex: 1,
+                                    onPressed: (context) {
+                                      selectedUser = (_searchBarController
+                                              .text.isNotEmpty)
+                                          ? userListOnSearch.elementAt(index)
+                                          : user.friendInfoList
+                                              .elementAt(index);
+                                      showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return AlertDialog(
+                                              title: Text(
+                                                  'Are you sure you want to unfriend ${selectedUser.displayName!}?'),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () {
+                                                    FirestoreFriend
+                                                        .deleteFriend(user.uid,
+                                                            selectedUser.uid);
+
+                                                    // Not a good way to delete Friend from local friendList
+                                                    // Pleased noted to change to listener to database
+                                                    user.friendInfoList
+                                                        .remove(selectedUser);
+                                                    setState(() {});
+                                                    Navigator.pop(context);
+                                                  },
+                                                  style: ButtonStyle(
+                                                      backgroundColor:
+                                                          MaterialStateProperty
+                                                              .all(Colors.red)),
+                                                  child: const Text(
+                                                    'Unfriend',
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                  style: ButtonStyle(
+                                                      backgroundColor:
+                                                          MaterialStateProperty
+                                                              .all(Colors
+                                                                  .lightBlue)),
+                                                  child: const Text(
+                                                    'Cancel',
+                                                    style: TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          });
+                                    },
+                                    backgroundColor: Colors.red,
+                                    foregroundColor: Colors.white,
+                                    icon: Icons.person_remove,
+                                    label: 'Unfriend',
+                                  ),
+                                  SlidableAction(
+                                    flex: 1,
+                                    onPressed: (context) {
+                                      toFriendChatView(index);
+                                    },
+                                    backgroundColor: Colors.lightBlue,
+                                    foregroundColor: Colors.white,
+                                    icon: Icons.chat,
+                                    label: 'Chat',
+                                  )
+                                ],
+                              ),
+                              child: ListTile(
+                                onTap: () async {
+                                  toFriendChatView(index);
+                                },
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                      userListOnSearch.isNotEmpty
+                                          ? userListOnSearch
+                                              .elementAt(index)
+                                              .photoURL!
+                                          : user.friendInfoList
+                                              .elementAt(index)
+                                              .photoURL!),
+                                ),
+                                title: Text(
+                                    (_searchBarController.text.isNotEmpty)
+                                        ? userListOnSearch
+                                            .elementAt(index)
+                                            .displayName!
+                                        : user.friendInfoList
+                                            .elementAt(index)
+                                            .displayName!),
+                                subtitle: Text((_searchBarController
+                                        .text.isNotEmpty)
+                                    ? userListOnSearch.elementAt(index).email!
+                                    : user.friendInfoList
+                                        .elementAt(index)
+                                        .email!),
+                                shape: RoundedRectangleBorder(
+                                    side: BorderSide(
+                                        color: Colors.black, width: 1),
+                                    borderRadius: BorderRadius.circular(15)),
+                              ),
+                            );
+                          },
+                        ),
                       ),
-                    )),
+                    ),
                   ],
                 ),
               )));
