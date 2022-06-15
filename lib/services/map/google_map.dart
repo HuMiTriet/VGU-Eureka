@@ -4,14 +4,16 @@ import 'dart:developer' as devtools show log;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:etoet/services/auth/auth_user.dart';
 import 'package:etoet/services/auth/location.dart';
+import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:etoet/services/database/database.dart';
-import 'package:etoet/views/emergency/emergency_marker.dart';
-import 'package:etoet/views/emergency/sos_default_map.dart';
 import 'package:etoet/services/map/friend/friend_marker_location.dart';
 import 'package:etoet/services/map/geoflutterfire/geoflutterfire.dart';
 import 'package:etoet/services/map/map_factory.dart' as etoet;
 import 'package:etoet/services/map/marker/marker.dart';
 import 'package:etoet/services/map/osrm/routing.dart';
+import 'package:etoet/views/emergency/emergency_marker.dart';
+import 'package:etoet/views/emergency/helper_marker.dart';
+import 'package:etoet/views/emergency/sos_default_map.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -140,6 +142,19 @@ class GoogleMapImpl extends StatefulWidget implements etoet.Map {
   }
 
   @override
+  void addHelperMarker({required etoet.UserInfo helperInfo}) async {
+    var helperLatLng = await Realtime.getUserLocation(helperInfo.uid);
+    var helperMarker = await HelperMarker(
+      context: context,
+      helperInfo: helperInfo,
+      polylines: _polylines,
+    ).createEmergencyMarker(helperLatLng: helperLatLng);
+    _markers
+        .removeWhere((element) => element.markerId == helperMarker.markerId);
+    _markers.add(helperMarker);
+  }
+
+  @override
   State<StatefulWidget> createState() => _GoogleMapImplState();
 }
 
@@ -218,11 +233,11 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
     for (var friendInfo in friendInfoList) {
       if (friendId == friendInfo.uid) {
         var friendMarkerCreator = FriendMarker(
-            context: context,
-            friendInfo: friendInfo,
-            polylines: widget._polylines,
-            setState: () => setState(() {}),
-            user: widget.authUser!,
+          context: context,
+          friendInfo: friendInfo,
+          polylines: widget._polylines,
+          setState: () => setState(() {}),
+          user: widget.authUser!,
         );
         var location = widget.authUser?.mapFriendUidLocation[friendInfo.uid];
         var latLng = LatLng(location!.latitude, location.longitude);
@@ -251,25 +266,24 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
       required String emergencyType}) async {
     var emergencyInfo = await Firestore.getUserInfo(emergencyId);
     var emergencyMarkerCreator = EmergencyMarker(
-      context: context,
-      emergencyInfo: emergencyInfo,
-      polylines: widget._polylines,
-      uid: emergencyId,
-      locationDescription: locationDescription,
-      situationDetail: situationDetail,
-      emergencyType: emergencyType,
-    );
+        context: context,
+        emergencyInfo: emergencyInfo,
+        polylines: widget._polylines,
+        uid: emergencyId,
+        locationDescription: locationDescription,
+        situationDetail: situationDetail,
+        emergencyType: emergencyType,
+        removeMarker: () => widget._markers.removeWhere(
+            (element) => element.markerId == MarkerId(emergencyId)),
+        setState: () => setState(() {}),
+        addHelpMarker: (helpMarker) {
+          widget._markers.add(helpMarker);
+        });
     var location = mapEmergencyUidLocation[emergencyId];
     var latLng = LatLng(location!.latitude, location.longitude);
     var emergencyMarker = await emergencyMarkerCreator.createEmergencyMarker(
-        emergencyLatLng: latLng,
-        helpButtonPressed: () {
-          // remove and add new marker
-          widget._markers.removeWhere(
-              (marker) => marker.markerId == MarkerId(emergencyId));
-
-          setState(() {});
-        });
+      emergencyLatLng: latLng,
+    );
     widget._markers
         .removeWhere((marker) => marker.markerId == MarkerId(emergencyId));
     setState(() {
@@ -304,7 +318,7 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
       for (var doc in data) {
         doc = doc as DocumentSnapshot;
         // only get public emergency signal
-        if (doc['isPublic'] == true) {
+        if (doc['isPublic'] == true && doc['uid'] != widget.authUser!.uid) {
           var geoPoint = doc['position']['geopoint'] as GeoPoint;
           var emergencyLocation = LatLng(geoPoint.latitude, geoPoint.longitude);
           var emergencyId = doc['uid'] as String;

@@ -2,11 +2,11 @@
 import 'dart:developer' as devtools show log;
 
 import 'package:etoet/constants/routes.dart';
-import 'package:etoet/services/database/firestore/firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../../services/auth/auth_service.dart';
 import '../../services/auth/auth_user.dart';
+import '../../services/database/firestore/firestore.dart';
 
 class VerifyEmailView extends StatefulWidget {
   final AuthUser user;
@@ -20,7 +20,8 @@ class VerifyEmailView extends StatefulWidget {
 class _VerifyEmailViewState extends State<VerifyEmailView> {
   @override
   Widget build(BuildContext context) {
-    var userExists = Firestore.userExists(widget.user.uid);
+    // ignore: omit_local_variable_types
+    Future<bool> userExists = Firestore.userExists(widget.user.uid);
     userExists.then((value) => {
           if (value)
             {

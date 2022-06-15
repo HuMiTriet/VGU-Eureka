@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:developer' as devtools show log;
 
 import 'package:etoet/services/auth/auth_user.dart';
-import 'package:etoet/services/map/geoflutterfire/geoflutterfire.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class Realtime {
   /// Points to the remote database
@@ -15,16 +15,10 @@ class Realtime {
   }
 
   static void updateUserLocation(AuthUser authUser) {
-    var userReference = databaseReference.child('users').child(authUser.uid);
+    var location =
+        databaseReference.child('users').child(authUser.uid).child('location');
 
-    var geohash = GeoFlutterFire.getGeohash(
-        latitude: authUser.location.latitude,
-        longitude: authUser.location.longitude);
-
-    userReference.set({
-      'location': authUser.location.toJson(),
-      'geohash': geohash
-    }).then((value) => devtools.log(
+    location.set(authUser.location.toJson()).then((value) => devtools.log(
         'location updated to database: $databaseReference'
         '\n'
         'userId: ${authUser.uid}'
@@ -52,5 +46,18 @@ class Realtime {
       streamSubscriptionSet.add(subscription);
     }
     return streamSubscriptionSet;
+  }
+
+  static Future<LatLng> getUserLocation(String uid) async {
+    var location = await databaseReference
+        .child('users')
+        .child(uid)
+        .child('location')
+        .get();
+
+    return LatLng(
+      location.child('latitude').value as double,
+      location.child('longitude').value as double,
+    );
   }
 }

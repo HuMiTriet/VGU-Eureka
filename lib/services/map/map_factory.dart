@@ -1,4 +1,5 @@
 import 'package:etoet/services/auth/auth_user.dart';
+import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:etoet/services/map/google_map.dart';
 import 'package:flutter/material.dart';
 
@@ -20,4 +21,6 @@ abstract class Map extends Widget {
 
   /// Move the camera to current location of user.
   void moveToCurrentLocation();
+
+  void addHelperMarker({required etoet.UserInfo helperInfo});
 }

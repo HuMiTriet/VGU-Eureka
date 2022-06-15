@@ -7,54 +7,40 @@ import 'package:etoet/services/map/geoflutterfire/geoflutterfire.dart';
 
 class FirestoreEmergency extends Firestore {
   static void setEmergencySignal({
-    required bool isPublic,
+    required String helpStatus,
     required String emergencyType,
+    required String uid,
+    required String displayName,
+    required String photoUrl,
     required String locationDescription,
     required String situationDetail,
     required double lat,
     required double lng,
-    required String uid,
+    required bool isPublic,
   }) {
     Firestore.firestoreReference.collection('emergencies').doc(uid).set(
       {
+        'helpStatus': helpStatus,
         'isPublic': isPublic,
         'emergencyType': emergencyType,
         'locationDescription': locationDescription,
         'situationDetail': situationDetail,
+        'uid': uid,
+        'displayName': displayName,
+        'photoUrl': photoUrl,
         'position': GeoFlutterFire.getGeoFirePointData(
           latitude: lat,
           longitude: lng,
         ),
-        'uid': uid,
       },
       SetOptions(merge: true),
     );
     devtools.log('Emergency signal set: $uid', name: 'FirestoreEmergency');
   }
 
+  /// used by the helpee (the person needing help)
   static void clearEmergency({required String uid}) {
-    Firestore.firestoreReference.collection('emergencies').doc(uid).update(
-      {
-        'isPublic': false,
-        'emergencyType': '',
-        'locationDescription': '',
-        'situationDetail': '',
-      },
-    );
-
-    Firestore.firestoreReference
-        .collection('users')
-        .doc(uid)
-        .collection('emergency')
-        .doc('emergency')
-        .update(
-      {
-        'isPublic': false,
-        'emergencyType': '',
-        'locationDescription': '',
-        'situationDetail': '',
-      },
-    );
+    Firestore.firestoreReference.collection('emergencies').doc(uid).delete();
 
     devtools.log('Emergency signal clear: $uid', name: 'FirestoreEmergency');
   }
@@ -63,10 +49,8 @@ class FirestoreEmergency extends Firestore {
     // ignore: prefer_typing_uninitialized_variables
     var emergency = Emergency();
     await Firestore.firestoreReference
-        .collection('users')
+        .collection('emergencies')
         .doc(uid)
-        .collection('emergency')
-        .doc('emergency')
         .get()
         .then(
       (snapshot) {
@@ -81,5 +65,59 @@ class FirestoreEmergency extends Firestore {
       },
     );
     return emergency;
+  }
+
+  static void acceptEmergencySignal({
+    required String helpStatus,
+    required String helpeeUID,
+    required String uid,
+    required String email,
+    required String phoneNumber,
+    required String displayName,
+    required String photoUrl,
+  }) {
+    Firestore.firestoreReference
+        .collection('emergencies')
+        .doc(helpeeUID)
+        .update({
+      'helpStatus': helpStatus,
+      'helperUID': uid,
+      'helperEmail': email,
+      'helperPhoneNumber': phoneNumber,
+      'helperDisplayName': displayName,
+      'helperPhotoUrl': photoUrl,
+    });
+  }
+
+  static void abortEmergencySignal({
+    required String helpeeUID,
+  }) {
+    Firestore.firestoreReference
+        .collection('emergencies')
+        .doc(helpeeUID)
+        .update({
+      'helpStatus': 'helperAbort',
+      'helperUID': FieldValue.delete(),
+      'helperEmail': FieldValue.delete(),
+      'helperPhoneNumber': FieldValue.delete(),
+      'helperDisplayName': FieldValue.delete(),
+      'helperPhotoUrl': FieldValue.delete(),
+    });
+  }
+
+  static void doneEmergencySignal({
+    required String helpeeUID,
+  }) {
+    Firestore.firestoreReference
+        .collection('emergencies')
+        .doc(helpeeUID)
+        .update({
+      'helpStatus': 'helperDone',
+      'helperUID': FieldValue.delete(),
+      'helperEmail': FieldValue.delete(),
+      'helperPhoneNumber': FieldValue.delete(),
+      'helperDisplayName': FieldValue.delete(),
+      'helperPhotoUrl': FieldValue.delete(),
+    });
   }
 }
