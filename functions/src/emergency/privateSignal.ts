@@ -61,6 +61,7 @@ export default async (
         helpeeUID: helpeeUID,
         photoUrl: photoUrl,
         locationDescription: String(snapshot.data()?.locationDescription),
+        situationDetail: String(snapshot.data()?.situationDetail),
       },
     };
     return fcm.sendToDevice(token, payload);
