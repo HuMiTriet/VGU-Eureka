@@ -4,7 +4,6 @@ import 'dart:developer' as developer show log;
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:etoet/services/database/firestore/firestore.dart';
-import 'package:etoet/services/database/firestore/firestore_emergency.dart';
 import 'package:etoet/services/database/firestore/firestore_friend.dart';
 import 'package:etoet/services/map/map_factory.dart' as etoet;
 import 'package:etoet/services/notification/notification.dart';
@@ -38,9 +37,6 @@ class MainViewState extends State<MainView> {
   @override
   Widget build(BuildContext context) {
     authUser = context.watch<AuthUser?>();
-    FirestoreEmergency.getEmergencySignal(uid: authUser!.uid).then((value) => {
-          authUser!.emergency = value,
-        });
 
     return FutureBuilder(
         future: FirestoreFriend.getFriendInfoList(authUser!.uid),

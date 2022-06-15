@@ -21,10 +21,14 @@ class AuthUser extends etoet.UserInfo {
 
   int helpRange = 5;
 
+  bool notificationsEnabled = true;
+
+
   AuthUser({
     required this.isEmailVerified,
     required super.uid,
     this.helpRange = 5,
+    this.notificationsEnabled = true,
     super.email,
     super.phoneNumber,
     super.displayName,

@@ -27,18 +27,10 @@ class Firestore {
     userHelperRef.set(
       {
         'helpRange': user.helpRange,
+        'notificationsEnabled': user.notificationsEnabled,
         'isHelping': false,
       },
     );
-
-    var userEmergencyRef = userRef.collection('emergency').doc('emergency');
-
-    userEmergencyRef.set({
-      'isPublic': false,
-      'problem': '',
-      'situationDetail': '',
-      'locationDescription': '',
-    });
   }
 
   static void updateUserInfo(AuthUser authUser) async {
@@ -54,17 +46,9 @@ class Firestore {
     userHelperRef.set(
       {
         'helpRange': authUser.helpRange,
+        'notificationsEnabled': authUser.notificationsEnabled,
       },
     );
-
-    var userEmergencyRef = userRef.collection('emergency').doc('emergency');
-
-    userEmergencyRef.update({
-      'isPublic': authUser.emergency.isPublic,
-      'emergencyType': authUser.emergency.emergencyType,
-      'situationDetail': authUser.emergency.situationDetail,
-      'locationDescription': authUser.emergency.locationDescription,
-    });
   }
 
   static void setFcmTokenAndNotificationStatus(

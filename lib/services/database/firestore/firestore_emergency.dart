@@ -41,12 +41,6 @@ class FirestoreEmergency extends Firestore {
   /// used by the helpee (the person needing help)
   static void clearEmergency({required String uid}) {
     Firestore.firestoreReference.collection('emergencies').doc(uid).delete();
-    Firestore.firestoreReference
-        .collection('users')
-        .doc(uid)
-        .collection('emergency')
-        .doc('emergency')
-        .delete();
 
     devtools.log('Emergency signal clear: $uid', name: 'FirestoreEmergency');
   }
@@ -55,10 +49,8 @@ class FirestoreEmergency extends Firestore {
     // ignore: prefer_typing_uninitialized_variables
     var emergency = Emergency();
     await Firestore.firestoreReference
-        .collection('users')
+        .collection('emergencies')
         .doc(uid)
-        .collection('emergency')
-        .doc('emergency')
         .get()
         .then(
       (snapshot) {
