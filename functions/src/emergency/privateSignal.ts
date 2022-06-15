@@ -47,7 +47,8 @@ export default async (
       }
     });
     const displayName = String(snapshot.get("displayName"));
-    const phtoUrl = String(snapshot.get("photoUrl"));
+    const photoUrl = String(snapshot.get("photoUrl"));
+    const helpeeUID = String(snapshot.get("uid"));
 
     const payload = {
       notification: {
@@ -57,7 +58,8 @@ export default async (
       data: {
         type: "privateEmegency",
         displayName: displayName,
-        photoUrl: phtoUrl,
+        helpeeUID: helpeeUID,
+        photoUrl: photoUrl,
         locationDescription: String(snapshot.data()?.locationDescription),
       },
     };
