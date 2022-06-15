@@ -307,7 +307,7 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
     widget._polylines.clear();
 
     // subcription to listen to all public signal in radius
-    var emergencyRadius = 20.0;
+    var emergencyRadius = widget.authUser!.helpRange.toDouble();
     emergencySubcription = GeoFlutterFire.querySignalInRadius(
         lat: widget._location.latitude,
         lng: widget._location.longitude,
