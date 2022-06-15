@@ -4,7 +4,6 @@ import 'dart:developer' as developer show log;
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:etoet/services/database/firestore/firestore.dart';
-import 'package:etoet/services/database/firestore/firestore_emergency.dart';
 import 'package:etoet/services/database/firestore/firestore_friend.dart';
 import 'package:etoet/services/map/map_factory.dart' as etoet;
 import 'package:etoet/services/notification/notification.dart';
@@ -38,9 +37,6 @@ class MainViewState extends State<MainView> {
   @override
   Widget build(BuildContext context) {
     authUser = context.watch<AuthUser?>();
-    FirestoreEmergency.getEmergencySignal(uid: authUser!.uid).then((value) => {
-          authUser!.emergency = value,
-        });
 
     return FutureBuilder(
         future: FirestoreFriend.getFriendInfoList(authUser!.uid),
@@ -95,11 +91,9 @@ class MainViewState extends State<MainView> {
                                 )),
                           ],
                         ),
-
                         const SizedBox(
                           height: 20,
                         ),
-
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -107,7 +101,9 @@ class MainViewState extends State<MainView> {
                                 onPressed: () {
                                   Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => SOSChatHallView()),
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            SOSChatHallView()),
                                   );
                                 },
                                 style: ElevatedButton.styleFrom(
@@ -121,7 +117,6 @@ class MainViewState extends State<MainView> {
                                 )),
                           ],
                         ),
-
                       ],
                     ),
                   ),
@@ -297,9 +292,9 @@ class MainViewState extends State<MainView> {
         showDialog(
           context: context,
           builder: (context) => PrivateDialog(
-          title: data['displayName'] + "'s Private Alert",
-          body: data['locationDescription'],
-        ),
+            title: data['displayName'] + "'s Private Alert",
+            body: data['locationDescription'],
+          ),
         );
         break;
     }
