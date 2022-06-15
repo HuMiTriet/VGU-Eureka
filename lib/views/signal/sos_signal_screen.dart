@@ -75,30 +75,36 @@ class _SOSViewState extends State<SOSView> {
                   const Spacer(),
                   IconButton(
                     onPressed: () {
-                      setState(() {
-                        FirestoreEmergency.setEmergencySignal(
-                            helpStatus: 'notHelp',
-                            uid: user!.uid,
-                            emergencyType: lostAndFound
-                                ? 'lostAndFound'
-                                : accident
-                                    ? 'accident'
-                                    : thief
-                                        ? 'thief'
-                                        : other
-                                            ? 'other'
-                                            : '',
-                            isPublic: isPublic,
-                            locationDescription:
-                                locationDescriptionController.text,
-                            situationDetail: situationDetailController.text,
-                            lat: user!.location.latitude,
-                            lng: user!.location.longitude,
-                            displayName: user!.displayName ?? 'Etoet user',
-                            photoUrl: user!.photoURL ??
-                                'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977');
-                      });
-                      Navigator.pop(context);
+                      if ((lostAndFound || accident || thief || other) &&
+                          (locationDescriptionController.text != '') &&
+                          (situationDetailController.text != '')) {
+                        setState(() {
+                          FirestoreEmergency.setEmergencySignal(
+                              helpStatus: 'helperVacant',
+                              uid: user!.uid,
+                              emergencyType: lostAndFound
+                                  ? 'lostAndFound'
+                                  : accident
+                                      ? 'accident'
+                                      : thief
+                                          ? 'thief'
+                                          : other
+                                              ? 'other'
+                                              : '',
+                              isPublic: isPublic,
+                              locationDescription:
+                                  locationDescriptionController.text,
+                              situationDetail: situationDetailController.text,
+                              lat: user!.location.latitude,
+                              lng: user!.location.longitude,
+                              displayName: user!.displayName ?? 'Etoet user',
+                              photoUrl: user!.photoURL ??
+                                  'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977');
+                        });
+                        Navigator.pop(context);
+                      } else {
+                        warningUnfilledFieldsDialog(context);
+                      }
                     },
                     icon: const Icon(Icons.close),
                     color: Colors.white,
@@ -868,6 +874,40 @@ class _SOSViewState extends State<SOSView> {
           ),
           onPressed: () => Navigator.pop(context),
           child: const Text('BACK TO SOS SCREEN'),
+        )
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return alertDialog;
+      },
+    );
+  }
+
+  void warningUnfilledFieldsDialog(BuildContext context) {
+    var alertDialog = AlertDialog(
+      title: const Text(
+        'OOPS?',
+        style: TextStyle(
+          color: Colors.red,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      content: const Text(
+        'Please fill in all the fields. You can not publish a signal without filling in all the fields.',
+      ),
+      actions: [
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            primary: Colors.blue,
+            onPrimary: Colors.white,
+          ),
+          onPressed: () => Navigator.pop(context),
+          child: const Text('OK'),
         )
       ],
     );

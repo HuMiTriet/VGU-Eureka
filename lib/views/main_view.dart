@@ -66,7 +66,7 @@ class MainViewState extends State<MainView> {
                                   Navigator.of(context).pushNamed(profileRoute);
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  primary: Colors.orange,
+                                  primary: Colors.orangeAccent,
                                   shape: const CircleBorder(),
                                   fixedSize: const Size(50, 50),
                                 ),
@@ -81,7 +81,7 @@ class MainViewState extends State<MainView> {
                                   );
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  primary: Colors.orange,
+                                  primary: Colors.orangeAccent,
                                   shape: const CircleBorder(),
                                   fixedSize: const Size(50, 50),
                                 ),
