@@ -1,5 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'firestore.dart';
 
 class FirestoreSOSChat{
@@ -117,5 +119,31 @@ class FirestoreSOSChat{
         .collection('messages')
         .add(data);
   }
+
+  static Future<Set<etoet.UserInfo>> getSOSChatHallParticipant(
+      String userUID) async {
+    var ref = await Firestore.firestoreReference
+        .collection('users')
+        .doc(userUID)
+        .collection('SOS_participant')
+        .get();
+
+    var SOSParticipantList = <etoet.UserInfo>{};
+
+
+    for (var i = 0; i < ref.docs.length; ++i) {
+      // var source =
+      // pendingFriendRequestData.metadata.isFromCache ? 'cache' : 'server';
+      // print('Pending fetched from $source');
+      var data = ref.docs.elementAt(i).data();
+
+      var SOSParticipantInfo = await Firestore.getUserInfo(data['participantUID']);
+      SOSParticipantList.add(SOSParticipantInfo);
+    }
+
+    return SOSParticipantList;
+
+  }
+
 
 }

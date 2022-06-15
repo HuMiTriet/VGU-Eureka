@@ -1,5 +1,9 @@
+import 'package:etoet/services/database/firestore/firestore_SOS_chat.dart';
+import 'package:etoet/views/emergency/sos_chat_room_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:etoet/services/auth/user_info.dart' as etoet;
+import 'package:uuid/uuid.dart';
 
 import '../../services/auth/auth_user.dart';
 
@@ -14,6 +18,7 @@ class SOSChatHallView extends StatefulWidget{
 
 class _SOSChatHallViewState extends State<SOSChatHallView> {
   late AuthUser user;
+  late Set<etoet.UserInfo> SOSparticipantList;
   
   
   @override
@@ -25,19 +30,64 @@ class _SOSChatHallViewState extends State<SOSChatHallView> {
         title: const Text('SOS Chat Hall'),
         backgroundColor: const Color.fromARGB(255, 255, 0, 0),
       ),
-      body: ListView.builder(
-        itemCount: 20,
-          itemBuilder: (context, index)
-              {
-                return const ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage('https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977'),
-                  ),
-                  title: Text('Username'),
-                  subtitle: Text('email'),
-                );
-              }
+      body: FutureBuilder(
+        future: FirestoreSOSChat.getSOSChatHallParticipant(user.uid),
+        builder: (context, snapshot){
+          if(!snapshot.hasData) // Loading waiting for Data
+            {
+              return const CircularProgressIndicator();
+            }
+          else
+            {
+              SOSparticipantList = snapshot.data as Set<etoet.UserInfo>;
+              if(SOSparticipantList.length == 0)
+                {
+                  return Center(
+                    child: Text('No SOS Chat yet'),
+                  );
+                }
+              return ListView.builder(
+                itemCount: SOSparticipantList.length,
+                  itemBuilder: (context, index){
+                   return ListTile(
+                     leading: CircleAvatar(
+                       backgroundImage: NetworkImage(
+                           SOSparticipantList
+                               .elementAt(index)
+                               .photoURL!),
+                     ),
+                     title: Text(
+                       SOSparticipantList
+                           .elementAt(index)
+                           .displayName!,
+                     ),
+                     subtitle: Text(
+                       SOSparticipantList.elementAt(index).email!,
+                     ),
+
+                     //To SOS chat view
+                     onTap: ()
+                     {
+                       toSOSChatView(index);
+                     },
+                   );
+                  }
+              );
+            }
+        },
       ),
+    );
+  }
+
+  void toSOSChatView(int index) async {
+    var selectedUser = SOSparticipantList.elementAt(index);
+    var chatroomUID = const Uuid().v4().toString();
+    await FirestoreSOSChat.createSOSChatroom(
+        user.uid, selectedUser.uid, chatroomUID);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => SOSChatRoomView(selectedUser)),
     );
   }
   
