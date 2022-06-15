@@ -1,44 +1,53 @@
-import 'package:etoet/views/friend/chat_room_view.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:etoet/services/auth/user_info.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../services/database/firestore/firestore_chat.dart';
+import '../friend/chat_room_view.dart';
 
 class PrivateDialog extends StatelessWidget {
   final String title;
   final String body;
+  final String helperUID;
+  final String helpeeUID;
+  final String helpeeDisplayName;
+  String helpeePhotoUrl;
+  final BuildContext context;
+
   PrivateDialog({
     required this.title,
     required this.body,
+    required this.helperUID,
+    required this.helpeeUID,
+    required this.helpeeDisplayName,
+    required this.helpeePhotoUrl,
+    required this.context,
     Key? key,
   }) : super(key: key);
   /* PrivateDialog({Key? key}) : super(key: key); */
+  void toFriendChatView() async {
+    var chatroomUID = const Uuid().v4().toString();
+    await FirestoreChat.createFriendChatroom(helperUID, helpeeUID, chatroomUID);
 
-  // set up the buttons
-  final Widget sendmessageButton = ElevatedButton(
-    onPressed: () {
+    var helpee = UserInfo(
+      uid: helpeeUID,
+      displayName: helpeeDisplayName,
+      photoURL: helpeePhotoUrl,
+    );
 
-    },
-
-    style: ElevatedButton.styleFrom(
-        primary: Colors.blue,
-        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 5),
-        textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-    child: const Text('SEND MESSAGE'),
-  );
-
-  final Widget helpButton = ElevatedButton(
-    onPressed: () {},
-    style: ElevatedButton.styleFrom(
-        primary: Colors.red,
-        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 5),
-        textStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-    child: const Text('HELP'),
-  );
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ChatRoomView(helpee)),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (helpeePhotoUrl == 'undefined') {
+      helpeePhotoUrl =
+          'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977';
+    }
+
     return AlertDialog(
       title: Column(
         children: <Widget>[
@@ -55,9 +64,10 @@ class PrivateDialog extends StatelessWidget {
               ),
             ],
           ),
-          const CircleAvatar(
+          CircleAvatar(
             backgroundImage: NetworkImage(
-                'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977'),
+              helpeePhotoUrl,
+            ),
             radius: 25,
           ),
           Text(title),
@@ -67,22 +77,27 @@ class PrivateDialog extends StatelessWidget {
       content: Text(body),
       /* content: const Text('null'), */
       actions: [
-        sendmessageButton,
-        helpButton,
+        ElevatedButton(
+          onPressed: () {
+            toFriendChatView();
+          },
+          style: ElevatedButton.styleFrom(
+              primary: Colors.blue,
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 5),
+              textStyle:
+                  const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+          child: const Text('SEND MESSAGE'),
+        ),
+        ElevatedButton(
+          onPressed: () {},
+          style: ElevatedButton.styleFrom(
+              primary: Colors.red,
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 5),
+              textStyle:
+                  const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+          child: const Text('HELP'),
+        ),
       ],
     );
   }
 }
-
-//  void toFriendChatView() async {
-//    var chatroomUID = const Uuid().v4().toString();
-//    await FirestoreChat.createFriendChatroom(
-//        user.uid, widget.needHelpUser.uid, chatroomUID);
-//    print('create chatroom complete');
-//
-//    Navigator.push(
-//      context,
-//      MaterialPageRoute(builder: (context) => ChatRoomView(widget.needHelpUser)),
-//    );
-//  }
-//}

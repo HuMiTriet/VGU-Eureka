@@ -266,9 +266,25 @@ class MainViewState extends State<MainView> {
             map.addHelperMarker(helperInfo: helperInfo);
           });
           break;
+        case 'privateEmegency':
+          showModalBottomSheet(
+            barrierColor: Colors.transparent,
+            context: context,
+            backgroundColor: Colors.transparent,
+            builder: (context) => PrivateDialog(
+              title: message.data['situationDetail'],
+              body: message.data['locationDescription'],
+              helperUID: authUser!.uid,
+              helpeeUID: message.data['helpeeUID'],
+              helpeePhotoUrl: message.data['photoUrl'],
+              context: context,
+              helpeeDisplayName: message.data['displayName'],
+            ),
+          );
+          break;
+
         default:
           NotificationHandler.display(message);
-
           break;
       }
     } else {
