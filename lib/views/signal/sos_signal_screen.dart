@@ -264,7 +264,7 @@ class _SOSViewState extends State<SOSView> {
                                     user?.emergency.isPublic = true;
                                     FirestoreEmergency.setEmergencySignal(
                                         helpStatus: 'helperVacant ',
-                                        phoneNumber: user!.phoneNumber,
+                                        //phoneNumber: user!.phoneNumber,
                                         uid: user!.uid,
                                         emergencyType:
                                             user!.emergency.emergencyType,
@@ -526,7 +526,7 @@ class _SOSViewState extends State<SOSView> {
                                 situationDetailController.text;
                             FirestoreEmergency.setEmergencySignal(
                                 helpStatus: 'helperVacant ',
-                                phoneNumber: user!.phoneNumber,
+                                //phoneNumber: user!.phoneNumber,
                                 uid: user!.uid,
                                 emergencyType: user!.emergency.emergencyType,
                                 isPublic: user!.emergency.isPublic,
@@ -603,7 +603,7 @@ class _SOSViewState extends State<SOSView> {
                                 situationDetailController.text;
                             FirestoreEmergency.setEmergencySignal(
                                 helpStatus: 'helperVacant ',
-                                phoneNumber: user!.phoneNumber,
+                                //phoneNumber: user!.phoneNumber,
                                 uid: user!.uid,
                                 emergencyType: user!.emergency.emergencyType,
                                 isPublic: user!.emergency.isPublic,
