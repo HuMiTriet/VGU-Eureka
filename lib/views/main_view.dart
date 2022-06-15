@@ -303,7 +303,7 @@ class MainViewState extends State<MainView> {
     }
   }
 
-  void onClickNotificationRouting(data) async {
+  void onClickNotificationRouting(dynamic data) async {
     switch (data['type']) {
       case 'newFriend':
         showBarModalBottomSheet(
@@ -346,9 +346,8 @@ class MainViewState extends State<MainView> {
       /*   showDialog( */
       /*     context: context, */
       /*     builder: (context) => PrivateDialog( */
-      /*       title: data['displayName'] + "'s Private Alert", */
-      /*       body: data['locationDescription'], */
-      /*     ), */
+      /*      event: data, */
+      /*   ), */
       /*   ); */
       /*   break; */
     }
