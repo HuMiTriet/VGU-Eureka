@@ -141,8 +141,8 @@ class MainViewState extends State<MainView> {
                       child: Image.asset(
                           'assets/images/ShowListFriendButton.png')),
                   SizedBox(
-                    height: 90.0,
-                    width: 80.0,
+                    height: 70.0,
+                    width: 60.0,
                     child: FittedBox(
                       child: FloatingActionButton(
                           shape: RoundedRectangleBorder(
