@@ -37,7 +37,8 @@ class EmergencyMarker {
 
   Future<Marker> createEmergencyMarker(
       {required LatLng emergencyLatLng}) async {
-    var distance = await routing.getDistance(emergencyLatLng);
+    num distance = await routing.getDistance(emergencyLatLng);
+    distance = num.parse(distance.toStringAsFixed(2));
     var helpMarker = Marker(
       markerId: MarkerId(uid),
       position: emergencyLatLng,
@@ -54,7 +55,7 @@ class EmergencyMarker {
               return Confirmbox(
                 locationDescription: locationDescription,
                 situationDetail: situationDetail,
-                distance: distance,
+                distance: distance as double,
                 needHelpUser: emergencyInfo,
                 emergencyType: emergencyType,
                 onHelpButtonPressed: () async {},
@@ -89,7 +90,7 @@ class EmergencyMarker {
               return Confirmbox(
                 locationDescription: locationDescription,
                 situationDetail: situationDetail,
-                distance: distance,
+                distance: distance as double,
                 needHelpUser: emergencyInfo,
                 emergencyType: emergencyType,
                 onHelpButtonPressed: () async {
