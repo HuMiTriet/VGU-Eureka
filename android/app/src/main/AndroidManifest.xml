@@ -9,7 +9,7 @@
             <data android:scheme="tel" />
         </intent>
     </queries>
-    <application android:label="etoet" android:name="${applicationName}" android:icon="@mipmap/ic_launcher">
+    <application android:label="etoet" android:name="${applicationName}" android:icon="@mipmap/ic_launcher_round">
         <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyCE5N-G7K8SPn3kwvI2B4UCcje1C5QsKRA" />
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
         <meta-data android:name="com.facebook.sdk.ClientToken" android:value="@string/facebook_client_token"/>

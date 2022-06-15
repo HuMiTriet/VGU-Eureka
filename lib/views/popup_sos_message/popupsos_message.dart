@@ -71,15 +71,15 @@ class PrivateDialog extends StatelessWidget {
   }
 }
 
-  void toFriendChatView() async {
-    var chatroomUID = const Uuid().v4().toString();
-    await FirestoreChat.createFriendChatroom(
-        user.uid, widget.needHelpUser.uid, chatroomUID);
-    print('create chatroom complete');
+  // void toFriendChatView() async {
+  //   var chatroomUID = const Uuid().v4().toString();
+  //   await FirestoreChat.createFriendChatroom(
+  //       user.uid, widget.needHelpUser.uid, chatroomUID);
+  //   print('create chatroom complete');
+  //
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(builder: (context) => ChatRoomView(widget.needHelpUser)),
+  //   );
+  // }
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => ChatRoomView(widget.needHelpUser)),
-    );
-  }
-}
