@@ -1,7 +1,7 @@
 import 'package:etoet/services/auth/user_info.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../services/auth/auth_user.dart';
@@ -224,10 +224,12 @@ class _ConfirmboxState extends State<Confirmbox> {
     // NoPhoneNumberDialog
     void showNoPhoneNumberDialog(BuildContext context) {
       var alert = AlertDialog(
-        title: const Text("No Phone Number!!!"),
-        content: const Text("The person you are trying to help does not have a phone number."),
+        title: const Text('No Phone Number!!!'),
+        content: const Text(
+            'The person you are trying to help does not have a phone number.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, 'OK'),
+          TextButton(
+              onPressed: () => Navigator.pop(context, 'OK'),
               child: const Text('OK')),
         ],
       );
@@ -235,11 +237,12 @@ class _ConfirmboxState extends State<Confirmbox> {
       // show the dialog
       showDialog(
         context: context,
-        builder: (BuildContext context) {
+        builder: (context) {
           return alert;
         },
       );
     }
+
     // double width = MediaQuery.of(context).size.width;
     // double height = MediaQuery.of(context).size.height;
     return Container(
@@ -328,14 +331,15 @@ class _ConfirmboxState extends State<Confirmbox> {
                         ),
                         if (widget.confirmedToHelp)
                           IconButton(
-                              icon: const Icon(Icons.phone),
-                              onPressed: () {
-                                //launchUrlString('tel:${phoneNumber ?? '113'} ');                              })
-                                if (phoneNumber != null)
-                                  launchUrlString('tel:${phoneNumber}');
-                                else
-                                  showNoPhoneNumberDialog(context);
-                              },
+                            icon: const Icon(Icons.phone),
+                            onPressed: () {
+                              //launchUrlString('tel:${phoneNumber ?? '113'} ');                              })
+                              if (phoneNumber != null) {
+                                launchUrlString('tel:$phoneNumber');
+                              } else {
+                                showNoPhoneNumberDialog(context);
+                              }
+                            },
                           )
                       ],
                     )),
@@ -489,5 +493,4 @@ class _ConfirmboxState extends State<Confirmbox> {
     //   MaterialPageRoute(builder: (context) => ChatRoomView(selectedUser)),
     // );
   }
-
 }

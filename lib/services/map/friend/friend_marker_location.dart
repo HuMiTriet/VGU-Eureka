@@ -36,8 +36,6 @@ class FriendMarker {
     );
   }
 
-
-
   FriendMarker({
     required this.friendInfo,
     required this.context,
@@ -48,7 +46,6 @@ class FriendMarker {
   Future<Marker> createFriendMarker({
     required LatLng friendLatLng,
   }) async {
-
     var location = await Geocoding.getAddress(friendLatLng);
     var isShowDirection = false;
     return Marker(
@@ -96,9 +93,6 @@ class FriendMarker {
                           color: Colors.black,
                         )),
                     const Spacer(),
-
-
-
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
@@ -143,12 +137,12 @@ class FriendMarker {
                           },
                         ),
                         const Spacer(),
-
                         ElevatedButton(
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(Colors.lightBlue),
+                              backgroundColor:
+                                  MaterialStateProperty.all(Colors.lightBlue),
                             ),
-                            onPressed: (){
+                            onPressed: () {
                               toFriendChatView();
                             },
                             child: const IconTheme(
