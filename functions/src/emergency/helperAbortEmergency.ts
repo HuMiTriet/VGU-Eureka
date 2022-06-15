@@ -11,7 +11,7 @@ export default async (
     context: functions.EventContext,
 ) => {
   if (change.before.data().isPublic === true &&
-    change.after.data().helpStatus === "helperIsHelping") {
+    change.after.data().helpStatus === "helperAbort") {
     const helpeeUID = context.params.userUID;
     console.log("helpee UID" + helpeeUID);
     const helpeeFcmTokenSnap = await getFcmToken(helpeeUID);
@@ -25,11 +25,11 @@ export default async (
 
     const payload = {
       notification: {
-        title: "Your public signal has been accepted by " + helperDisplayName,
+        title: "Your public signal has been aborted by " + helperDisplayName,
         body: helperEmail,
       },
       data: {
-        type: "publicAccepted",
+        type: "helperAbort",
         helperUID: helperUID,
         helperEmail: helperEmail,
         helperPhoneNumber: helperPhoneNumber,
@@ -44,7 +44,8 @@ export default async (
     fcm.sendToDevice(helpeeFcmToken, payload);
   } else {
     return functions
-        .logger.log("acceptPublicMessage: Public signal not accepted");
+        .logger.log("helperAbortEmergency: emergency not aborted, emergency: " +
+        change.after.data().helpStatus );
   }
 };
 

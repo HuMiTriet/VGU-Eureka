@@ -62,9 +62,9 @@ export const acceptPublicEmergency = functions.region("asia-southeast1")
           .default(change, context);
     });
 
-// export
-// const autofillDefaultUserPhotoUrl = functions.region("asia-southeast1")
-//     .auth.user().onCreate(async (user) => {
-//       await (await import("./auth/autofillUserPhotoUrl"))
-//           .default(user);
-//     });
+export const helperAbortEmergency = functions.region("asia-southeast1")
+    .firestore.document("/emergencies/{userUID}")
+    .onUpdate(async (change, context) => {
+      await (await import("./emergency/helperAbortEmergency"))
+          .default(change, context);
+    });
