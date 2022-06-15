@@ -510,7 +510,7 @@ class _SOSViewState extends State<SOSView> {
                     ),
                     TextSpan(
                         text:
-                            ", your location will be public for all ETOET's users. This may put you in danger! Choose wisingly and intentinally"),
+                            ", your location will be public for all ETOET's users. This may put you in danger! Choose wisely and intentionally"),
                   ])),
               const SizedBox(
                 height: 15,
@@ -524,7 +524,7 @@ class _SOSViewState extends State<SOSView> {
                         onTap: () {
                           setState(() {
                             FirestoreEmergency.setEmergencySignal(
-                                helpStatus: 'helperVacant ',
+                                helpStatus: 'helperVacant',
                                 uid: user!.uid,
                                 emergencyType: lostAndFound
                                     ? 'lostAndFound'
@@ -656,7 +656,7 @@ class _SOSViewState extends State<SOSView> {
                 ],
               ),
               const SizedBox(
-                height: 15,
+                height: 30,
               ),
             ],
           ),
