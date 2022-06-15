@@ -7,6 +7,7 @@ import 'package:etoet/services/map/geoflutterfire/geoflutterfire.dart';
 
 class FirestoreEmergency extends Firestore {
   static void setEmergencySignal({
+    required String helpStatus,
     required String emergencyType,
     required String uid,
     required String displayName,
@@ -19,6 +20,7 @@ class FirestoreEmergency extends Firestore {
   }) {
     Firestore.firestoreReference.collection('emergencies').doc(uid).set(
       {
+        'helpStatus': helpStatus,
         'isPublic': isPublic,
         'emergencyType': emergencyType,
         'locationDescription': locationDescription,
@@ -30,36 +32,21 @@ class FirestoreEmergency extends Firestore {
           latitude: lat,
           longitude: lng,
         ),
-        'uid': uid,
       },
       SetOptions(merge: true),
     );
     devtools.log('Emergency signal set: $uid', name: 'FirestoreEmergency');
   }
 
+  /// used by the helpee (the person needing help)
   static void clearEmergency({required String uid}) {
-    Firestore.firestoreReference.collection('emergencies').doc(uid).update(
-      {
-        'isPublic': false,
-        'emergencyType': '',
-        'locationDescription': '',
-        'situationDetail': '',
-      },
-    );
-
+    Firestore.firestoreReference.collection('emergencies').doc(uid).delete();
     Firestore.firestoreReference
         .collection('users')
         .doc(uid)
         .collection('emergency')
         .doc('emergency')
-        .update(
-      {
-        'isPublic': false,
-        'emergencyType': '',
-        'locationDescription': '',
-        'situationDetail': '',
-      },
-    );
+        .delete();
 
     devtools.log('Emergency signal clear: $uid', name: 'FirestoreEmergency');
   }
