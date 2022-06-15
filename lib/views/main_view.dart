@@ -244,16 +244,43 @@ class MainViewState extends State<MainView> {
 
       switch (message.data['type']) {
         case 'publicAccepted':
+          var helperInfo = etoet.UserInfo(
+              uid: message.data['helperUID'],
+              displayName: message.data['helperDisplayName'],
+              email: message.data['helperEmail'],
+              phoneNumber: message.data['helperPhoneNumber'],
+              photoURL: message.data['helperPhotoUrl']);
           developer.log('show sos received message');
-          showMaterialModalBottomSheet(
-              expand: false,
+          showModalBottomSheet(
+              barrierColor: Colors.transparent,
               context: context,
               backgroundColor: Colors.transparent,
-              builder: (context) => const SoSReceivedBottomSheet());
+              builder: (context) => SoSReceivedBottomSheet(
+                    helperInfo: helperInfo,
+                  ));
+          setState(() {
+            map.addHelperMarker(helperInfo: helperInfo);
+          });
           break;
+        case 'privateEmegency':
+          showModalBottomSheet(
+            barrierColor: Colors.transparent,
+            context: context,
+            backgroundColor: Colors.transparent,
+            builder: (context) => PrivateDialog(
+              title: message.data['situationDetail'],
+              body: message.data['locationDescription'],
+              helperUID: authUser!.uid,
+              helpeeUID: message.data['helpeeUID'],
+              helpeePhotoUrl: message.data['photoUrl'],
+              context: context,
+              helpeeDisplayName: message.data['displayName'],
+            ),
+          );
+          break;
+
         default:
           NotificationHandler.display(message);
-
           break;
       }
     } else {
@@ -281,22 +308,34 @@ class MainViewState extends State<MainView> {
         );
         break;
       case 'publicAccepted':
-        showMaterialModalBottomSheet(
-            expand: false,
+        var helperInfo = etoet.UserInfo(
+            uid: data['helperUID'],
+            displayName: data['helperDisplayName'],
+            email: data['helperEmail'],
+            phoneNumber: data['helperPhoneNumber'],
+            photoURL: data['helperPhotoUrl']);
+        showModalBottomSheet(
+            // expand: false
+            barrierColor: Colors.transparent,
             context: context,
             backgroundColor: Colors.transparent,
-            builder: (context) => const SoSReceivedBottomSheet());
+            builder: (context) => SoSReceivedBottomSheet(
+                  helperInfo: helperInfo,
+                ));
+        setState(() {
+          map.addHelperMarker(helperInfo: helperInfo);
+        });
         break;
 
-      case 'privateEmergency':
-        showDialog(
-          context: context,
-          builder: (context) => PrivateDialog(
-            title: data['displayName'] + "'s Private Alert",
-            body: data['locationDescription'],
-          ),
-        );
-        break;
+      /* case 'privateEmergency': */
+      /*   showDialog( */
+      /*     context: context, */
+      /*     builder: (context) => PrivateDialog( */
+      /*       title: data['displayName'] + "'s Private Alert", */
+      /*       body: data['locationDescription'], */
+      /*     ), */
+      /*   ); */
+      /*   break; */
     }
   }
 }

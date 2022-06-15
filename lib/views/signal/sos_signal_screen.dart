@@ -260,7 +260,8 @@ class _SOSViewState extends State<SOSView> {
                                   setState(() {
                                     isPublic = value;
                                     FirestoreEmergency.setEmergencySignal(
-                                        helpStatus: 'notHelp',
+                                        helpStatus: 'helperVacant ',
+                                        //phoneNumber: user!.phoneNumber,
                                         uid: user!.uid,
                                         emergencyType: lostAndFound
                                             ? 'lostAndFound'
@@ -512,7 +513,8 @@ class _SOSViewState extends State<SOSView> {
                         onTap: () {
                           setState(() {
                             FirestoreEmergency.setEmergencySignal(
-                                helpStatus: 'notHelp',
+                                helpStatus: 'helperVacant ',
+                                //phoneNumber: user!.phoneNumber,
                                 uid: user!.uid,
                                 emergencyType: lostAndFound
                                     ? 'lostAndFound'
@@ -581,7 +583,8 @@ class _SOSViewState extends State<SOSView> {
                           setState(() {
                             isPublic = true;
                             FirestoreEmergency.setEmergencySignal(
-                                helpStatus: 'notHelp',
+                                helpStatus: 'helperVacant ',
+                                //phoneNumber: user!.phoneNumber,
                                 uid: user!.uid,
                                 emergencyType: lostAndFound
                                     ? 'lostAndFound'

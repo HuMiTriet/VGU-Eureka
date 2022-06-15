@@ -3,6 +3,7 @@ import 'dart:developer' as devtools show log;
 
 import 'package:etoet/services/auth/auth_user.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class Realtime {
   /// Points to the remote database
@@ -45,5 +46,18 @@ class Realtime {
       streamSubscriptionSet.add(subscription);
     }
     return streamSubscriptionSet;
+  }
+
+  static Future<LatLng> getUserLocation(String uid) async {
+    var location = await databaseReference
+        .child('users')
+        .child(uid)
+        .child('location')
+        .get();
+
+    return LatLng(
+      location.child('latitude').value as double,
+      location.child('longitude').value as double,
+    );
   }
 }
