@@ -248,18 +248,23 @@ class MainViewState extends State<MainView> {
 
       switch (message.data['type']) {
         case 'publicAccepted':
+          var helperInfo = etoet.UserInfo(
+              uid: message.data['helperUID'],
+              displayName: message.data['helperDisplayName'],
+              email: message.data['helperEmail'],
+              phoneNumber: message.data['helperPhoneNumber'],
+              photoURL: message.data['helperPhotoUrl']);
           developer.log('show sos received message');
           showModalBottomSheet(
               barrierColor: Colors.transparent,
               context: context,
               backgroundColor: Colors.transparent,
               builder: (context) => SoSReceivedBottomSheet(
-                    helperUID: message.data['helperUID'],
-                    helperDisplayName: message.data['helperDisplayName'],
-                    helperEmail: message.data['helperEmail'],
-                    helperPhoneNumber: message.data['helperPhoneNumber'],
-                    helperPhotoURL: message.data['helperPhotoUrl'],
+                    helperInfo: helperInfo,
                   ));
+          setState(() {
+            map.addHelperMarker(helperInfo: helperInfo);
+          });
           break;
         default:
           NotificationHandler.display(message);
@@ -291,18 +296,23 @@ class MainViewState extends State<MainView> {
         );
         break;
       case 'publicAccepted':
+        var helperInfo = etoet.UserInfo(
+            uid: data['helperUID'],
+            displayName: data['helperDisplayName'],
+            email: data['helperEmail'],
+            phoneNumber: data['helperPhoneNumber'],
+            photoURL: data['helperPhotoUrl']);
         showModalBottomSheet(
             // expand: false
             barrierColor: Colors.transparent,
             context: context,
             backgroundColor: Colors.transparent,
             builder: (context) => SoSReceivedBottomSheet(
-                  helperUID: data['helperUID'],
-                  helperDisplayName: data['helperDisplayName'],
-                  helperEmail: data['helperEmail'],
-                  helperPhoneNumber: data['helperPhoneNumber'],
-                  helperPhotoURL: data['helperPhotoUrl'],
+                  helperInfo: helperInfo,
                 ));
+        setState(() {
+          map.addHelperMarker(helperInfo: helperInfo);
+        });
         break;
 
       case 'privateEmergency':
