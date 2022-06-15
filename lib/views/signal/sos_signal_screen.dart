@@ -7,7 +7,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-
 const int maxLines = 3;
 const int maxLength = 1000;
 
@@ -264,6 +263,7 @@ class _SOSViewState extends State<SOSView> {
                                         situationDetailController.text;
                                     user?.emergency.isPublic = true;
                                     FirestoreEmergency.setEmergencySignal(
+                                        helpStatus: 'notHelp',
                                         uid: user!.uid,
                                         emergencyType:
                                             user!.emergency.emergencyType,
@@ -273,8 +273,11 @@ class _SOSViewState extends State<SOSView> {
                                         situationDetail:
                                             situationDetailController.text,
                                         lat: user!.location.latitude,
-                                        lng: user!.location.longitude, displayName: user!.displayName?? 'Etoet user',
-                                        photoUrl: user!.photoURL ?? 'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977');
+                                        lng: user!.location.longitude,
+                                        displayName:
+                                            user!.displayName ?? 'Etoet user',
+                                        photoUrl: user!.photoURL ??
+                                            'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977');
                                     Firestore.updateUserInfo(user!);
                                     isPublic = value;
                                   });
@@ -521,6 +524,7 @@ class _SOSViewState extends State<SOSView> {
                             user?.emergency.situationDetail =
                                 situationDetailController.text;
                             FirestoreEmergency.setEmergencySignal(
+                                helpStatus: 'notHelp',
                                 uid: user!.uid,
                                 emergencyType: user!.emergency.emergencyType,
                                 isPublic: user!.emergency.isPublic,
@@ -528,8 +532,10 @@ class _SOSViewState extends State<SOSView> {
                                     locationDescriptionController.text,
                                 situationDetail: situationDetailController.text,
                                 lat: user!.location.latitude,
-                                lng: user!.location.longitude, displayName: user!.displayName ?? 'Etoet user',
-                                photoUrl: user!.photoURL ?? 'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977');
+                                lng: user!.location.longitude,
+                                displayName: user!.displayName ?? 'Etoet user',
+                                photoUrl: user!.photoURL ??
+                                    'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977');
                             Firestore.updateUserInfo(user!);
                             showSignalPostedDialog(context, 'private');
                           });
@@ -594,6 +600,7 @@ class _SOSViewState extends State<SOSView> {
                             user?.emergency.situationDetail =
                                 situationDetailController.text;
                             FirestoreEmergency.setEmergencySignal(
+                                helpStatus: 'notHelp',
                                 uid: user!.uid,
                                 emergencyType: user!.emergency.emergencyType,
                                 isPublic: user!.emergency.isPublic,
@@ -601,7 +608,9 @@ class _SOSViewState extends State<SOSView> {
                                     locationDescriptionController.text,
                                 situationDetail: situationDetailController.text,
                                 lat: user!.location.latitude,
-                                lng: user!.location.longitude, photoUrl: user!.photoURL ?? 'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977',
+                                lng: user!.location.longitude,
+                                photoUrl: user!.photoURL ??
+                                    'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977',
                                 displayName: user!.displayName ?? 'Etoet user');
                             Firestore.updateUserInfo(user!);
                             showSignalPostedDialog(context, 'public');

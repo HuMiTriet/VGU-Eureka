@@ -218,11 +218,11 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
     for (var friendInfo in friendInfoList) {
       if (friendId == friendInfo.uid) {
         var friendMarkerCreator = FriendMarker(
-            context: context,
-            friendInfo: friendInfo,
-            polylines: widget._polylines,
-            setState: () => setState(() {}),
-            user: widget.authUser!,
+          context: context,
+          friendInfo: friendInfo,
+          polylines: widget._polylines,
+          setState: () => setState(() {}),
+          user: widget.authUser!,
         );
         var location = widget.authUser?.mapFriendUidLocation[friendInfo.uid];
         var latLng = LatLng(location!.latitude, location.longitude);
@@ -251,17 +251,19 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
       required String emergencyType}) async {
     var emergencyInfo = await Firestore.getUserInfo(emergencyId);
     var emergencyMarkerCreator = EmergencyMarker(
-      context: context,
-      emergencyInfo: emergencyInfo,
-      polylines: widget._polylines,
-      uid: emergencyId,
-      locationDescription: locationDescription,
-      situationDetail: situationDetail,
-      emergencyType: emergencyType,
-      removeMarker: () => widget._markers
-          .removeWhere((element) => element.markerId == MarkerId(emergencyId)),
-      setState: () => setState(() {}),
-    );
+        context: context,
+        emergencyInfo: emergencyInfo,
+        polylines: widget._polylines,
+        uid: emergencyId,
+        locationDescription: locationDescription,
+        situationDetail: situationDetail,
+        emergencyType: emergencyType,
+        removeMarker: () => widget._markers.removeWhere(
+            (element) => element.markerId == MarkerId(emergencyId)),
+        setState: () => setState(() {}),
+        addHelpMarker: (helpMarker) {
+          widget._markers.add(helpMarker);
+        });
     var location = mapEmergencyUidLocation[emergencyId];
     var latLng = LatLng(location!.latitude, location.longitude);
     var emergencyMarker = await emergencyMarkerCreator.createEmergencyMarker(
