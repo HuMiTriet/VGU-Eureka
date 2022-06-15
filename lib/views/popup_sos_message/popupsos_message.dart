@@ -6,9 +6,14 @@ import 'package:uuid/uuid.dart';
 import '../../services/database/firestore/firestore_chat.dart';
 
 class PrivateDialog extends StatelessWidget {
-  /* final RemoteMessage event; */
-  /* PrivateDialog({required this.event, Key? key}) : super(key: key); */
-  PrivateDialog({Key? key}) : super(key: key);
+  final String title;
+  final String body;
+  PrivateDialog({
+    required this.title,
+    required this.body,
+    Key? key,
+  }) : super(key: key);
+  /* PrivateDialog({Key? key}) : super(key: key); */
 
   // set up the buttons
   final Widget sendmessageButton = ElevatedButton(
@@ -24,9 +29,7 @@ class PrivateDialog extends StatelessWidget {
   );
 
   final Widget helpButton = ElevatedButton(
-    onPressed: () {
-
-    },
+    onPressed: () {},
     style: ElevatedButton.styleFrom(
         primary: Colors.red,
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 5),
@@ -57,12 +60,12 @@ class PrivateDialog extends StatelessWidget {
                 'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977'),
             radius: 25,
           ),
-          /* Text(event.notification!.title ?? 'private help'), */
-          const Text('private helphelphelphelphelphelp' ),
+          Text(title),
+          /* const Text('private helphelphelphelphelphelp' ), */
         ],
       ),
-      /* content: Text(event.notification!.body ?? 'null'), */
-      content: const Text('null'),
+      content: Text(body),
+      /* content: const Text('null'), */
       actions: [
         sendmessageButton,
         helpButton,
@@ -71,15 +74,15 @@ class PrivateDialog extends StatelessWidget {
   }
 }
 
-  void toFriendChatView() async {
-    var chatroomUID = const Uuid().v4().toString();
-    await FirestoreChat.createFriendChatroom(
-        user.uid, widget.needHelpUser.uid, chatroomUID);
-    print('create chatroom complete');
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => ChatRoomView(widget.needHelpUser)),
-    );
-  }
-}
+//  void toFriendChatView() async {
+//    var chatroomUID = const Uuid().v4().toString();
+//    await FirestoreChat.createFriendChatroom(
+//        user.uid, widget.needHelpUser.uid, chatroomUID);
+//    print('create chatroom complete');
+//
+//    Navigator.push(
+//      context,
+//      MaterialPageRoute(builder: (context) => ChatRoomView(widget.needHelpUser)),
+//    );
+//  }
+//}

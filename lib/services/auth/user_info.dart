@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class UserInfo {
   final String uid;
 

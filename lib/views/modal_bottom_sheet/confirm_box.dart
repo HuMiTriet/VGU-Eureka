@@ -1,7 +1,8 @@
 import 'package:etoet/services/auth/user_info.dart';
+import 'package:etoet/services/database/firestore/firestore_emergency.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:uuid/uuid.dart';
 
@@ -105,6 +106,8 @@ class _ConfirmboxState extends State<Confirmbox> {
           ),
           onPressed: () {
             widget.onAbortButtonPressed();
+            FirestoreEmergency.abortEmergencySignal(
+                helpeeUID: widget.needHelpUser.uid);
             Navigator.of(context).pop();
           },
         ),
@@ -184,6 +187,8 @@ class _ConfirmboxState extends State<Confirmbox> {
           ),
           onPressed: () {
             widget.onDoneButtonPressed();
+            FirestoreEmergency.doneEmergencySignal(
+                helpeeUID: widget.needHelpUser.uid);
             Navigator.of(context).pop();
           },
         ),
@@ -217,10 +222,12 @@ class _ConfirmboxState extends State<Confirmbox> {
     // NoPhoneNumberDialog
     void showNoPhoneNumberDialog(BuildContext context) {
       var alert = AlertDialog(
-        title: const Text("No Phone Number!!!"),
-        content: const Text("The person you are trying to help does not have a phone number."),
+        title: const Text('No Phone Number!!!'),
+        content: const Text(
+            'The person you are trying to help does not have a phone number.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, 'OK'),
+          TextButton(
+              onPressed: () => Navigator.pop(context, 'OK'),
               child: const Text('OK')),
         ],
       );
@@ -228,11 +235,12 @@ class _ConfirmboxState extends State<Confirmbox> {
       // show the dialog
       showDialog(
         context: context,
-        builder: (BuildContext context) {
+        builder: (context) {
           return alert;
         },
       );
     }
+
     // double width = MediaQuery.of(context).size.width;
     // double height = MediaQuery.of(context).size.height;
     return Container(
@@ -378,6 +386,16 @@ class _ConfirmboxState extends State<Confirmbox> {
                     widget.onHelpButtonPressed();
                     setState(() {
                       widget.confirmedToHelp = true;
+                      FirestoreEmergency.acceptEmergencySignal(
+                        helpStatus: 'helperIsHelping',
+                        helpeeUID: widget.needHelpUser.uid,
+                        uid: user.uid,
+                        email: user.email!,
+                        phoneNumber: user.phoneNumber!,
+                        displayName: user.displayName ?? 'Etoet user',
+                        photoUrl: user.photoURL ??
+                            'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977',
+                      );
                     });
                   },
                   child: Text('Confirm help ${widget.needHelpUser.displayName}',
@@ -479,5 +497,4 @@ class _ConfirmboxState extends State<Confirmbox> {
       MaterialPageRoute(builder: (context) => SOSChatRoomView(widget.needHelpUser)),
     );
   }
-
 }
