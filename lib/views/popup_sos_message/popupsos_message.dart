@@ -1,5 +1,9 @@
+import 'package:etoet/views/friend/chat_room_view.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
+
+import '../../services/database/firestore/firestore_chat.dart';
 
 class PrivateDialog extends StatelessWidget {
   /* final RemoteMessage event; */
@@ -11,6 +15,7 @@ class PrivateDialog extends StatelessWidget {
     onPressed: () {
 
     },
+
     style: ElevatedButton.styleFrom(
         primary: Colors.blue,
         padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 5),
@@ -62,6 +67,19 @@ class PrivateDialog extends StatelessWidget {
         sendmessageButton,
         helpButton,
       ],
+    );
+  }
+}
+
+  void toFriendChatView() async {
+    var chatroomUID = const Uuid().v4().toString();
+    await FirestoreChat.createFriendChatroom(
+        user.uid, widget.needHelpUser.uid, chatroomUID);
+    print('create chatroom complete');
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ChatRoomView(widget.needHelpUser)),
     );
   }
 }

@@ -27,7 +27,7 @@ class FirestoreEmergency extends Firestore {
         'situationDetail': situationDetail,
         'uid': uid,
         'displayName': displayName,
-        'phtoUrl': photoUrl,
+        'photoUrl': photoUrl,
         'position': GeoFlutterFire.getGeoFirePointData(
           latitude: lat,
           longitude: lng,
