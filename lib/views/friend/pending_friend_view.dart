@@ -1,9 +1,9 @@
 import 'package:etoet/services/auth/user_info.dart' as etoet;
-import 'package:etoet/services/database/firestore/firestore_friend.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../services/auth/auth_user.dart';
+import '../../services/database/firestore/firestore_friend.dart';
 
 class PendingFriendView extends StatefulWidget {
   @override

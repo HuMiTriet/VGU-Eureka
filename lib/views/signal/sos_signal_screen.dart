@@ -33,11 +33,21 @@ class _SOSViewState extends State<SOSView> {
   late bool other;
   late AuthUser? user;
 
+  late String photoURL;
+
   bool showLoading = true;
 
   @override
   Widget build(BuildContext context) {
     user = context.watch<AuthUser?>();
+    if(user?.photoURL == null)
+      {
+        photoURL = 'https://firebasestorage.googleapis.com/v0/b/etoet-app.appspot.com/o/default_profile_pic.png?alt=media&token=f8f8f8f8-f8f8f8f8-f8f8f8f8-f8f8f8f8';
+      }
+    else
+      {
+        photoURL = user!.photoURL!;
+      }
 
     locationDescriptionController.text =
         user?.emergency.locationDescription ?? '';
@@ -513,8 +523,6 @@ class _SOSViewState extends State<SOSView> {
                                 locationDescriptionController.text;
                             user?.emergency.situationDetail =
                                 situationDetailController.text;
-                            user?.photoURL = user?.photoURL ??
-                                'https://firebasestorage.googleapis.com/v0/b/etoet-app.appspot.com/o/default_profile_pic.png?alt=media&token=f8f8f8f8-f8f8f8f8-f8f8f8f8-f8f8f8f8';
                             FirestoreEmergency.setEmergencySignal(
                                 helpStatus: 'notHelp',
                                 uid: user!.uid,
@@ -591,8 +599,6 @@ class _SOSViewState extends State<SOSView> {
                                 locationDescriptionController.text;
                             user?.emergency.situationDetail =
                                 situationDetailController.text;
-                            user?.photoURL = user?.photoURL ??
-                                'https://firebasestorage.googleapis.com/v0/b/etoet-app.appspot.com/o/default_profile_pic.png?alt=media&token=f8f8f8f8-f8f8f8f8-f8f8f8f8-f8f8f8f8';
                             FirestoreEmergency.setEmergencySignal(
                                 helpStatus: 'notHelp',
                                 uid: user!.uid,

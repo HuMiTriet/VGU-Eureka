@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:developer' as developer show log;
+
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/user_info.dart' as etoet;
 import 'package:etoet/services/database/firestore/firestore.dart';
@@ -5,9 +8,11 @@ import 'package:etoet/services/database/firestore/firestore_emergency.dart';
 import 'package:etoet/services/database/firestore/firestore_friend.dart';
 import 'package:etoet/services/map/map_factory.dart' as etoet;
 import 'package:etoet/services/notification/notification.dart';
+import 'package:etoet/views/friend/chat_room_view.dart';
 import 'package:etoet/views/friend/friend_view.dart';
-import 'package:etoet/views/signal/sos_signal_screen.dart';
 import 'package:etoet/views/popup_sos_message/popupsos_message.dart';
+import 'package:etoet/views/popup_sos_message/sos_received_bottom_bar.dart';
+import 'package:etoet/views/signal/sos_signal_screen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
@@ -193,16 +198,110 @@ class MainViewState extends State<MainView> {
       } else {
         Firestore.setFcmTokenAndNotificationStatus(
             uid: authUser!.uid, token: token);
-        FirebaseMessaging.onMessage.listen((event) {
-          var dataType = event.data['type'];
-          if (dataType == 'privateEmegency') {
-            showDialog(
-              context: context,
-              builder: (context) => PrivateDialog(),
-            );
-          }
-        });
+        setupInteractedMessage();
       }
     });
+  }
+
+  Future<void> setupInteractedMessage() async {
+    // Get any messages which caused the application to open from
+    // a terminated state.
+    var initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+
+    if (initialMessage != null) {
+      _handleMessage(initialMessage);
+      developer.log('resume message');
+    } else {
+      developer.log('message which opens app is null');
+    }
+
+    // app is in background but open
+    // handle firebase messaging
+    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
+
+    // app is in foreground
+    // handle firebase messaging
+    FirebaseMessaging.onMessage.listen(_handleForeGroundMessage);
+
+    // handle onclick local push notification
+    NotificationHandler.onNotifications.stream.listen(onClickNotification);
+  }
+
+  // foreground notification
+  void onClickNotification(String? payload) {
+    if (payload != null) {
+      var data = json.decode(payload);
+      developer.log('payload in object: $data');
+
+      onClickNotificationRouting(data);
+    }
+  }
+
+  void _handleMessage(RemoteMessage message) {
+    developer.log('message comming while app is in background');
+
+    onClickNotificationRouting(message.data);
+  }
+
+  void _handleForeGroundMessage(RemoteMessage message) {
+    if (message.notification != null) {
+      developer.log('received message: ${message.data}');
+
+      switch (message.data['type']) {
+        case 'publicAccepted':
+          developer.log('show sos received message');
+          showMaterialModalBottomSheet(
+              expand: false,
+              context: context,
+              backgroundColor: Colors.transparent,
+              builder: (context) => const SoSReceivedBottomSheet());
+          break;
+        default:
+          NotificationHandler.display(message);
+
+          break;
+      }
+    } else {
+      developer.log('message is null');
+    }
+  }
+
+  void onClickNotificationRouting(data) async {
+    switch (data['type']) {
+      case 'newFriend':
+        showBarModalBottomSheet(
+          //expand: true,
+          context: context,
+          backgroundColor: Colors.transparent,
+          builder: (context) => const FriendView(),
+        );
+        break;
+      case 'newMessage':
+        // create user from payload data
+        var sender = await Firestore.getUserInfo(data['senderUID']);
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ChatRoomView(sender)),
+        );
+        break;
+      case 'publicAccepted':
+        showMaterialModalBottomSheet(
+            expand: false,
+            context: context,
+            backgroundColor: Colors.transparent,
+            builder: (context) => const SoSReceivedBottomSheet());
+        break;
+
+      case 'privateEmergency':
+        showDialog(
+          context: context,
+          builder: (context) => PrivateDialog(
+          title: data['displayName'] + "'s Private Alert",
+          body: data['locationDescription'],
+        ),
+        );
+        break;
+    }
   }
 }

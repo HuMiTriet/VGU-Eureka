@@ -1,6 +1,7 @@
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/auth_service.dart';
 import 'package:etoet/services/auth/auth_user.dart';
+import 'package:etoet/services/notification/notification.dart';
 import 'package:etoet/views/auth/login_view.dart';
 import 'package:etoet/views/auth/recover_account_view.dart';
 import 'package:etoet/views/auth/register_view.dart';
@@ -17,6 +18,8 @@ import 'package:provider/provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  NotificationHandler.initialize();
+
   runApp(
     MultiProvider(
       providers: [

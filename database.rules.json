@@ -1,8 +1,5 @@
 {
   "rules": {
-    "users" : {
-      ".indexOn": ["geohash"]
-    },
     ".read": true,  
     ".write": true,  
   }

@@ -1,5 +1,9 @@
 import 'package:etoet/constants/routes.dart';
 import 'package:etoet/services/auth/auth_user.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:etoet/views/settingUI_lib/src/custom_section.dart';
 import 'package:etoet/views/settingUI_lib/src/settings_list.dart';
 import 'package:etoet/views/settingUI_lib/src/settings_section.dart';
 import 'package:etoet/views/settingUI_lib/src/settings_tile.dart';
@@ -13,10 +17,10 @@ class SettingsView extends StatefulWidget {
   const SettingsView({Key? key}) : super(key: key);
 
   @override
-  SettingsViewState createState() => SettingsViewState();
+  _SettingsViewState createState() => _SettingsViewState();
 }
 
-class SettingsViewState extends State<SettingsView> {
+class _SettingsViewState extends State<SettingsView> {
   bool notificationsEnabled = true;
   double _receivedRange = 5.0;
   late AuthUser? user;
@@ -117,7 +121,7 @@ class SettingsViewState extends State<SettingsView> {
               title: 'Logout',
               leading: const Icon(Icons.collections_bookmark),
               onTap: () => showAlertDialog(context),
-              ),
+            ),
             SettingsTile.switchTile(
               title: 'Push notifications',
               leading: const Icon(Icons.phonelink_lock),
@@ -134,7 +138,7 @@ class SettingsViewState extends State<SettingsView> {
                 titleWidget: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    const Text('Notification-received range'),
+                    Text('Notification-received range'),
                     Text('${_receivedRange.toStringAsFixed(1)} km'),
                   ],
                 ),
