@@ -27,6 +27,7 @@ class Firestore {
     userHelperRef.set(
       {
         'helpRange': user.helpRange,
+        'notificationsEnabled': user.notificationsEnabled,
         'isHelping': false,
       },
     );
@@ -54,6 +55,7 @@ class Firestore {
     userHelperRef.set(
       {
         'helpRange': authUser.helpRange,
+        'notificationsEnabled': authUser.notificationsEnabled,
       },
     );
 
