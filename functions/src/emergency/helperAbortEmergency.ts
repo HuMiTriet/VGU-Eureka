@@ -17,11 +17,11 @@ export default async (
     const helpeeFcmTokenSnap = await getFcmToken(helpeeUID);
     const helpeeFcmToken: string = helpeeFcmTokenSnap.get("fcm_token");
 
-    const helperUID = String(change.after.data().helperUID);
-    const helperEmail = String(change.after.data().helperEmail);
-    const helperPhoneNumber = String(change.after.data().helperPhoneNumber);
-    const helperDisplayName = String(change.after.data().helperDisplayName);
-    const helperPhotoUrl = String(change.after.data().helperPhotoUrl);
+    const helperUID = String(change.before.data().helperUID);
+    const helperEmail = String(change.before.data().helperEmail);
+    const helperPhoneNumber = String(change.before.data().helperPhoneNumber);
+    const helperDisplayName = String(change.before.data().helperDisplayName);
+    const helperPhotoUrl = String(change.before.data().helperPhotoUrl);
 
     const payload = {
       notification: {
