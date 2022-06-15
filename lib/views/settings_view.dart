@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/auth/auth_user.dart';
+import 'package:etoet/services/database/firestore/firestore.dart';
 
 class SettingsView extends StatefulWidget {
   @override
@@ -17,8 +18,8 @@ class SettingsView extends StatefulWidget {
 }
 
 class SettingsViewState extends State<SettingsView> {
-  bool notificationsEnabled = true;
-  double _receivedRange = 5.0;
+  late bool notificationsEnabled ;
+  late double _receivedRange;
   late AuthUser? user;
   String? photoURL;
 
@@ -26,6 +27,9 @@ class SettingsViewState extends State<SettingsView> {
   Widget build(BuildContext context) {
     user = context.watch<AuthUser?>();
     photoURL = user!.photoURL;
+    notificationsEnabled = user?.notificationsEnabled ?? true; // because of the legacy problem, the previous users may not have this field in Firestore
+    _receivedRange = (user!.helpRange).toDouble();
+
 
     return Scaffold(
       appBar: AppBar(title: const Text('Settings UI')),
@@ -72,7 +76,7 @@ class SettingsViewState extends State<SettingsView> {
 
   Widget buildSettingsList() {
     return SettingsList(
-      contentPadding: const EdgeInsets.only(top: 20),
+      contentPadding: const EdgeInsets.only(top: 10, bottom:  10),
       sections: [
         SettingsSection(
           tiles: [
@@ -93,14 +97,16 @@ class SettingsViewState extends State<SettingsView> {
               ),
             ),
             CustomTile(
-              child: Text(
-                //username,
-                user!.displayName ?? '',
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+              child: Container(
+                margin: const EdgeInsets.only(top: 5, bottom: 5),
+                child: Text(
+                  user!.displayName ?? '',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
               ),
             ),
           ],
@@ -124,8 +130,10 @@ class SettingsViewState extends State<SettingsView> {
               switchValue: notificationsEnabled,
               onToggle: (var value) {
                 setState(() {
-                  notificationsEnabled = value;
+                  //notificationsEnabled = value;
+                  user?.notificationsEnabled = value;
                 });
+                Firestore.updateUserInfo(user!);
               },
               switchActiveColor: Colors.orange,
             ),
@@ -149,8 +157,10 @@ class SettingsViewState extends State<SettingsView> {
                 value: _receivedRange,
                 onChanged: (var value) {
                   setState(() {
-                    _receivedRange = value;
+                    //_receivedRange = value;
+                    user?.helpRange = value.toInt();
                   });
+                  Firestore.updateUserInfo(user!);
                 },
                 label: '$_receivedRange km',
               ),
