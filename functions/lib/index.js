@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.helperDoneEmergency = exports.helperAbortEmergency = exports.acceptPublicEmergency = exports.newMessageNotification = exports.userUpdateProfileNotification = exports.unFriendNotification = exports.notifyNewFriendReceiver = exports.notifyNewFriendSender = exports.sendPublicNotification = exports.sendPrivateNotification = void 0;
+exports.helperDoneEmergency = exports.helperAbortEmergency = exports.acceptPublicEmergency = exports.newMessageNotification = exports.userUpdateProfileNotification = exports.unFriendNotification = exports.notifyNewFriendReceiver = exports.notifyNewFriendSender = exports.sendStraightPublicNotification = exports.sendPublicNotification = exports.sendPrivateNotification = void 0;
 const functions = require("firebase-functions");
 // firebase emulators:start --import ./emulators_data --export-on-exit
 // ./emulators_data
@@ -16,6 +16,13 @@ exports.sendPublicNotification = functions.region("asia-southeast1")
     .onUpdate(async (change, context) => {
     await (await Promise.resolve().then(() => require("./emergency/publicSignal")))
         .default(change, context);
+});
+exports.sendStraightPublicNotification = functions
+    .region("asia-southeast1")
+    .firestore.document("/emergencies/{userUID}")
+    .onCreate(async (snapshot, context) => {
+    await (await Promise.resolve().then(() => require("./emergency/straighPublicSignal")))
+        .default(snapshot, context);
 });
 // Send a notification Annoucing new friend for Sender of that friend reques
 exports.notifyNewFriendSender = functions.region("asia-southeast1")

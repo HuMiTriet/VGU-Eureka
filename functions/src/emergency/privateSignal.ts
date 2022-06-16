@@ -19,7 +19,9 @@ export default async (
   }
   // getting the regerence pointing at the user friend collection
   const userFriendsRef = db.collection("users")
-      .doc(context.params.userId).collection("friends");
+      .doc(context.params.userId).collection("friends")
+      .where("requestConfirmed", "==", true);
+
   // getting all of the user's friends collection (database query require
   // async interaction with the database)
   try {
