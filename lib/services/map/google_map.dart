@@ -324,7 +324,7 @@ class _GoogleMapImplState extends State<GoogleMapImpl> {
           var emergencyId = doc['uid'] as String;
           var locationDescription = doc['locationDescription'] as String;
           var situationDetail = doc['situationDetail'] as String;
-          var emergencyType = 'emergency type on firestore';
+          var emergencyType = doc['emergencyType'];
           mapEmergencyUidLocation[emergencyId] = emergencyLocation;
           updateEmergencyMarker(
             emergencyId: emergencyId,
