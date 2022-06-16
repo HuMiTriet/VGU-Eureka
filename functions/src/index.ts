@@ -63,6 +63,14 @@ export const newMessageNotification = functions.region("asia-southeast1")
           .default(snapshot, context);
     });
 
+export const newSosMessageNotification = functions.region("asia-southeast1")
+    .firestore
+    .document("emergencies-chatrooms/{chatroomId}/messages/{messageId}")
+    .onCreate(async (snapshot, context) => {
+      await (await import("./messaging/newSosMessage"))
+          .default(snapshot, context);
+    });
+
 export const acceptPublicEmergency = functions.region("asia-southeast1")
     .firestore.document("/emergencies/{userUID}")
     .onUpdate(async (change, context) => {

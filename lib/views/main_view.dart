@@ -7,6 +7,7 @@ import 'package:etoet/services/database/firestore/firestore.dart';
 import 'package:etoet/services/database/firestore/firestore_friend.dart';
 import 'package:etoet/services/map/map_factory.dart' as etoet;
 import 'package:etoet/services/notification/notification.dart';
+import 'package:etoet/views/emergency/sos_chat_room_view.dart';
 import 'package:etoet/views/friend/chat_room_view.dart';
 import 'package:etoet/views/friend/friend_view.dart';
 import 'package:etoet/views/popup_sos_message/popupsos_message.dart';
@@ -316,12 +317,20 @@ class MainViewState extends State<MainView> {
       case 'newMessage':
         // create user from payload data
         var sender = await Firestore.getUserInfo(data['senderUID']);
-
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => ChatRoomView(sender)),
         );
         break;
+
+      case 'newSosMessage':
+        var sender = await Firestore.getUserInfo(data['senderUID']);
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => SOSChatRoomView(sender)),
+        );
+      break;
+
       case 'publicAccepted':
         var helperInfo = etoet.UserInfo(
             uid: data['helperUID'],

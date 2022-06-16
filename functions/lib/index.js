@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.helperDoneEmergency = exports.helperAbortEmergency = exports.acceptPublicEmergency = exports.newMessageNotification = exports.userUpdateProfileNotification = exports.unFriendNotification = exports.notifyNewFriendReceiver = exports.notifyNewFriendSender = exports.sendStraightPublicNotification = exports.sendPublicNotification = exports.sendPrivateNotification = void 0;
+exports.helperDoneEmergency = exports.helperAbortEmergency = exports.acceptPublicEmergency = exports.newSosMessageNotification = exports.newMessageNotification = exports.userUpdateProfileNotification = exports.unFriendNotification = exports.notifyNewFriendReceiver = exports.notifyNewFriendSender = exports.sendStraightPublicNotification = exports.sendPublicNotification = exports.sendPrivateNotification = void 0;
 const functions = require("firebase-functions");
 // firebase emulators:start --import ./emulators_data --export-on-exit
 // ./emulators_data
@@ -54,6 +54,13 @@ exports.newMessageNotification = functions.region("asia-southeast1")
     .firestore.document("chatrooms/{chatroomId}/messages/{messageId}")
     .onCreate(async (snapshot, context) => {
     await (await Promise.resolve().then(() => require("./messaging/newMessage")))
+        .default(snapshot, context);
+});
+exports.newSosMessageNotification = functions.region("asia-southeast1")
+    .firestore
+    .document("emergencies-chatrooms/{chatroomId}/messages/{messageId}")
+    .onCreate(async (snapshot, context) => {
+    await (await Promise.resolve().then(() => require("./messaging/newSosMessage")))
         .default(snapshot, context);
 });
 exports.acceptPublicEmergency = functions.region("asia-southeast1")
