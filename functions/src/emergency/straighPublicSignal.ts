@@ -92,14 +92,17 @@ export default async (
     const helperFcmToken: string[] = [];
     for (const oneCandidate of candidatePool) {
       const candidateHelperInfoSnap = await getHelperInfo(oneCandidate.uid);
-      if (candidateHelperInfoSnap.get("isHelping") === false) {
-        if (oneCandidate.distanceInKm <= candidateHelperInfoSnap
-            .get("helpRange")) {
-          const helperFcmTokenSnap = await getFcmToken(oneCandidate.uid);
-          const oneHelperFcmtoken: string = helperFcmTokenSnap.get("fcm_token");
-          helperFcmToken.push(oneHelperFcmtoken);
-        }
+      // if (candidateHelperInfoSnap.get("isHelping") === false) {
+      if (oneCandidate.distanceInKm <= candidateHelperInfoSnap
+          .get("helpRange")) {
+        const helperFcmTokenSnap = await getFcmToken(oneCandidate.uid);
+        const oneHelperFcmtoken: string = helperFcmTokenSnap.get("fcm_token");
+        helperFcmToken.push(oneHelperFcmtoken);
+        console.log("One helper token " + oneHelperFcmtoken);
+        console.log("helper range: " +
+          candidateHelperInfoSnap.get("helpRange"));
       }
+      // }
     }
 
     // now we check if the token list is empty, if not send a no helper
@@ -117,7 +120,7 @@ export default async (
     } else {
       const locationDescription = String(emergencySnap
           .get("locationDescription"));
-      const situtationDetail = String(emergencySnap.get("situtationDetail"));
+      const situtationDetail = String(emergencySnap.get("situationDetail"));
       const displayName = String(emergencySnap.get("displayName"));
       const payload = {
         notification: {
@@ -131,6 +134,7 @@ export default async (
         },
       };
       console.log(payload);
+      console.log(helperFcmToken);
       fcm.sendToDevice(helperFcmToken, payload);
     }
   } else {
