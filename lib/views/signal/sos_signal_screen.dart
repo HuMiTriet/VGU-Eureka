@@ -49,10 +49,7 @@ class _SOSViewState extends State<SOSView> {
               ),
             ),
           )
-        : ((lostAndFound || accident || thief || other) &&
-                locationDescriptionController.text.isNotEmpty &&
-                situationDetailController.text.isNotEmpty &&
-                isPushed)
+        : isPushed
             ? showUserFormView(context)
             : showSOSFormView(context);
   }
@@ -522,33 +519,42 @@ class _SOSViewState extends State<SOSView> {
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: GestureDetector(
                         onTap: () {
-                          setState(() {
-                            FirestoreEmergency.setEmergencySignal(
-                                helpStatus: 'helperVacant',
-                                uid: user!.uid,
-                                emergencyType: lostAndFound
-                                    ? 'lostAndFound'
-                                    : accident
-                                        ? 'accident'
-                                        : thief
-                                            ? 'thief'
-                                            : other
-                                                ? 'other'
-                                                : '',
-                                isPublic: isPublic,
-                                locationDescription:
-                                    locationDescriptionController.text,
-                                situationDetail: situationDetailController.text,
-                                lat: user!.location.latitude,
-                                lng: user!.location.longitude,
-                                displayName: user!.displayName ?? 'Etoet user',
-                                photoUrl: user!.photoURL ??
-                                    'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977');
-                            isPushed = true;
-                            showSignalPostedDialog(context, 'private');
-                          });
-                          devtools.log('PRIVATE SIGNAL SENT FROM: ${user!.uid}',
-                              name: 'EmergencySignal');
+                          if ((lostAndFound || accident || thief || other) &&
+                              locationDescriptionController.text.isNotEmpty &&
+                              situationDetailController.text.isNotEmpty) {
+                            setState(() {
+                              FirestoreEmergency.setEmergencySignal(
+                                  helpStatus: 'helperVacant',
+                                  uid: user!.uid,
+                                  emergencyType: lostAndFound
+                                      ? 'lostAndFound'
+                                      : accident
+                                          ? 'accident'
+                                          : thief
+                                              ? 'thief'
+                                              : other
+                                                  ? 'other'
+                                                  : '',
+                                  isPublic: isPublic,
+                                  locationDescription:
+                                      locationDescriptionController.text,
+                                  situationDetail:
+                                      situationDetailController.text,
+                                  lat: user!.location.latitude,
+                                  lng: user!.location.longitude,
+                                  displayName:
+                                      user!.displayName ?? 'Etoet user',
+                                  photoUrl: user!.photoURL ??
+                                      'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977');
+                              isPushed = true;
+                              showSignalPostedDialog(context, 'private');
+                            });
+                            devtools.log(
+                                'PRIVATE SIGNAL SENT FROM: ${user!.uid}',
+                                name: 'EmergencySignal');
+                          } else {
+                            warningUnfilledFieldsDialog(context);
+                          }
                         },
                         child: Container(
                           alignment: Alignment.center,
@@ -591,34 +597,43 @@ class _SOSViewState extends State<SOSView> {
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: GestureDetector(
                         onTap: () {
-                          setState(() {
-                            isPublic = true;
-                            FirestoreEmergency.setEmergencySignal(
-                                helpStatus: 'helperVacant',
-                                uid: user!.uid,
-                                emergencyType: lostAndFound
-                                    ? 'lostAndFound'
-                                    : accident
-                                        ? 'accident'
-                                        : thief
-                                            ? 'thief'
-                                            : other
-                                                ? 'other'
-                                                : '',
-                                isPublic: isPublic,
-                                locationDescription:
-                                    locationDescriptionController.text,
-                                situationDetail: situationDetailController.text,
-                                lat: user!.location.latitude,
-                                lng: user!.location.longitude,
-                                photoUrl: user!.photoURL ??
-                                    'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977',
-                                displayName: user!.displayName ?? 'Etoet user');
-                            isPushed = true;
-                            showSignalPostedDialog(context, 'public');
-                          });
-                          devtools.log('PUBLIC SIGNAL SENT FROM: ${user!.uid}',
-                              name: 'EmergencySignal');
+                          if ((lostAndFound || accident || thief || other) &&
+                              locationDescriptionController.text.isNotEmpty &&
+                              situationDetailController.text.isNotEmpty) {
+                            setState(() {
+                              isPublic = true;
+                              FirestoreEmergency.setEmergencySignal(
+                                  helpStatus: 'helperVacant',
+                                  uid: user!.uid,
+                                  emergencyType: lostAndFound
+                                      ? 'lostAndFound'
+                                      : accident
+                                          ? 'accident'
+                                          : thief
+                                              ? 'thief'
+                                              : other
+                                                  ? 'other'
+                                                  : '',
+                                  isPublic: isPublic,
+                                  locationDescription:
+                                      locationDescriptionController.text,
+                                  situationDetail:
+                                      situationDetailController.text,
+                                  lat: user!.location.latitude,
+                                  lng: user!.location.longitude,
+                                  photoUrl: user!.photoURL ??
+                                      'https://firebasestorage.googleapis.com/v0/b/etoet-pe2022.appspot.com/o/images%2FDefault.png?alt=media&token=9d2d4b15-cf04-44f1-b46d-ab0f06ab2977',
+                                  displayName:
+                                      user!.displayName ?? 'Etoet user');
+                              isPushed = true;
+                              showSignalPostedDialog(context, 'public');
+                            });
+                            devtools.log(
+                                'PUBLIC SIGNAL SENT FROM: ${user!.uid}',
+                                name: 'EmergencySignal');
+                          } else {
+                            warningUnfilledFieldsDialog(context);
+                          }
                         },
                         child: Container(
                           alignment: Alignment.center,
