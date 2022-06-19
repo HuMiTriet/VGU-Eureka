@@ -1,4 +1,4 @@
-# PE2022_Team 7
+# PE2022 Team 7
 
 ## Members
 + Huỳnh Minh Triết (17447) - (Team leader) - Back end
@@ -18,10 +18,12 @@
 
 [Use case description](./documentation/usecase_diagram.png)
 
-[Authentication](./documentation/Authentication_architecture.md)
+# Motivation
+
+# Inspired by
 
 # Table of content 
-1. [Authentication](./documentation/Authentication_architecture.md)
-2. [Databse](./documentation/backend/Overview.md)
+1. [Authentication](./documentation/Authentication_architecture.md): 
+2. [Databse](./documentation/backend/Overview.md): Explanation on the two database and their usages.
 3. [Cloud messaging](./documentation/cloud_messaging/overview.md)
 4. [geohash](./documentation/geohash.md)
