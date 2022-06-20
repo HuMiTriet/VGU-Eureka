@@ -7,7 +7,7 @@
 
 [Reference]( https://firebase.google.com/docs/auth/flutter/password-auth)
 
-- After doing so, we just need to add the dependency to the pubspec.yaml file to use the firebase_auth library.
+- After doing so, we just need to add the dependency to the [pubspec.yaml]( /pubspec.yaml) file to use the firebase_auth library.
 
 - Our password sign in process for a new user consists of three parts: registration, email validation, sign in with valid account.
 
