@@ -1,13 +1,9 @@
 # Password Sign in Authentication
-- Since Firebase supports Flutter, there are various dependencies (libraries) that help us to make the sign in process go smoothly. For our application, we use firebase_auth version 3.3.14. 
+- Since Firebase supports Flutter, there are various dependencies (libraries) that help us to make the sign in process go smoothly. For our application, we use [firebase_auth 3.3.14](https://pub.dev/packages/firebase_auth). 
 
-[Reference]( https://pub.dev/packages/firebase_auth)
+- In order to use any of the sign in authentication methods provided by Firebase, enabling the method in the [Firebase console](https://firebase.google.com/docs/auth/flutter/password-auth) is the initial step.
 
-- In order to use any of the sign in authentication methods provided by Firebase, enabling the method in the Firebase console is the initial step.
-
-[Reference]( https://firebase.google.com/docs/auth/flutter/password-auth)
-
-- After doing so, we just need to add the dependency to the [pubspec.yaml]( /pubspec.yaml) file to use the firebase_auth library.
+- After doing so, we just need to add the dependency to the [pubspec.yaml](/pubspec.yaml) file to use the firebase_auth library.
 
 - Our password sign in process for a new user consists of three parts: registration, email validation, sign in with valid account.
 
