@@ -28,7 +28,7 @@ signingConfigs {
 
 ## Sign in with Google account
 - After having done all the configuration, you can now use the Google as a sign-in method.
-- The following code will demonstrate the process:
+- The first step is trigger the authentication flow. The scopes are the permission that our application wants to ask the user for allowance.
 ```dart
 // Trigger the authentication flow
     _googleUser = await GoogleSignIn(
@@ -40,7 +40,9 @@ signingConfigs {
         'email',
       ],
     ).signIn();
-
+```
+- When user pass the above steps, it means that the user has passed the Google Sign In section. Now we can obtain the access token and id token from the sign in step.
+```dart
     // Obtain the auth details from the request
     // It contains access token and id token for retrieving credential for the application to use for signing in user to Firebase
     _googleAuth = await _googleUser?.authentication;
@@ -50,7 +52,9 @@ signingConfigs {
       accessToken: _googleAuth?.accessToken,
       idToken: _googleAuth?.idToken,
     );
-
+```
+- With the valid access token and id token, we can obtain the Google credential. We can use it in exchange for the Firebase Credential for login
+```dart
     // Once signed in, return the UserCredential
     // This UserCredential is used to obtain user information to create new user in Firestore
     final user = (await FirebaseAuth.instance.signInWithCredential(credential))
