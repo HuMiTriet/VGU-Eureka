@@ -13,4 +13,4 @@ Widgets are generally defined in 2 main types:
 - Stateless widgets: The widgets acts like constant view, only display the information and cannot be interacted with the user.
 - Stateful widgets: The widgets contains internal states so that it allows the interaction between user and application.
 
-In our app, we only use the statefull widgtets to build all main screens.
+In our app, we mostly use the statefull widgtets to build all main screens.
