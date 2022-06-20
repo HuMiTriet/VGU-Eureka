@@ -29,7 +29,7 @@
     AuthService.firebase().sendEmailVerification();
 ```
 - The user will be prompted to check their email inbox to verify their email address.
-
+![Verification Email](/documentation/verification_email.png)
 ## Sign in
 - After users having their email verified, they can now continue to login to the application using their registered email and password.
 
