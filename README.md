@@ -14,7 +14,7 @@
 ## Project:
 [Project description](Project_Proposal.pdf)
 
-[Database ER diagram](./documentation/Database ER.png)
+[Database ER Diagram](./documentation/Database ER.png)
 
 [Use case description](./documentation/usecase_diagram.png)
 
@@ -24,6 +24,7 @@
 
 # Table of content 
 1. [Authentication](./documentation/Authentication_architecture.md): 
-2. [Databse](./documentation/backend/Overview.md): Explanation on the two database and their usages.
-3. [Cloud messaging](./documentation/cloud_messaging/overview.md)
-4. [geohash](./documentation/geohash.md)
+2. [Database](./documentation/backend.md): Explanation on the two database and their usages.
+3. [Cloud functions](./documentation/cloud_functions.md)
+4. [Cloud messaging](./documentation/cloud_messaging.md) 
+5. [Geohash](./documentation/geohash.md)
