@@ -34,7 +34,7 @@ signingConfigs {
     _googleUser = await GoogleSignIn(
       clientId:
         // client id of the application
-          '344264346912-1qh85k7a5tpslbfk37p0ojs3hfik6t10.apps.googleusercontent.com',
+          clientId,
         // scopes are the permissions that Google ask the user if they allows the application to share it
       scopes: <String>[
         'email',
