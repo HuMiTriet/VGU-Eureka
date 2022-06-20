@@ -11,10 +11,14 @@ The app uses two of firebase's database:
 - Realtime database
 - Firestore database
 
+From now on the word Firebase will be used to refer to both databases, and the 
+word realtime and Firestone will be referred to the realtime and firestore 
+database respectively.
+
 # Differences between Firestore database and realtime database
 
-## Realtime database (sometimes called simply Firebase)
-- The original version of the firebase database
+## Realtime database (sometimes called simply called Firebase)
+- The original version of the Firebase database
 
 ## Firestore
 - The new version and built on top of realtime database 
@@ -47,4 +51,23 @@ used for:
   devices the need for limiting client data processing as much as possible is 
   paramount.
 
+# Database rules
+- Since each client to the firebase database communicate directly with the
+  servers directly without having to go through a middleware such as a servlet,
+  the main way to protect user's data and prevent unauthorized read and write 
+  operations is via security rules.
 
+-  For the realtime datbase uses JSON for the security rule declaration, while
+   Firestore and Cloud Storage uses a unique languge developed by Google to
+   accomodate more complex rule-specific structures
+
+## Realtime database security rules
+
+```js
+      allow read, write: if 
+        request.auth != null;
+}
+```
+Allowing the user to read write only if they have been signed in.
+
+## Firestore database security rules
