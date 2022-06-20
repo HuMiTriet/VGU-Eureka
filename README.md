@@ -28,3 +28,4 @@
 3. [Cloud functions](./documentation/cloud_functions.md)
 4. [Cloud messaging](./documentation/cloud_messaging.md) 
 5. [Geohash](./documentation/geohash.md)
+6. [Flutter](./documentation/Frontend/Flutter.md)
