@@ -30,3 +30,4 @@
 5. [Geohash](./documentation/geohash.md)
 6. [Flutter](./documentation/Frontend/Flutter.md)
 7. [CI/CD](./documentation/CICD/CICD.md)
+8. [Google Map](./documentation/map/google_map.md)
