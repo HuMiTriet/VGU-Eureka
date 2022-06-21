@@ -102,7 +102,7 @@
   to allow for asynchronous programming on JavaScript single threaded workload.
 
 - In the following example demonstrate this:
-```ts
+``` ts
     // Store each of the user's friend promise into an array, for each
     // of the friend we query the database again for their fcm token
     const friendFcmTokenPromises: Promise<DocumentSnapshot>[] = [];
@@ -130,4 +130,6 @@
 - The function Promise.all() await for all the promise and will only be done
   until all the promises inside the array is fulfilled. This allows for 
   multiple FCM token to be queried simultaneously and not done sequentially as
-  normally would. This is used both
+  normally would. This is used both by to send public and private SOS signal, 
+  because in both cases the user can have either a lot of friends or there is 
+  a lot of nearby user to help the public SOS signal.

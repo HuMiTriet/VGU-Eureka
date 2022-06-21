@@ -1,3 +1,8 @@
+# Fcm overview
+
+Each device is uniquely identified with a firebase cloud messaging ID token, 
+each token is used by the Firebase cloud messaging service to send the 
+
 # Capabilities of Firebase Cloud Messaging (FCM)
 
 - Firebase cloud messaging formerly Google Cloud messaging is a cloud platform 
@@ -25,11 +30,9 @@ e.g., A(not send) B(not sent) C(not sent) → send A, B, C
 yet been delivered to the device.
 e.g., A(not send) B(not sent) C(not sent) → send C
 
-=> Enabled by
-Set the appropriate parameter in your message request: collapseKey on Android
-apns-collapse-id on Apple
-Topic on Web
-collapse_key in legacy protocols (all platforms)
+=> Enabled by Set the appropriate parameter in your message request:
+collapseKey on Android apns-collapse-id on Apple Topic on Web collapse_key in
+legacy protocols (all platforms)
 
 *Except for notification messages, all messages are non-collapsible by default.*
 

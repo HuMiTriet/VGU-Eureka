@@ -14,9 +14,9 @@
 ## Project:
 [Project description](Project_Proposal.pdf)
 
-[Database ER Diagram](./documentation/Database ER.png)
+![Database ER Diagram](./documentation/Database ER.png)
 
-[Use case description](./documentation/usecase_diagram.png)
+![Use case description](./documentation/usecase_diagram.png)
 
 # Introduction
 - Etoet is a location tracking application that allows users to make friends
@@ -35,6 +35,14 @@ feature with Zenly - another friend location tracking app. If there is enough
 room for development, this app could become a tool for users seeking assistance 
 with health and security issues. Authorities will be able to locate the person 
 in need of help more quickly and easily.
+
+# Core features:
+
+## Private SOS signal
+
+## Public SOS signal
+
+## Adding Friends and live location tracking
 
 # Table of content 
 1. [Authentication](./documentation/Authentication_architecture.md): 
