@@ -5,19 +5,21 @@
 
 - After doing so, we just need to add the dependency to the [pubspec.yaml](/pubspec.yaml) file to use the firebase_auth library.
 
-- Our password sign in process for a new user consists of three parts: registration, email validation, sign in with valid account.
+- Our password login process for new users consists of three parts: registration, email verification, login with a valid account.
 
 ## Registration
-- In this steps, our application will take email and password as inputs of new user.
+- In this step, our application will take the new user's email and password as input.
 
-- User password must be strong enough to be eligible for a proper password: minimum length is 6, at least 2 uppercase letters, at least 3 characters, at least 1 special character. The user also need to confirm their password.
+- User password must be strong enough to qualify as an appropriate password: minimum length 6, at least 2 uppercase letters, at least 3 characters, at least 1 special character. Users also need to confirm their password.
+
 ![Registration](/documentation/Collections/registration.png)
 
-- Input in an already-used email will invoke the registration function to output to the UI to warn the user that they need to choose another email.
+- Input in an already used email will invoke the registration function that outputs the UI to warn the user that they need to choose another email.
+
 ![Invalid Email](/documentation/Collections/invalid_email.png)
 
 ## Email validation
-- After successfully follow the registration steps, new user will be created and a function will be invoked to send a verification email. Only new user account with their email verified are considered valid account and they can sign in to the app.
+- After successfully performing the registration steps, a new user will be created and a function will be called to send a verification email. Only user accounts that have their email verified are considered valid accounts and they can log in to the app
 
 - The following code will demonstrate the process of sending verification email:
 ```dart
@@ -33,9 +35,9 @@
 - The user will be prompted to check their email inbox to verify their email address.
 ![Verification Email](/documentation/verification_email.png)
 ## Sign in
-- After users having their email verified, they can now continue to login to the application using their registered email and password.
+- Once the user is email verified, they can now continue to log in to the app with their registered email and password.
 
-- The email and password will be passed into a function to invoke the application to either continue or notify the user that they typed in the wrong password.
+- The email and password will be passed into a function that invokes the application to continue or notifies the user that they have entered the wrong password.
 
 - The code below shows how user can login to the application
 ```dart

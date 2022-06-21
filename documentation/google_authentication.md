@@ -1,10 +1,10 @@
 # Google Sign In Authentication
-- Aside from traditional password sign in, our application also let users authenticate with Firebase using their Google Accounts.
+- In addition to traditional password login, our app also allows users to authenticate to Firebase with their Google Account.
 
 - For our project, we use [google_sign_in 5.3.1](https://pub.dev/packages/google_sign_in) for our Google Sign In process.
 
 ## Configuration
-- For Android applications, to use Google Sign in, you need to specify your application's SHA-1 fingerprint inside both your project and the Firebase console. Google Play Services like Google Sign In require you to provide the SHA-1 of your signing certificate so they can create an OAuth2 client and API key for your application.
+- For Android apps, to use Google Sign-in you need to specify your app's SHA-1 fingerprint inside both your project and the Firebase console. Google Play services like Sign in with Google require you to provide the SHA-1 of your signing certificate so they can generate an OAuth2 client and an API key for your app.
 
 ### SHA-1 fingerprint
 - Details of [how to generate SHA-1 key](https://developers.google.com/android/guides/client-auth)
@@ -28,8 +28,8 @@ signingConfigs {
 ![Enable Google Sign In](/documentation/Collections/enable_google_auth.png)
 
 ## Sign in with Google account
-- After having done all the configuration, you can now use the Google as a sign-in method.
-- The first step is trigger the authentication flow. The scopes are the permission that our application wants to ask the user for allowance.
+- After all the configurations are done, you can now use Google as the login method.
+- The first step is to enable the authentication flow. Scopes are the permission our application wants to ask the user for permission.
 ```dart
 // Trigger the authentication flow
     _googleUser = await GoogleSignIn(
@@ -42,7 +42,7 @@ signingConfigs {
       ],
     ).signIn();
 ```
-- When user pass the above steps, it means that the user has passed the Google Sign In section. Now we can obtain the access token and id token from the sign in step.
+- When the user passes the above steps, it means the user has passed the Google Sign-in section. Now we can get access token and id token from login step.
 ```dart
     // Obtain the auth details from the request
     // It contains access token and id token for retrieving credential for the application to use for signing in user to Firebase
@@ -54,7 +54,7 @@ signingConfigs {
       idToken: _googleAuth?.idToken,
     );
 ```
-- With the valid access token and id token, we can obtain the Google credential. We can use it in exchange for the Firebase Credential for login
+- With valid access token and id token we can get Google Credential. We can use it in exchange for Firebase Credential to sign in
 ```dart
     // Once signed in, return the UserCredential
     // This UserCredential is used to obtain user information to create new user in Firestore

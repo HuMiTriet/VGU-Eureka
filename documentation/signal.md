@@ -3,13 +3,14 @@
 - Private Signal is only available for friends, in another words, only friends can see their Private Signal. The disadvantage of this signal is that their friend might not available to help them.
 - Public Signal allows all users within the help range of the requester to receive a notification from the person in need of assistance. The minus point of this signal is that the requester's phone number will be public to all the users within the help range.
 ## Usage
-- User press the SOS button at the center bottom in the main view.
+- User press the SOS button at the center bottom in the main view:
 ![SOS button](/documentation/Collections/SOS_button.png)
 
-- User then fill in the information needed for a `help`
+- User then fill in the information needed for a `help`:
+
 ![SOS help view](/documentation/Collections/SOS_help_view.png)
 
-- The user will then be prompted that they have successfully requested help and the help information will be forwarded to the Firestore.
+- The user will then be prompted that they have successfully requested help and the help information will be forwarded to the Firestore:
 ![SOS user view](/documentation/Collections/SOS_user_view.png)
 
 - Users can also change their request information in this view (problem type, problem description, location description, signal type) and the updated information will be passed to Firestore each time the user edits it. User can cancel their signal by pressing the `MY SITUATION HAS BEEN SOLVED!` button.
@@ -21,7 +22,8 @@
     });
 ```
 ## Limit excessive querying
-- Whenever users trying to check their information in the SOS information view, conventionally we will have to query user's request information in the database to fill in all the field in this view
+- Whenever users trying to check their information in the SOS information view, conventionally we will have to query user's request information in the database to fill in all the field in this view.
+
 ![SOS information view](/documentation/Collections/SOS_info_view.png)
 
 - This causes unnecessary queries and therefore we don't want this to happen to our database (expensive database operating costs)
