@@ -1,7 +1,9 @@
-import * as admin from "firebase-admin";
-
-admin.initializeApp();
-const db = admin.firestore();
+// import * as admin from "firebase-admin";
+import {firestore, messaging} from "firebase-admin";
+import {MessagingDevicesResponse, MessagingOptions, MessagingPayload}
+  from "firebase-admin/lib/messaging/messaging-api";
+// const db = admin.firestore();
+// const fcm = admin.messaging();
 /**
  This file provides all of the common static functions that will be used by the
  many different cloud functions.
@@ -9,23 +11,28 @@ const db = admin.firestore();
 
 /**
  @param {string} uid the unique string that identify a user and is the key
- specifying each user in firestore. returns an empty string if the user has
- turned off notification.
+ specifying each user in firestore.
  @return {Promise<DocumentSnapshot<DocumentData>>} Promise that return the
- document along with the data inside it (the user's fcm token)
+document along with the data inside it (the user's fcm token)
 */
-export async function getFcmToken(uid: string):
-  Promise<[string, boolean]> {
-  const fcmTokenRef = db
+export async function getFcmDocPromise(uid: string):
+  Promise<firestore.DocumentSnapshot<firestore.DocumentData>> {
+  const fcmDocRef = firestore()
       .collection("users")
       .doc(uid)
       .collection("notification")
       .doc("fcm_token");
 
-  const fcmTokenSnap = await fcmTokenRef.get();
+  return fcmDocRef.get();
+}
 
-  const fcmToken = fcmTokenSnap.get("fcm_token");
-  const notificationEnabled = fcmTokenSnap.get("enable_notification");
-
-  return [fcmToken, notificationEnabled];
+/**
+  @param registrationTokenOrTokens: string 
+*/
+export async function FcmSendToDevice(
+    registrationTokenOrTokens: string | string[],
+    payload: MessagingPayload,
+    options?: MessagingOptions | undefined
+): Promise<MessagingDevicesResponse> {
+  return messaging().sendToDevice(registrationTokenOrTokens, payload, options);
 }
