@@ -35,9 +35,9 @@ SettingsList(
       ],
     ),
 ```
-- SettingsList is the most outter wrapper and it actually is a ListView from inside. It contains multiple sections that can be SettingsSections or CustomSections.
-- SettingSection is the block of your settings tiles located in the SettingsList.
-- SettingsTile is the implementation of AbstractSettingsTile. It has a lot of fabric methods and parameters that help us add and custome widget the way we want.
+&mdash; SettingsList is the most outter wrapper and it actually is a ListView from inside. It contains multiple sections that can be SettingsSections or CustomSections.
+&mdash; SettingSection is the block of your settings tiles located in the SettingsList.
+&mdash; SettingsTile is the implementation of AbstractSettingsTile. It has a lot of fabric methods and parameters that help us add and custome widget the way we want.
 
 
 1. Pub.dev, Settings UI, from:https://pub.dev/packages/settings_ui 
