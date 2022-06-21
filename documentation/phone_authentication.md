@@ -44,7 +44,7 @@ await AuthService.firebase().verifyPhoneNumber(
 - An OTP code will be sent to the user's phone number. User will be navigated to Verification View.
 ![Verification view](/documentation/Collections/phone_verification_view.png)
 
-- User will then use the OTP code sent by Firebase to type in the blank field in verification view.
+- User will then use the OTP code sent by Firebase to type in the blank field in verification view.  
 ![OTP](/documentation/Collections/OTP.png)
 
 - Then, the verification ID in the first step with the OTP code from user's phone will be verified:
@@ -52,5 +52,5 @@ await AuthService.firebase().verifyPhoneNumber(
 var phoneCred = PhoneAuthProvider.credential(
     verificationId: verificationId, smsCode: otpCode);
 ``` 
-- The phone credential obtained from the code above will be linked with the user's account. If the user already have a verified phone number, the old phone number will be replaced by the new one.
+- The phone credential obtained from the code above will be linked with the user's account. If the user already have a verified phone number, the old phone number will be replaced by the new one.   
 ![Phone linked with account](/documentation/Collections/phone_linked_account.png)
