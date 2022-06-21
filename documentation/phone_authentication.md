@@ -5,7 +5,7 @@
 
 - Fortunately, Firebase also has phone number verification that can send OTP via SMS. The user can then verify their phone number through this process.
 
-- Flutter also has libraries that can enable Firebase phone authentication. For our application we use[firebase_auth 3.3.14](https://pub.dev/packages/firebase_auth) for phone number verification.
+- Flutter also has libraries that can enable Firebase phone authentication. For our application we use [firebase_auth 3.3.14](https://pub.dev/packages/firebase_auth) for phone number verification.
 ## Configuration
 - First and foremost, enable Phone as a Sign-in method in the [Firebase console](https://console.firebase.google.com/u/0/project/_/authentication/providers).
 ![Enable Phone Firebase](/documentation/Collections/enable_phone_auth.png)
@@ -15,7 +15,7 @@
 ## Usage
 - The below code shows the process of verifying phone number:
 
-1. After the user enters their phone number, trigger the verification process
+- After the user enters their phone number, trigger the verification process
 ```dart
 await AuthService.firebase().verifyPhoneNumber(
     phoneNumber: '+84${_phoneNumber.text}',
