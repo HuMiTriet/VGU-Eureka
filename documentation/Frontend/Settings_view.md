@@ -35,9 +35,36 @@ SettingsList(
       ],
     ),
 ```
-&mdash; SettingsList is the most outter wrapper and it actually is a ListView from inside. It contains multiple sections that can be SettingsSections or CustomSections.
-&mdash; SettingSection is the block of your settings tiles located in the SettingsList.
-&mdash; SettingsTile is the implementation of AbstractSettingsTile. It has a lot of fabric methods and parameters that help us add and custome widget the way we want.
+#### SettingsList is the most outter wrapper and it actually is a ListView from inside. It contains multiple sections that can be SettingsSections or CustomSections.
+#### SettingSection is the block of your settings tiles located in the SettingsList.
+#### SettingsTile is the implementation of AbstractSettingsTile. It has a lot of fabric methods and parameters that help us add and custome widget the way we want.
+
+## Slider
+### How to use
+- Import the material dart package:
+```dart
+import 'package:flutter/material.dart';
+```
+- Usage:
+```dart
+Slider(
+  min: 5,
+  max: 20,
+  divisions: 3,
+  activeColor: Colors.orange,
+  inactiveColor: Colors.grey,
+  value: _receivedRange,
+  onChanged: (var value) {
+    setState(() {
+      user?.helpRange = value.toInt();
+    });
+    Firestore.updateUserInfo(user!);
+  },
+  label: '$_receivedRange km',
+)
+```
+In this project, we use Slider to let the user choose their wanted notificatoin received range.
 
 
-1. Pub.dev, Settings UI, from:https://pub.dev/packages/settings_ui 
+1. Pub.dev, Settings UI, from https://pub.dev/packages/settings_ui 
+2. Flutter.dev, Slider class, from https://api.flutter.dev/flutter/material/Slider-class.html
