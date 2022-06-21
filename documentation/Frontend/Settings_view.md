@@ -63,7 +63,9 @@ Slider(
   label: '$_receivedRange km',
 )
 ```
-In this project, we use Slider to let the user choose their wanted notificatoin received range.
+In this project, we use Slider to let the user choose their wanted notification received range.
+
+
 
 
 1. Pub.dev, Settings UI, from https://pub.dev/packages/settings_ui 
