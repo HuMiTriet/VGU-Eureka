@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:etoet/services/database/firestore/firestore.dart';
 import 'package:etoet/views/profile/Widgets/edit_image_dialog.dart';
 import 'package:etoet/views/profile/change_phone_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -149,15 +150,17 @@ class MapScreenState extends State<ProfilePage>
                           ),
                         ),
                         const ProfileFieldLabel(label: 'Display Name'),
-                        ProfileField(controller: nameController),
+                        ProfileField(controller: nameController, user: user!),
                         const ProfileFieldLabel(label: 'Email'),
                         EditVerifiableFieldsController(
+                          user: user!,
                           controller: emailController,
                           verificationView: ChangeEmailPage(
                               user: user!, title: 'Change Email'),
                         ),
                         const ProfileFieldLabel(label: 'Mobile'),
                         EditVerifiableFieldsController(
+                          user: user!,
                           controller: mobileController,
                           verificationView: ChangePhoneNumberPage(
                               user: user!, title: 'Change Phone'),
@@ -186,11 +189,11 @@ class MapScreenState extends State<ProfilePage>
 /// will push a new screen on top
 class EditVerifiableFieldsController extends StatelessWidget {
   late VerificationView verificationView;
-
+  final AuthUser user;
   final TextEditingController controller;
 
   EditVerifiableFieldsController(
-      {Key? key, required this.controller, required this.verificationView})
+      {Key? key, required this.controller, required this.verificationView, required this.user})
       : super(key: key);
 
   @override
@@ -203,7 +206,7 @@ class EditVerifiableFieldsController extends StatelessWidget {
             padding: EdgeInsets.zero,
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
-          child: ProfileTextField(controller: controller),
+          child: ProfileTextField(controller: controller, isEditable: false, user: user!),
           onPressed: () {
             Navigator.push(
               context,
@@ -239,10 +242,16 @@ class EditVerifiableLinksController extends StatelessWidget {
   }
 }
 
-class ProfileField extends StatelessWidget {
-  const ProfileField({Key? key, required this.controller}) : super(key: key);
+class ProfileField extends StatefulWidget {
+  ProfileField({Key? key, required this.controller, required this.user}) : super(key: key);
+  final AuthUser user;
+  TextEditingController controller;
 
-  final TextEditingController controller;
+  @override
+  _ProfileFieldState createState() => _ProfileFieldState();
+}
+class _ProfileFieldState extends State<ProfileField> {
+  bool isEditable = false;
 
   @override
   Widget build(BuildContext context) {
@@ -254,8 +263,13 @@ class ProfileField extends StatelessWidget {
           padding: EdgeInsets.zero,
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
-        child: ProfileTextField(controller: controller),
-        onPressed: () {},
+        child: ProfileTextField(controller: widget.controller, isEditable: isEditable, user: widget.user),
+        onPressed: () {
+           setState(() {
+            isEditable = true;
+            // widget.controller.selection = TextSelection.fromPosition(TextPosition(offset: widget.controller.text.length));
+           });
+        },
       ),
     );
   }
@@ -276,19 +290,40 @@ class ProfileFieldLabel extends StatelessWidget {
   }
 }
 
-class ProfileTextField extends StatelessWidget {
-  const ProfileTextField({
+class ProfileTextField extends StatefulWidget {
+  ProfileTextField({
     Key? key,
     required this.controller,
+    required this.isEditable,
+    required this.user,
   }) : super(key: key);
 
-  final TextEditingController controller;
+  TextEditingController controller;
+  bool isEditable;
+  final AuthUser user;
 
+  @override
+  _ProfileTextFieldState createState() => _ProfileTextFieldState();
+
+  // @override
+  // void initState() {
+  //   controller.addListener(() {
+  //     final text = controller.text;
+  //     controller.value = controller.value.copyWith(
+  //       text: text,
+  //       selection: TextSelection(baseOffset: text.length, extentOffset: text.length),
+  //       composing: TextRange.empty,
+  //     );
+  //   });
+  // }
+}
+
+class _ProfileTextFieldState extends State<ProfileTextField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       autofocus: false,
-      controller: controller,
+      controller: widget.controller,
       decoration: InputDecoration(
         fillColor: Colors.amber,
         contentPadding: EdgeInsets.fromLTRB(10, 10, 10, 0),
@@ -297,7 +332,12 @@ class ProfileTextField extends StatelessWidget {
             borderRadius: BorderRadius.circular(32.0),
             borderSide: BorderSide(width: 1)),
       ),
-      enabled: false,
+      enabled: widget.isEditable,
+      onChanged: (text) {
+        // widget.controller.selection = TextSelection.fromPosition(TextPosition(offset: widget.controller.text.length));
+        widget.user.displayName = widget.controller.text;
+        Firestore.updateUserInfo(widget.user);
+      },
     );
   }
 }
