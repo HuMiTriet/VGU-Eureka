@@ -25,6 +25,7 @@ signingConfigs {
 ### Enable Google as a Sign In method
 - In the [Firebase console](https://console.firebase.google.com), open the Auth section.
 - On the Sign in method tab, enable the Google sign-in method and click Save.
+![Enable Google Sign In](/documentation/Collections/enable_google_auth.png)
 
 ## Sign in with Google account
 - After having done all the configuration, you can now use the Google as a sign-in method.

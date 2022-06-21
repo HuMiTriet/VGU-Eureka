@@ -11,8 +11,10 @@
 - In this steps, our application will take email and password as inputs of new user.
 
 - User password must be strong enough to be eligible for a proper password: minimum length is 6, at least 2 uppercase letters, at least 3 characters, at least 1 special character. The user also need to confirm their password.
+![Registration](/documentation/Collections/registration.png)
 
-- Input in an already-used email will invoke the registration function to output to the UI to warning the user that they need to choose another email.
+- Input in an already-used email will invoke the registration function to output to the UI to warn the user that they need to choose another email.
+![Invalid Email](/documentation/Collections/invalid_email.png)
 
 ## Email validation
 - After successfully follow the registration steps, new user will be created and a function will be invoked to send a verification email. Only new user account with their email verified are considered valid account and they can sign in to the app.

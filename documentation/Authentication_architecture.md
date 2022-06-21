@@ -7,10 +7,6 @@
 register, reset, password all contact to the authentication via the AuthService
 interface.
 
-## Concrete Authentication Provider
-- For our application it is only firebase, provide either authentication via token
-return the user object as a json class which will then be translated to a user object of class AuthUser. 
-
 - In order to use any of the sign in methods provided by Firebase, you will need to enable them in Firebase console.
 
 [Reference](https://firebase.google.com/docs/auth/android/firebaseui)
@@ -25,3 +21,10 @@ return the user object as a json class which will then be translated to a user o
 
 3. [Facebook Sign In Authentication](./documentation/facebook_authentication.md) 
 
+- In order to use Etoet, users also need to add their phone.
+[Phone number authentication](/documentation/phone_authentication.md)
+
+
+## Concrete Authentication Provider
+- For our application it is only firebase, provide either authentication via token
+return the user object as a json class which will then be translated to a user object of class AuthUser. 

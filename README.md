@@ -38,9 +38,7 @@ in need of help more quickly and easily.
 
 # Core features:
 
-## Private SOS signal
-
-## Public SOS signal
+## [Public and Private Signal](/documentation/signal.md)
 
 ## Adding Friends and live location tracking
 
@@ -53,3 +51,4 @@ in need of help more quickly and easily.
 6. [Flutter](./documentation/Frontend/Flutter.md)
 7. [CI/CD](./documentation/CICD/CICD.md)
 8. [Google Map](./documentation/map/google_map.md)
+
