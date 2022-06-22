@@ -393,7 +393,7 @@ class _GradientTextState extends State<GradientText>
     return Center(
       child: Container(
         child: ShaderMask(
-            child: Text(
+            child: const Text(
               'CREATE ACCOUNT',
               textAlign: TextAlign.center,
               style: TextStyle(
