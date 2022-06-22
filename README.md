@@ -50,6 +50,6 @@ in need of help more quickly and easily.
 5. [Geohash](./documentation/geohash.md)
 6. [Flutter](./documentation/Frontend/Flutter.md)
 7. [CI/CD](./documentation/CICD/CICD.md)
-8. [Google Map](./documentation/map/google_map.md)
+8. [Google Map](/documentation/map/google_map.md)
 9. [Friends_and_Messages](./documentation/friends_and_messages.md)
 10. [Settings view](./documentation/Frontend/Settings_view.md)

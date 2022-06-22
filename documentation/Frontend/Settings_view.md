@@ -63,33 +63,6 @@ Slider(
   label: '$_receivedRange km',
 )
 ```
-In this project, we use Slider to let the user choose their wanted notification received range.
-
-
-## Slider
-### How to use
-- Import the material dart package:
-```dart
-import 'package:flutter/material.dart';
-```
-- Usage:
-```dart
-Slider(
-  min: 5,
-  max: 20,
-  divisions: 3,
-  activeColor: Colors.orange,
-  inactiveColor: Colors.grey,
-  value: _receivedRange,
-  onChanged: (var value) {
-    setState(() {
-      user?.helpRange = value.toInt();
-    });
-    Firestore.updateUserInfo(user!);
-  },
-  label: '$_receivedRange km',
-)
-```
 In this project, we use Slider to let the user choose their wanted notificatoin received range.
 
 
